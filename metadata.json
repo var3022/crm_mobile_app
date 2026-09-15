@@ -1,0 +1,6 @@
+{
+  "name": "CRM Pro Field Sales",
+  "description": "Field sales CRM mobile application built with Flutter and Dart.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
