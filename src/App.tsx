@@ -23,18 +23,415 @@ import {
   ChevronLeft,
   RotateCcw,
   ShieldCheck,
+  Shield,
   ArrowRight,
   ExternalLink,
   Sparkles,
   AlertTriangle,
+  AlertCircle,
   Circle,
-  CheckCheck
+  CheckCheck,
+  ScanFace,
+  MapPin,
+  Camera,
+  Mic,
+  Bell,
+  Database,
+  Calendar,
+  Home,
+  Folder,
+  Route,
+  ListTodo,
+  Plus,
+  Bot,
+  Handshake
 } from 'lucide-react';
 
 export default function App() {
-  const [selectedScreen, setSelectedScreen] = useState<'success' | 'reset' | 'otp' | 'forgot' | 'verification' | 'signup' | 'signin' | 'splash'>('success');
+  const [selectedScreen, setSelectedScreen] = useState<'dashboard' | 'notifications' | 'intro-slide-three' | 'intro-slide-two' | 'app-intro-walkthrough' | 'onboarding-complete' | 'onboarding-offline-setup' | 'onboarding-notifications' | 'onboarding-microphone' | 'onboarding-camera' | 'onboarding-location' | 'onboarding-welcome' | 'biometric' | 'success' | 'reset' | 'otp' | 'forgot' | 'verification' | 'signup' | 'signin' | 'splash'>('dashboard');
   const [activeTab, setActiveTab] = useState<'preview' | 'code' | 'instructions'>('preview');
   const [copied, setCopied] = useState(false);
+
+  // Dashboard & Notification Screen 2 (Notifications) State
+  const [notificationToast, setNotificationToast] = useState<string | null>(null);
+  const [notificationFilter, setNotificationFilter] = useState<'All' | 'Unread' | 'Leads' | 'Visits'>('All');
+  const [notificationNavIndex, setNotificationNavIndex] = useState(0);
+  const [notificationsList, setNotificationsList] = useState([
+    {
+      id: '1',
+      title: 'New lead assigned: Acme Corp',
+      time: '2 hours ago',
+      category: 'leads',
+      isUnread: true,
+      iconType: 'user',
+      iconBg: '#E0F2F1',
+      iconColor: '#0F4C4C',
+      actionText: 'View Lead',
+    },
+    {
+      id: '2',
+      title: 'Visit with TechVista in 30 min',
+      time: '30 min ago',
+      category: 'visits',
+      isUnread: true,
+      iconType: 'calendar',
+      iconBg: '#FEF3C7',
+      iconColor: '#D97706',
+    },
+    {
+      id: '3',
+      title: 'John at Acme opened your proposal',
+      time: '1 hour ago',
+      category: 'leads',
+      isUnread: true,
+      iconType: 'eye',
+      iconBg: '#DBEAFE',
+      iconColor: '#2563EB',
+    },
+    {
+      id: '4',
+      title: 'Follow-up with DataFlow is due today',
+      time: '3 hours ago',
+      category: 'tasks',
+      isUnread: false,
+      iconType: 'alert',
+      iconBg: '#FEF3C7',
+      iconColor: '#D97706',
+    },
+    {
+      id: '5',
+      title: 'Deal moved to Negotiation',
+      time: 'Yesterday',
+      category: 'deals',
+      isUnread: false,
+      iconType: 'handshake',
+      iconBg: '#EDE9FE',
+      iconColor: '#7C3AED',
+    },
+  ]);
+
+  const triggerNotificationToast = (msg: string) => {
+    setNotificationToast(msg);
+    setTimeout(() => {
+      setNotificationToast(null);
+    }, 2600);
+  };
+
+  const handleMarkAllNotificationsRead = () => {
+    setNotificationsList(prev => prev.map(n => ({ ...n, isUnread: false })));
+    triggerNotificationToast('All notifications marked as read');
+  };
+
+  const toggleNotificationItemRead = (id: string) => {
+    setNotificationsList(prev =>
+      prev.map(n => (n.id === id ? { ...n, isUnread: !n.isUnread } : n))
+    );
+  };
+
+  // Dashboard & Notification Screen 1 State
+  const [dashboardToast, setDashboardToast] = useState<string | null>(null);
+  const [dashboardNavIndex, setDashboardNavIndex] = useState(0);
+  const [dashboardScheduleItems, setDashboardScheduleItems] = useState([
+    {
+      id: '1',
+      time: '09:30 AM',
+      status: 'completed',
+      company: 'Acme Corp',
+      contact: 'John Doe (CTO)',
+      location: 'Nariman Point, South Mumbai',
+      isCompleted: true,
+    },
+    {
+      id: '2',
+      time: '11:45 AM',
+      status: 'completed',
+      company: 'TechVista Ltd',
+      contact: 'Priya Sharma (HR)',
+      location: 'Lower Parel, Mumbai',
+      isCompleted: true,
+    },
+    {
+      id: '3',
+      time: '02:30 PM',
+      status: 'upcoming',
+      company: 'DataFlow Systems',
+      contact: 'Karan Malhotra (MD)',
+      location: 'Andheri East, Mumbai',
+      isCompleted: false,
+    },
+  ]);
+
+  const triggerDashboardToast = (msg: string) => {
+    setDashboardToast(msg);
+    setTimeout(() => {
+      setDashboardToast(null);
+    }, 2800);
+  };
+
+  // Onboarding Screen 10: Intro Slide Three State
+  const [introSlideThreeToast, setIntroSlideThreeToast] = useState<string | null>(null);
+
+  const handleGetStartedIntroSlideThree = () => {
+    setIntroSlideThreeToast("Walkthrough completed! Proceeding to Biometric Login...");
+    setTimeout(() => {
+      setIntroSlideThreeToast(null);
+      setSelectedScreen('biometric');
+    }, 600);
+  };
+
+  const handleSkipIntroSlideThree = () => {
+    setIntroSlideThreeToast("Walkthrough skipped. Proceeding to Biometric Login...");
+    setTimeout(() => {
+      setIntroSlideThreeToast(null);
+      setSelectedScreen('biometric');
+    }, 500);
+  };
+
+  // Onboarding Screen 9: Intro Slide Two State
+  const [introSlideTwoToast, setIntroSlideTwoToast] = useState<string | null>(null);
+
+  const handleNextIntroSlideTwo = () => {
+    setIntroSlideTwoToast("Proceeding to next walkthrough slide...");
+    setTimeout(() => {
+      setIntroSlideTwoToast(null);
+      setSelectedScreen('intro-slide-three');
+    }, 600);
+  };
+
+  const handleSkipIntroSlideTwo = () => {
+    setIntroSlideTwoToast("Walkthrough skipped. Proceeding to Biometric Login...");
+    setTimeout(() => {
+      setIntroSlideTwoToast(null);
+      setSelectedScreen('biometric');
+    }, 500);
+  };
+
+  // Onboarding Screen 8: App Intro Walkthrough State
+  const [walkthroughPage, setWalkthroughPage] = useState(0);
+  const [walkthroughToast, setWalkthroughToast] = useState<string | null>(null);
+
+  const walkthroughSlides = [
+    {
+      title: "Plan Your Day",
+      subtitle: "AI-optimized routes, smart scheduling, and morning briefings to maximize your visits.",
+      type: "map",
+    },
+    {
+      title: "Track Your Visits",
+      subtitle: "GPS-verified check-ins, real-time visit tracking, and automated meeting logs kept instantly in sync.",
+      type: "track-visits",
+    },
+    {
+      title: "Win with AI Insights",
+      subtitle: "Smart lead scoring, deal win probability, and personalized day-coaching to close deals faster.",
+      type: "ai-insights",
+    },
+  ];
+
+  const handleNextWalkthrough = () => {
+    if (walkthroughPage < walkthroughSlides.length - 1) {
+      setWalkthroughPage(walkthroughPage + 1);
+    } else {
+      setWalkthroughToast("Intro complete! Proceeding to Biometric Security...");
+      setTimeout(() => {
+        setWalkthroughToast(null);
+        setSelectedScreen('biometric');
+      }, 700);
+    }
+  };
+
+  const handleSkipWalkthrough = () => {
+    setWalkthroughToast("Walkthrough skipped. Proceeding to Biometric Security...");
+    setTimeout(() => {
+      setWalkthroughToast(null);
+      setSelectedScreen('biometric');
+    }, 500);
+  };
+
+  // Onboarding: Complete State
+  const [completeToast, setCompleteToast] = useState<string | null>(null);
+  const handleOnboardingFinish = () => {
+    setCompleteToast("Field kit ready! Starting App Walkthrough...");
+    setTimeout(() => {
+      setCompleteToast(null);
+      setSelectedScreen('app-intro-walkthrough');
+    }, 800);
+  };
+
+  // Onboarding Screen 6: Offline Setup State
+  const [downloadProgress, setDownloadProgress] = useState(60);
+  const [downloadedLeads, setDownloadedLeads] = useState(72);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloadCompleted, setIsDownloadCompleted] = useState(false);
+  const [offlineToast, setOfflineToast] = useState<string | null>(null);
+
+  const handleStartDownload = () => {
+    if (isDownloading || isDownloadCompleted) return;
+    setIsDownloading(true);
+
+    let current = downloadedLeads;
+    const interval = setInterval(() => {
+      current += 4;
+      if (current >= 120) {
+        current = 120;
+        clearInterval(interval);
+        setDownloadedLeads(120);
+        setDownloadProgress(100);
+        setIsDownloading(false);
+        setIsDownloadCompleted(true);
+        setOfflineToast('Offline cache ready! South Mumbai territory synced.');
+        setTimeout(() => {
+          setOfflineToast(null);
+          setSelectedScreen('onboarding-complete');
+        }, 1200);
+      } else {
+        setDownloadedLeads(current);
+        setDownloadProgress(Math.round((current / 120) * 100));
+      }
+    }, 80);
+  };
+
+  const handleSkipOffline = () => {
+    setOfflineToast("Offline sync skipped. Proceeding to Onboarding Complete...");
+    setTimeout(() => {
+      setOfflineToast(null);
+      setSelectedScreen('onboarding-complete');
+    }, 700);
+  };
+
+  // Onboarding Notifications State (Screen 5)
+  const [notificationsStatus, setNotificationsStatus] = useState<'idle' | 'requesting' | 'granted'>('idle');
+  const [notificationsToast, setNotificationsToast] = useState<string | null>(null);
+
+  const handleAllowNotifications = () => {
+    if (notificationsStatus === 'requesting' || notificationsStatus === 'granted') return;
+    setNotificationsStatus('requesting');
+    setTimeout(() => {
+      setNotificationsStatus('granted');
+      setNotificationsToast('Notifications enabled! Push channels calibrated for field sales.');
+      setTimeout(() => {
+        setNotificationsToast(null);
+        setSelectedScreen('onboarding-offline-setup');
+      }, 1200);
+    }, 700);
+  };
+
+  const handleSkipNotifications = () => {
+    setNotificationsToast('Notifications skipped. Proceeding to Offline Setup...');
+    setTimeout(() => {
+      setNotificationsToast(null);
+      setSelectedScreen('onboarding-offline-setup');
+    }, 700);
+  };
+
+  // Onboarding Microphone State (Screen 4)
+  const [microphoneStatus, setMicrophoneStatus] = useState<'idle' | 'requesting' | 'granted'>('idle');
+  const [microphoneToast, setMicrophoneToast] = useState<string | null>(null);
+
+  const handleAllowMicrophone = () => {
+    if (microphoneStatus === 'requesting' || microphoneStatus === 'granted') return;
+    setMicrophoneStatus('requesting');
+    setTimeout(() => {
+      setMicrophoneStatus('granted');
+      setMicrophoneToast('Microphone access granted! Hands-free minutes & AI speech transcription enabled.');
+      setTimeout(() => {
+        setMicrophoneToast(null);
+        setSelectedScreen('onboarding-notifications');
+      }, 900);
+    }, 700);
+  };
+
+  const handleSkipMicrophone = () => {
+    setMicrophoneToast('Microphone access skipped. Proceeding to Notifications setup...');
+    setTimeout(() => {
+      setMicrophoneToast(null);
+      setSelectedScreen('onboarding-notifications');
+    }, 700);
+  };
+
+  // Onboarding Camera State (Screen 3)
+  const [cameraStatus, setCameraStatus] = useState<'idle' | 'requesting' | 'granted'>('idle');
+  const [cameraToast, setCameraToast] = useState<string | null>(null);
+
+  const handleAllowCamera = () => {
+    if (cameraStatus === 'requesting' || cameraStatus === 'granted') return;
+    setCameraStatus('requesting');
+    setTimeout(() => {
+      setCameraStatus('granted');
+      setCameraToast('Camera access granted! OCR ready for visiting cards and site compliance.');
+      setTimeout(() => {
+        setCameraToast(null);
+        setSelectedScreen('onboarding-microphone');
+      }, 900);
+    }, 700);
+  };
+
+  const handleSkipCamera = () => {
+    setCameraToast('Camera access skipped. Proceeding to Microphone setup...');
+    setTimeout(() => {
+      setCameraToast(null);
+      setSelectedScreen('onboarding-microphone');
+    }, 700);
+  };
+
+  // Onboarding Location State (Screen 2)
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'requesting' | 'granted'>('idle');
+  const [locationToast, setLocationToast] = useState<string | null>(null);
+
+  const handleAllowLocation = () => {
+    if (locationStatus === 'requesting' || locationStatus === 'granted') return;
+    setLocationStatus('requesting');
+    setTimeout(() => {
+      setLocationStatus('granted');
+      setLocationToast('Location access granted! GPS calibrated for South Mumbai operations.');
+      setTimeout(() => {
+        setLocationToast(null);
+        setSelectedScreen('onboarding-camera');
+      }, 900);
+    }, 700);
+  };
+
+  const handleSkipLocation = () => {
+    setLocationToast('Location skipped. Proceeding to Camera setup...');
+    setTimeout(() => {
+      setLocationToast(null);
+      setSelectedScreen('onboarding-camera');
+    }, 700);
+  };
+
+  // Onboarding Welcome State
+  const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+  const [onboardingSuccessMessage, setOnboardingSuccessMessage] = useState<string | null>(null);
+
+  const toggleOnboardingStep = (stepId: string) => {
+    setCompletedSteps((prev) =>
+      prev.includes(stepId) ? prev.filter((id) => id !== stepId) : [...prev, stepId]
+    );
+  };
+
+  const handleLetsGo = () => {
+    const allStepIds = ['location', 'camera', 'microphone', 'notifications', 'offline_data'];
+    setCompletedSteps(allStepIds);
+    setOnboardingSuccessMessage("Field kit ready! Proceeding to Location setup...");
+    setTimeout(() => {
+      setOnboardingSuccessMessage(null);
+      setSelectedScreen('onboarding-location');
+    }, 900);
+  };
+
+  // Biometric Login State
+  const [biometricScanning, setBiometricScanning] = useState<boolean>(false);
+  const [biometricSuccess, setBiometricSuccess] = useState<boolean>(false);
+
+  const handleTriggerBiometric = () => {
+    if (biometricScanning) return;
+    setBiometricScanning(true);
+    setBiometricSuccess(false);
+    setTimeout(() => {
+      setBiometricScanning(false);
+      setBiometricSuccess(true);
+    }, 1200);
+  };
 
   // Screen 7: Reset Password ("Set New Password") State
   const [resetNewPassword, setResetNewPassword] = useState<string>('');
@@ -924,6 +1321,5774 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 }`;
+
+  const onboardingWelcomeDartCode = `import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_typography.dart";
+import "../../../core/theme/app_dimensions.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Setup step model for Onboarding Welcome checklist
+class SetupStepItem {
+  final String id;
+  final String title;
+  final IconData icon;
+  final String? description;
+
+  const SetupStepItem({
+    required this.id,
+    required this.title,
+    required this.icon,
+    this.description,
+  });
+}
+
+/// Onboarding Screen 1: Onboarding Welcome Screen
+/// Pixel-accurate implementation matching the CRM Pro Field Sales design system.
+class OnboardingWelcomeScreen extends StatefulWidget {
+  final String userName;
+  final String userInitials;
+  final String companyName;
+  final String assignedTerritory;
+  final List<SetupStepItem> steps;
+  final VoidCallback? onLetsGo;
+
+  const OnboardingWelcomeScreen({
+    super.key,
+    this.userName = "Arjun",
+    this.userInitials = "AM",
+    this.companyName = "Acme Industries",
+    this.assignedTerritory = "South Mumbai",
+    this.steps = const [
+      SetupStepItem(
+        id: "location",
+        title: "Location Access",
+        icon: Icons.location_on_outlined,
+        description: "Enables client geolocation and route tracking",
+      ),
+      SetupStepItem(
+        id: "camera",
+        title: "Camera Access",
+        icon: Icons.camera_alt_outlined,
+        description: "Enables invoice and visual proof scanning",
+      ),
+      SetupStepItem(
+        id: "microphone",
+        title: "Microphone Access",
+        icon: Icons.mic_none_outlined,
+        description: "Enables audio memos and visit notes",
+      ),
+      SetupStepItem(
+        id: "notifications",
+        title: "Notifications",
+        icon: Icons.notifications_none_outlined,
+        description: "Delivers urgent field visit updates and reminders",
+      ),
+      SetupStepItem(
+        id: "offline_data",
+        title: "Offline Data Setup",
+        icon: Icons.dns_outlined,
+        description: "Syncs territory master data for offline work",
+      ),
+    ],
+    this.onLetsGo,
+  });
+
+  @override
+  State<OnboardingWelcomeScreen> createState() => _OnboardingWelcomeScreenState();
+}
+
+class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
+  final Set<String> _completedStepIds = {};
+
+  void _toggleStep(String stepId) {
+    setState(() {
+      if (_completedStepIds.contains(stepId)) {
+        _completedStepIds.remove(stepId);
+      } else {
+        _completedStepIds.add(stepId);
+      }
+    });
+  }
+
+  void _handleLetsGo() {
+    if (widget.onLetsGo != null) {
+      widget.onLetsGo!();
+    } else {
+      Navigator.of(context).pushNamed("/onboarding-step-2");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenHorizontal,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 40),
+
+              // 1. Top Avatar Badge: Centered dark teal squircle with white initials ("AM")
+              Center(
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(22),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.18),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    widget.userInitials,
+                    style: GoogleFonts.inter(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // 2. Greeting Headline: "Hi Arjun!"
+              Text(
+                "Hi \${widget.userName}!",
+                style: GoogleFonts.inter(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.6,
+                  height: 1.2,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // 3. Subtitle / Description
+              Text(
+                "Let's set up your field kit in under a minute to prepare for \${widget.assignedTerritory} territory operations.",
+                style: GoogleFonts.inter(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.45,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 4. Company & Territory Info Card
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3F4F6),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+                  border: Border.all(
+                    color: const Color(0xFFE5E7EB),
+                    width: 1.0,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFFD1FADF),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.business_center_outlined,
+                        size: 20,
+                        color: Color(0xFF0F766E),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.companyName,
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            "Assigned Territory: \${widget.assignedTerritory}",
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // 5. Section Header: "REQUIRED SETUP PROGRESS"
+              Text(
+                "REQUIRED SETUP PROGRESS",
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF6B7280),
+                  letterSpacing: 0.6,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // 6. Checklist Items
+              Expanded(
+                child: ListView.separated(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  itemCount: widget.steps.length,
+                  separatorBuilder: (context, index) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final item = widget.steps[index];
+                    final isCompleted = _completedStepIds.contains(item.id);
+
+                    return InkWell(
+                      onTap: () => _toggleStep(item.id),
+                      borderRadius: BorderRadius.circular(10),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 2.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              item.icon,
+                              size: 22,
+                              color: isCompleted
+                                  ? AppColors.primary
+                                  : AppColors.textSecondary,
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                item.title,
+                                style: GoogleFonts.inter(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              width: 22,
+                              height: 22,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isCompleted
+                                    ? const Color(0xFF10B981)
+                                    : Colors.transparent,
+                                border: Border.all(
+                                  color: isCompleted
+                                      ? const Color(0xFF10B981)
+                                      : const Color(0xFFD1D5DB),
+                                  width: 1.8,
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: isCompleted
+                                  ? const Icon(
+                                      Icons.check,
+                                      size: 14,
+                                      color: Colors.white,
+                                    )
+                                  : null,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // 7. Bottom CTA Button: "Let's Go"
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0, top: 12.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: AppDimensions.buttonHeight,
+                  child: ElevatedButton(
+                    onPressed: _handleLetsGo,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+                      ),
+                    ),
+                    child: Text(
+                      "Let's Go",
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+`;
+
+  const onboardingLocationDartCode = `import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_typography.dart";
+import "../../../core/theme/app_dimensions.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Screen 2 of Onboarding: Location Permission
+/// Follows CRM Pro Flutter/Dart design system and architecture.
+class OnboardingLocationScreen extends StatefulWidget {
+  final VoidCallback? onAllowLocation;
+  final VoidCallback? onSkip;
+
+  const OnboardingLocationScreen({
+    super.key,
+    this.onAllowLocation,
+    this.onSkip,
+  });
+
+  @override
+  State<OnboardingLocationScreen> createState() =>
+      _OnboardingLocationScreenState();
+}
+
+class _OnboardingLocationScreenState extends State<OnboardingLocationScreen> {
+  bool _isRequesting = false;
+  bool _isGranted = false;
+
+  void _handleAllowLocation() async {
+    if (_isRequesting || _isGranted) return;
+
+    setState(() {
+      _isRequesting = true;
+    });
+
+    // Simulate location permission request latency
+    await Future.delayed(const Duration(milliseconds: 700));
+
+    if (mounted) {
+      setState(() {
+        _isRequesting = false;
+        _isGranted = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Location permission granted successfully!"),
+          backgroundColor: AppColors.primary,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      if (widget.onAllowLocation != null) {
+        widget.onAllowLocation!();
+      } else {
+        Navigator.of(context).pushNamed("/onboarding-step-3");
+      }
+    }
+  }
+
+  void _handleSkip() {
+    if (widget.onSkip != null) {
+      widget.onSkip!();
+    } else {
+      Navigator.of(context).pushNamed("/onboarding-step-3");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenHorizontal,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 12),
+
+              // 1. Top Progress Indicator (Step 2 of Onboarding: ~25%)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  height: 4.5,
+                  width: double.infinity,
+                  color: const Color(0xFFE5E7EB),
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: 0.25,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.primary, // #0F4C4C
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 2. Hero Graphic Card: Light mint container with custom route/nodes illustration
+              Container(
+                width: double.infinity,
+                height: 210,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0FDF9), // Soft mint tint
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                alignment: Alignment.center,
+                child: CustomPaint(
+                  size: const Size(140, 140),
+                  painter: _RouteIllustrationPainter(),
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // 3. Title: "Enable Location"
+              Text(
+                "Enable Location",
+                style: GoogleFonts.inter(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.6,
+                  height: 1.15,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // 4. Subtitle / Purpose Explanation
+              Text(
+                "We use GPS to verify your check-ins, optimize your routes, and show nearby leads.",
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.45,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // 5. Value Propositions List (3 key benefits with checkmark icons)
+              Expanded(
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  children: const [
+                    _BenefitItem(
+                      title: "Accurate Check-ins",
+                      description:
+                          "Geofenced visits automatically logs meetings at the client's office.",
+                    ),
+                    SizedBox(height: 20),
+                    _BenefitItem(
+                      title: "Smart Route Optimization",
+                      description:
+                          "Minimize commute fatigue with dynamic sequence plans.",
+                    ),
+                    SizedBox(height: 20),
+                    _BenefitItem(
+                      title: "Nearby Client Alerts",
+                      description:
+                          "Discover unassigned hot prospects within 1 km of your current site.",
+                    ),
+                  ],
+                ),
+              ),
+
+              // 6. Bottom Action Controls
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
+                child: Column(
+                  children: [
+                    // Primary CTA: "Allow Location Access"
+                    SizedBox(
+                      width: double.infinity,
+                      height: AppDimensions.buttonHeight,
+                      child: ElevatedButton(
+                        onPressed: _handleAllowLocation,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusButton,
+                            ),
+                          ),
+                        ),
+                        child: _isRequesting
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                _isGranted
+                                    ? "Location Access Granted"
+                                    : "Allow Location Access",
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Secondary Action: "Skip for now"
+                    TextButton(
+                      onPressed: _handleSkip,
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF6B7280),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 16,
+                        ),
+                      ),
+                      child: Text(
+                        "Skip for now",
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF6B7280),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Helper widget to render each value proposition item with a green checkmark badge
+class _BenefitItem extends StatelessWidget {
+  final String title;
+  final String description;
+
+  const _BenefitItem({
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 22,
+          height: 22,
+          margin: const EdgeInsets.only(top: 2),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Color(0xFFD1FADF),
+          ),
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.check,
+            size: 14,
+            color: Color(0xFF0F766E),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                description,
+                style: GoogleFonts.inter(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Custom painter for the route & nodes illustration matching the reference image
+class _RouteIllustrationPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const tealColor = Color(0xFF0F4C4C);
+
+    final strokePaint = Paint()
+      ..color = tealColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.4
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final nodeFillPaint = Paint()
+      ..color = const Color(0xFFF0FDF9)
+      ..style = PaintingStyle.fill;
+
+    // 1. Draw outer boundary L-bracket frame
+    final framePath = Path();
+    framePath.moveTo(size.width * 0.15, size.height * 0.18);
+    framePath.lineTo(size.width * 0.15, size.height * 0.80);
+    framePath.quadraticBezierTo(
+      size.width * 0.15,
+      size.height * 0.88,
+      size.width * 0.24,
+      size.height * 0.88,
+    );
+    framePath.lineTo(size.width * 0.82, size.height * 0.88);
+    canvas.drawPath(framePath, strokePaint);
+
+    // 2. Define node positions (3 connected route waypoints)
+    final nodeA = Offset(size.width * 0.52, size.height * 0.28);
+    final nodeB = Offset(size.width * 0.68, size.height * 0.48);
+    final nodeC = Offset(size.width * 0.42, size.height * 0.70);
+
+    final leadInEnd = Offset(size.width * 0.80, size.height * 0.22);
+    canvas.drawLine(leadInEnd, nodeA, strokePaint);
+    canvas.drawLine(nodeA, nodeB, strokePaint);
+    canvas.drawLine(nodeB, nodeC, strokePaint);
+
+    const nodeRadius = 8.5;
+    final nodes = [nodeA, nodeB, nodeC];
+
+    for (final node in nodes) {
+      canvas.drawCircle(node, nodeRadius, nodeFillPaint);
+      canvas.drawCircle(node, nodeRadius, strokePaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+`;
+
+  const onboardingCameraDartCode = `import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_dimensions.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Screen 3 of Onboarding: Camera Permission
+/// Follows CRM Pro Flutter/Dart design system and architecture.
+class OnboardingCameraScreen extends StatefulWidget {
+  final VoidCallback? onAllowCamera;
+  final VoidCallback? onSkip;
+
+  const OnboardingCameraScreen({
+    super.key,
+    this.onAllowCamera,
+    this.onSkip,
+  });
+
+  @override
+  State<OnboardingCameraScreen> createState() => _OnboardingCameraScreenState();
+}
+
+class _OnboardingCameraScreenState extends State<OnboardingCameraScreen> {
+  bool _isRequesting = false;
+  bool _isGranted = false;
+
+  void _handleAllowCamera() async {
+    if (_isRequesting || _isGranted) return;
+
+    setState(() {
+      _isRequesting = true;
+    });
+
+    // Simulate camera permission request latency
+    await Future.delayed(const Duration(milliseconds: 700));
+
+    if (mounted) {
+      setState(() {
+        _isRequesting = false;
+        _isGranted = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Camera permission granted successfully!"),
+          backgroundColor: AppColors.primary,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      if (widget.onAllowCamera != null) {
+        widget.onAllowCamera!();
+      } else {
+        Navigator.of(context).pushNamed("/onboarding-step-4");
+      }
+    }
+  }
+
+  void _handleSkip() {
+    if (widget.onSkip != null) {
+      widget.onSkip!();
+    } else {
+      Navigator.of(context).pushNamed("/onboarding-step-4");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenHorizontal,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 12),
+
+              // 1. Top Progress Indicator (Step 3 of Onboarding: ~42%)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  height: 4.5,
+                  width: double.infinity,
+                  color: const Color(0xFFE5E7EB),
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: 0.42,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.primary, // #0F4C4C
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 2. Hero Graphic Card: Light mint container with custom camera line illustration
+              Container(
+                width: double.infinity,
+                height: 210,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0FDF9), // Soft mint tint
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                alignment: Alignment.center,
+                child: CustomPaint(
+                  size: const Size(106, 106),
+                  painter: _CameraIllustrationPainter(),
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // 3. Title: "Enable Camera"
+              Text(
+                "Enable Camera",
+                style: GoogleFonts.inter(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.6,
+                  height: 1.15,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // 4. Subtitle / Purpose Explanation
+              Text(
+                "Capture visiting cards, customer photos, and documents during visits.",
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.45,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // 5. Value Propositions List (3 key benefits with mint checkmark badges)
+              Expanded(
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  children: const [
+                    _BenefitItem(
+                      title: "Business Card OCR",
+                      description:
+                          "Instant lead translation from physical cards directly to the CRM.",
+                    ),
+                    SizedBox(height: 20),
+                    _BenefitItem(
+                      title: "Site Verification",
+                      description:
+                          "Upload physical storefront images as meeting proof for compliance.",
+                    ),
+                    SizedBox(height: 20),
+                    _BenefitItem(
+                      title: "Receipt Scans",
+                      description:
+                          "Instantly log client lunch bills to expenses on the fly.",
+                    ),
+                  ],
+                ),
+              ),
+
+              // 6. Bottom Action Controls
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
+                child: Column(
+                  children: [
+                    // Primary CTA: "Allow Camera Access"
+                    SizedBox(
+                      width: double.infinity,
+                      height: AppDimensions.buttonHeight,
+                      child: ElevatedButton(
+                        onPressed: _handleAllowCamera,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusButton,
+                            ),
+                          ),
+                        ),
+                        child: _isRequesting
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                _isGranted
+                                    ? "Camera Access Granted"
+                                    : "Allow Camera Access",
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Secondary Action: "Skip for now"
+                    TextButton(
+                      onPressed: _handleSkip,
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF6B7280),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 16,
+                        ),
+                      ),
+                      child: Text(
+                        "Skip for now",
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF6B7280),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Helper widget to render each value proposition item with a mint checkmark badge
+class _BenefitItem extends StatelessWidget {
+  final String title;
+  final String description;
+
+  const _BenefitItem({
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 22,
+          height: 22,
+          margin: const EdgeInsets.only(top: 2),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Color(0xFFD1FADF),
+          ),
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.check,
+            size: 14,
+            color: Color(0xFF0F766E),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                description,
+                style: GoogleFonts.inter(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Custom painter for the camera outline illustration matching the reference image
+class _CameraIllustrationPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const tealColor = Color(0xFF0F4C4C);
+
+    final strokePaint = Paint()
+      ..color = tealColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.8
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final scale = size.width / 24.0;
+
+    // Draw clean iconic camera outline with angled slopes and rounded corners
+    final path = Path();
+    path.moveTo(14.5 * scale, 4.0 * scale);
+    path.lineTo(9.5 * scale, 4.0 * scale);
+    path.lineTo(7.0 * scale, 7.0 * scale);
+    path.lineTo(4.0 * scale, 7.0 * scale);
+    path.arcToPoint(
+      Offset(2.0 * scale, 9.0 * scale),
+      radius: Radius.circular(2.0 * scale),
+      clockwise: false,
+    );
+    path.lineTo(2.0 * scale, 18.0 * scale);
+    path.arcToPoint(
+      Offset(4.0 * scale, 20.0 * scale),
+      radius: Radius.circular(2.0 * scale),
+      clockwise: false,
+    );
+    path.lineTo(20.0 * scale, 20.0 * scale);
+    path.arcToPoint(
+      Offset(22.0 * scale, 18.0 * scale),
+      radius: Radius.circular(2.0 * scale),
+      clockwise: false,
+    );
+    path.lineTo(22.0 * scale, 9.0 * scale);
+    path.arcToPoint(
+      Offset(20.0 * scale, 7.0 * scale),
+      radius: Radius.circular(2.0 * scale),
+      clockwise: false,
+    );
+    path.lineTo(17.0 * scale, 7.0 * scale);
+    path.close();
+
+    canvas.drawPath(path, strokePaint);
+
+    // Central circular camera lens
+    canvas.drawCircle(
+      Offset(12.0 * scale, 13.0 * scale),
+      3.4 * scale,
+      strokePaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+`;
+
+  const onboardingMicrophoneDartCode = `import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_dimensions.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Screen 4 of Onboarding: Microphone Permission
+/// Follows CRM Pro Flutter/Dart design system and architecture.
+class OnboardingMicrophoneScreen extends StatefulWidget {
+  final VoidCallback? onAllowMicrophone;
+  final VoidCallback? onSkip;
+
+  const OnboardingMicrophoneScreen({
+    super.key,
+    this.onAllowMicrophone,
+    this.onSkip,
+  });
+
+  @override
+  State<OnboardingMicrophoneScreen> createState() =>
+      _OnboardingMicrophoneScreenState();
+}
+
+class _OnboardingMicrophoneScreenState
+    extends State<OnboardingMicrophoneScreen> {
+  bool _isRequesting = false;
+  bool _isGranted = false;
+
+  void _handleAllowMicrophone() async {
+    if (_isRequesting || _isGranted) return;
+
+    setState(() {
+      _isRequesting = true;
+    });
+
+    // Simulate microphone permission latency
+    await Future.delayed(const Duration(milliseconds: 700));
+
+    if (mounted) {
+      setState(() {
+        _isRequesting = false;
+        _isGranted = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Microphone permission granted successfully!"),
+          backgroundColor: AppColors.primary,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      if (widget.onAllowMicrophone != null) {
+        widget.onAllowMicrophone!();
+      } else {
+        Navigator.of(context).pushNamed("/onboarding-step-5");
+      }
+    }
+  }
+
+  void _handleSkip() {
+    if (widget.onSkip != null) {
+      widget.onSkip!();
+    } else {
+      Navigator.of(context).pushNamed("/onboarding-step-5");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenHorizontal,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 12),
+
+              // 1. Top Progress Bar (Step 4 of Onboarding: ~60%)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  height: 4.5,
+                  width: double.infinity,
+                  color: const Color(0xFFE5E7EB),
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: 0.60,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.primary, // #0F4C4C
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 2. Hero Graphic Card: Soft mint card with continuous audio waveform vector illustration
+              Container(
+                width: double.infinity,
+                height: 210,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0FDF9), // Soft mint tint
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                alignment: Alignment.center,
+                child: CustomPaint(
+                  size: const Size(125, 105),
+                  painter: _WaveformIllustrationPainter(),
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // 3. Title: "Enable Microphone"
+              Text(
+                "Enable Microphone",
+                style: GoogleFonts.inter(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.6,
+                  height: 1.15,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // 4. Subtitle / Purpose Explanation
+              Text(
+                "Record voice notes during or after meetings instead of typing.",
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.45,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // 5. Value Propositions List (3 key benefits with mint checkmark badges)
+              Expanded(
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  children: const [
+                    _BenefitItem(
+                      title: "Hands-free Minutes",
+                      description:
+                          "Dictate logs walking back to your car, converted instantly to text.",
+                    ),
+                    SizedBox(height: 20),
+                    _BenefitItem(
+                      title: "Quick Client Quotes",
+                      description:
+                          "Capture precise verbal requests with secure client agreement notes.",
+                    ),
+                    SizedBox(height: 20),
+                    _BenefitItem(
+                      title: "Smart Summary",
+                      description:
+                          "AI distills 5-minute recordings into actionable tasks.",
+                    ),
+                  ],
+                ),
+              ),
+
+              // 6. Bottom Action Controls
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
+                child: Column(
+                  children: [
+                    // Primary CTA: "Allow Microphone Access"
+                    SizedBox(
+                      width: double.infinity,
+                      height: AppDimensions.buttonHeight,
+                      child: ElevatedButton(
+                        onPressed: _handleAllowMicrophone,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusButton,
+                            ),
+                          ),
+                        ),
+                        child: _isRequesting
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                _isGranted
+                                    ? "Microphone Access Granted"
+                                    : "Allow Microphone Access",
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Secondary Action: "Skip for now"
+                    TextButton(
+                      onPressed: _handleSkip,
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF6B7280),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 16,
+                        ),
+                      ),
+                      child: Text(
+                        "Skip for now",
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF6B7280),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Helper widget to render each value proposition item with a mint checkmark badge
+class _BenefitItem extends StatelessWidget {
+  final String title;
+  final String description;
+
+  const _BenefitItem({
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 22,
+          height: 22,
+          margin: const EdgeInsets.only(top: 2),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Color(0xFFD1FADF),
+          ),
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.check,
+            size: 14,
+            color: Color(0xFF0F766E),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                description,
+                style: GoogleFonts.inter(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Custom painter for the continuous audio sound waveform illustration matching the reference image
+class _WaveformIllustrationPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const tealColor = Color(0xFF0F4C4C);
+
+    final strokePaint = Paint()
+      ..color = tealColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final scaleX = size.width / 100.0;
+    final scaleY = size.height / 100.0;
+
+    final path = Path();
+
+    // Start of the left wave tail
+    path.moveTo(16.0 * scaleX, 52.0 * scaleY);
+
+    // Curve into the first vertical stem
+    path.cubicTo(
+      22.0 * scaleX, 51.0 * scaleY,
+      26.0 * scaleX, 42.0 * scaleY,
+      28.0 * scaleX, 32.0 * scaleY,
+    );
+
+    // Peak 1 top rounded dome with wider breathing room
+    path.arcToPoint(
+      Offset(44.0 * scaleX, 32.0 * scaleY),
+      radius: Radius.circular(8.0 * scaleX),
+      clockwise: true,
+    );
+
+    // Straight down to trough 1
+    path.lineTo(44.0 * scaleX, 78.0 * scaleY);
+
+    // Trough 1 bottom rounded curve (deepest drop) with wider space
+    path.arcToPoint(
+      Offset(60.0 * scaleX, 78.0 * scaleY),
+      radius: Radius.circular(8.0 * scaleX),
+      clockwise: false,
+    );
+
+    // Straight up to peak 2 (highest peak)
+    path.lineTo(60.0 * scaleX, 22.0 * scaleY);
+
+    // Peak 2 top rounded dome with wider space
+    path.arcToPoint(
+      Offset(76.0 * scaleX, 22.0 * scaleY),
+      radius: Radius.circular(8.0 * scaleX),
+      clockwise: true,
+    );
+
+    // Straight down to trough 2
+    path.lineTo(76.0 * scaleX, 62.0 * scaleY);
+
+    // Trough 2 bottom rounded curve with wider space
+    path.arcToPoint(
+      Offset(90.0 * scaleX, 62.0 * scaleY),
+      radius: Radius.circular(7.0 * scaleX),
+      clockwise: false,
+    );
+
+    // Curve out to the right ending tail
+    path.cubicTo(
+      91.0 * scaleX, 55.0 * scaleY,
+      94.0 * scaleX, 48.0 * scaleY,
+      98.0 * scaleX, 44.0 * scaleY,
+    );
+
+    canvas.drawPath(path, strokePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+`;
+
+  const onboardingNotificationsDartCode = `import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_dimensions.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Screen 5 of Onboarding: Notifications Permission
+/// Follows CRM Pro Flutter/Dart design system and architecture.
+class OnboardingNotificationsScreen extends StatefulWidget {
+  final VoidCallback? onAllowNotifications;
+  final VoidCallback? onSkip;
+
+  const OnboardingNotificationsScreen({
+    super.key,
+    this.onAllowNotifications,
+    this.onSkip,
+  });
+
+  @override
+  State<OnboardingNotificationsScreen> createState() =>
+      _OnboardingNotificationsScreenState();
+}
+
+class _OnboardingNotificationsScreenState
+    extends State<OnboardingNotificationsScreen> {
+  bool _isRequesting = false;
+  bool _isGranted = false;
+
+  void _handleAllowNotifications() async {
+    if (_isRequesting || _isGranted) return;
+
+    setState(() {
+      _isRequesting = true;
+    });
+
+    // Simulate notification permission prompt latency
+    await Future.delayed(const Duration(milliseconds: 700));
+
+    if (mounted) {
+      setState(() {
+        _isRequesting = false;
+        _isGranted = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Notifications enabled! Push channels calibrated for field sales."),
+          backgroundColor: AppColors.primary,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      if (widget.onAllowNotifications != null) {
+        widget.onAllowNotifications!();
+      } else {
+        // Complete onboarding flow: navigate to biometric or sign in
+        Navigator.of(context).pushReplacementNamed("/biometric-login");
+      }
+    }
+  }
+
+  void _handleSkip() {
+    if (widget.onSkip != null) {
+      widget.onSkip!();
+    } else {
+      Navigator.of(context).pushReplacementNamed("/biometric-login");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenHorizontal,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 12),
+
+              // 1. Top Progress Bar (Step 5 of Onboarding: ~78%)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  height: 4.5,
+                  width: double.infinity,
+                  color: const Color(0xFFE5E7EB),
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: 0.78,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.primary, // #0F4C4C
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 2. Hero Graphic Card: Soft mint card with notification bell vector illustration
+              Container(
+                width: double.infinity,
+                height: 210,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0FDF9), // Soft mint tint
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                alignment: Alignment.center,
+                child: CustomPaint(
+                  size: const Size(120, 110),
+                  painter: _NotificationBellIllustrationPainter(),
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // 3. Title: "Enable Notifications"
+              Text(
+                "Enable Notifications",
+                style: GoogleFonts.inter(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.6,
+                  height: 1.15,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // 4. Subtitle / Purpose Explanation
+              Text(
+                "Get reminders for visits, follow-ups, and new lead assignments.",
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.45,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // 5. Value Propositions List (3 key benefits with mint checkmark badges)
+              Expanded(
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  children: const [
+                    _BenefitItem(
+                      title: "Real-time Lead Routing",
+                      description:
+                          "Instant alert the moment a manager scopes a hot lead into your zone.",
+                    ),
+                    SizedBox(height: 20),
+                    _BenefitItem(
+                      title: "Next Appointment Alerts",
+                      description:
+                          "Polite reminders 15 mins prior to keep you moving efficiently.",
+                    ),
+                    SizedBox(height: 20),
+                    _BenefitItem(
+                      title: "Daily Summary",
+                      description:
+                          "Morning heads-up summarizing critical actions for the day.",
+                    ),
+                  ],
+                ),
+              ),
+
+              // 6. Bottom Action Controls
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
+                child: Column(
+                  children: [
+                    // Primary CTA: "Allow Notifications"
+                    SizedBox(
+                      width: double.infinity,
+                      height: AppDimensions.buttonHeight,
+                      child: ElevatedButton(
+                        onPressed: _handleAllowNotifications,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusButton,
+                            ),
+                          ),
+                        ),
+                        child: _isRequesting
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                _isGranted
+                                    ? "Notifications Enabled"
+                                    : "Allow Notifications",
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Secondary Action: "Skip for now"
+                    TextButton(
+                      onPressed: _handleSkip,
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF6B7280),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 16,
+                        ),
+                      ),
+                      child: Text(
+                        "Skip for now",
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF6B7280),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Helper widget to render each value proposition item with a mint checkmark badge
+class _BenefitItem extends StatelessWidget {
+  final String title;
+  final String description;
+
+  const _BenefitItem({
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 22,
+          height: 22,
+          margin: const EdgeInsets.only(top: 2),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Color(0xFFD1FADF),
+          ),
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.check,
+            size: 14,
+            color: Color(0xFF0F766E),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                description,
+                style: GoogleFonts.inter(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Custom painter for the minimalist notification bell vector illustration matching the reference image
+class _NotificationBellIllustrationPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const tealColor = Color(0xFF0F4C4C);
+
+    final strokePaint = Paint()
+      ..color = tealColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final scaleX = size.width / 100.0;
+    final scaleY = size.height / 100.0;
+
+    // 1. Bell Body Outline with wide flare and notch for notification pip
+    final bellPath = Path();
+
+    // Start on upper curve just left of the alert circle
+    bellPath.moveTo(47.0 * scaleX, 17.5 * scaleY);
+
+    // Arch over top apex to the left shoulder
+    bellPath.cubicTo(
+      42.0 * scaleX, 17.0 * scaleY,
+      37.5 * scaleX, 21.0 * scaleY,
+      36.0 * scaleX, 28.0 * scaleY,
+    );
+
+    // Down through the left waist
+    bellPath.cubicTo(
+      35.0 * scaleX, 35.0 * scaleY,
+      35.0 * scaleX, 41.0 * scaleY,
+      33.5 * scaleX, 46.0 * scaleY,
+    );
+
+    // Graceful outward flare to bottom-left rim tip
+    bellPath.cubicTo(
+      31.5 * scaleX, 52.0 * scaleY,
+      26.0 * scaleX, 55.0 * scaleY,
+      24.0 * scaleX, 56.5 * scaleY,
+    );
+
+    // Rounded bottom-left corner
+    bellPath.arcToPoint(
+      Offset(27.0 * scaleX, 58.5 * scaleY),
+      radius: Radius.circular(2.5 * scaleX),
+      clockwise: false,
+    );
+
+    // Flat horizontal baseline
+    bellPath.lineTo(71.0 * scaleX, 58.5 * scaleY);
+
+    // Rounded bottom-right corner
+    bellPath.arcToPoint(
+      Offset(74.0 * scaleX, 56.5 * scaleY),
+      radius: Radius.circular(2.5 * scaleX),
+      clockwise: false,
+    );
+
+    // Graceful inward swoop from bottom-right flare tip through right waist
+    bellPath.cubicTo(
+      72.0 * scaleX, 55.0 * scaleY,
+      66.5 * scaleX, 52.0 * scaleY,
+      64.5 * scaleX, 46.0 * scaleY,
+    );
+
+    // Up through the right waist, terminating cleanly below the alert circle
+    bellPath.cubicTo(
+      63.0 * scaleX, 41.0 * scaleY,
+      63.0 * scaleX, 36.0 * scaleY,
+      59.5 * scaleX, 31.0 * scaleY,
+    );
+
+    canvas.drawPath(bellPath, strokePaint);
+
+    // 2. Alert Notification Pip (circle on upper-right shoulder)
+    final alertCenter = Offset(58.0 * scaleX, 20.0 * scaleY);
+    final alertRadius = 7.5 * scaleX;
+    canvas.drawCircle(alertCenter, alertRadius, strokePaint);
+
+    // 3. Centered Bell Clapper (smile arc underneath the rim)
+    final clapperPath = Path();
+    clapperPath.moveTo(44.0 * scaleX, 64.0 * scaleY);
+    clapperPath.quadraticBezierTo(
+      49.0 * scaleX, 68.0 * scaleY,
+      54.0 * scaleX, 64.0 * scaleY,
+    );
+    canvas.drawPath(clapperPath, strokePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+`;
+
+  const onboardingOfflineSetupDartCode = `import "dart:async";
+import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_dimensions.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Screen 6 of Onboarding: Prepare for Offline Data Setup
+/// Follows CRM Pro Flutter/Dart design system and architecture.
+class OnboardingOfflineSetupScreen extends StatefulWidget {
+  final VoidCallback? onDownloadComplete;
+  final VoidCallback? onSkip;
+
+  const OnboardingOfflineSetupScreen({
+    super.key,
+    this.onDownloadComplete,
+    this.onSkip,
+  });
+
+  @override
+  State<OnboardingOfflineSetupScreen> createState() =>
+      _OnboardingOfflineSetupScreenState();
+}
+
+class _OnboardingOfflineSetupScreenState
+    extends State<OnboardingOfflineSetupScreen> {
+  bool _isDownloading = false;
+  bool _isCompleted = false;
+  double _progress = 0.60; // Initial 60% as seen in reference design
+  int _downloadedCount = 72; // 72 of 120 leads
+  final int _totalCount = 120;
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startDownload() {
+    if (_isDownloading || _isCompleted) return;
+
+    setState(() {
+      _isDownloading = true;
+    });
+
+    _timer = Timer.periodic(const Duration(milliseconds: 60), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
+      setState(() {
+        if (_downloadedCount < _totalCount) {
+          _downloadedCount += 2;
+          if (_downloadedCount > _totalCount) {
+            _downloadedCount = _totalCount;
+          }
+          _progress = _downloadedCount / _totalCount;
+        } else {
+          timer.cancel();
+          _isDownloading = false;
+          _isCompleted = true;
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Offline cache ready! South Mumbai territory synced."),
+              backgroundColor: AppColors.primary,
+              duration: Duration(seconds: 2),
+            ),
+          );
+
+          Future.delayed(const Duration(milliseconds: 1200), () {
+            if (mounted) {
+              if (widget.onDownloadComplete != null) {
+                widget.onDownloadComplete!();
+              } else {
+                Navigator.of(context).pushReplacementNamed("/biometric-login");
+              }
+            }
+          });
+        }
+      });
+    });
+  }
+
+  void _handleSkip() {
+    if (widget.onSkip != null) {
+      widget.onSkip!();
+    } else {
+      Navigator.of(context).pushReplacementNamed("/biometric-login");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final percent = (_progress * 100).toInt();
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenHorizontal,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 12),
+
+              // 1. Top Progress Bar (Step 6 of Onboarding: 100% full dark teal line)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  height: 4.5,
+                  width: double.infinity,
+                  color: const Color(0xFFE5E7EB),
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: 1.0, // 100% full
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.primary, // #0F4C4C
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 2. Hero Graphic Card: Soft mint card with cloud download vector illustration
+              Container(
+                width: double.infinity,
+                height: 210,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0FDF9), // Soft mint tint
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                alignment: Alignment.center,
+                child: CustomPaint(
+                  size: const Size(120, 110),
+                  painter: _CloudDownloadIllustrationPainter(),
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // 3. Title: "Prepare for Offline"
+              Text(
+                "Prepare for Offline",
+                style: GoogleFonts.inter(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.6,
+                  height: 1.15,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // 4. Subtitle / Purpose Explanation
+              Text(
+                "Download your leads and customer data so you can work without internet.",
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.45,
+                ),
+              ),
+
+              const SizedBox(height: 22),
+
+              // 5. Territory Payload Information Box
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9FAFB),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFFF3F4F6),
+                    width: 1.0,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "SOUTH MUMBAI SYNC PAYLOAD",
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF6B7280),
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                        Text(
+                          "~45 MB",
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    _PayloadBullet(text: "120 assigned leads"),
+                    const SizedBox(height: 5),
+                    _PayloadBullet(text: "85 customers in territory"),
+                    const SizedBox(height: 5),
+                    _PayloadBullet(text: "7 days offline visit logs"),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 6. Download Progress Indicator Section
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _isCompleted
+                            ? "Download complete"
+                            : _isDownloading
+                                ? "Downloading leads..."
+                                : "Downloading leads...",
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      Text(
+                        "$_downloadedCount / $_totalCount ($percent%)",
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      height: 5.5,
+                      width: double.infinity,
+                      color: const Color(0xFFE5E7EB),
+                      child: FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: _progress,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 60),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const Spacer(),
+
+              // 7. Bottom Action Controls
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      height: AppDimensions.buttonHeight,
+                      child: ElevatedButton(
+                        onPressed: _startDownload,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusButton,
+                            ),
+                          ),
+                        ),
+                        child: _isDownloading
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    "Downloading...",
+                                    style: GoogleFonts.inter(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                      letterSpacing: -0.2,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                _isCompleted
+                                    ? "Sync Completed"
+                                    : "Download Now",
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    TextButton(
+                      onPressed: _handleSkip,
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF6B7280),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 16,
+                        ),
+                      ),
+                      child: Text(
+                        "Skip — I'll sync later",
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF6B7280),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PayloadBullet extends StatelessWidget {
+  final String text;
+  const _PayloadBullet({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: 4.5,
+          height: 4.5,
+          margin: const EdgeInsets.only(right: 8, left: 2),
+          decoration: const BoxDecoration(
+            color: Color(0xFF374151),
+            shape: BoxShape.circle,
+          ),
+        ),
+        Text(
+          text,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF1F2937),
+            height: 1.4,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CloudDownloadIllustrationPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const tealColor = Color(0xFF0F4C4C);
+
+    final strokePaint = Paint()
+      ..color = tealColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final scaleX = size.width / 100.0;
+    final scaleY = size.height / 100.0;
+
+    final cloudPath = Path();
+    cloudPath.moveTo(42.0 * scaleX, 66.0 * scaleY);
+    cloudPath.cubicTo(
+      36.0 * scaleX, 66.0 * scaleY,
+      27.0 * scaleX, 61.0 * scaleY,
+      26.0 * scaleX, 51.0 * scaleY,
+    );
+    cloudPath.cubicTo(
+      25.0 * scaleX, 41.0 * scaleY,
+      33.0 * scaleX, 33.0 * scaleY,
+      43.0 * scaleX, 33.0 * scaleY,
+    );
+    cloudPath.cubicTo(
+      47.0 * scaleX, 22.0 * scaleY,
+      61.0 * scaleX, 22.0 * scaleY,
+      67.0 * scaleX, 32.0 * scaleY,
+    );
+    cloudPath.cubicTo(
+      77.0 * scaleX, 33.0 * scaleY,
+      83.0 * scaleX, 42.0 * scaleY,
+      82.0 * scaleX, 51.0 * scaleY,
+    );
+    cloudPath.cubicTo(
+      81.0 * scaleX, 61.0 * scaleY,
+      72.0 * scaleX, 66.0 * scaleY,
+      58.0 * scaleX, 66.0 * scaleY,
+    );
+    canvas.drawPath(cloudPath, strokePaint);
+
+    final arrowPath = Path();
+    arrowPath.moveTo(50.0 * scaleX, 46.0 * scaleY);
+    arrowPath.lineTo(50.0 * scaleX, 72.0 * scaleY);
+    arrowPath.moveTo(43.0 * scaleX, 64.0 * scaleY);
+    arrowPath.lineTo(50.0 * scaleX, 72.0 * scaleY);
+    arrowPath.lineTo(57.0 * scaleX, 64.0 * scaleY);
+    canvas.drawPath(arrowPath, strokePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+`;
+
+  const introSlideTwoDartCode = `import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Onboarding Screen 9: Intro Slide Two (Track Your Visits)
+/// Authentic reproduction of the CRM Pro Field Sales walkthrough slide two.
+/// Follows the CRM Pro Flutter/Dart master prompt and design system.
+class IntroSlideTwoScreen extends StatelessWidget {
+  final VoidCallback? onNext;
+  final VoidCallback? onSkip;
+
+  const IntroSlideTwoScreen({
+    super.key,
+    this.onNext,
+    this.onSkip,
+  });
+
+  void _handleNext(BuildContext context) {
+    if (onNext != null) {
+      onNext!();
+    } else {
+      Navigator.of(context).pushReplacementNamed("/app-intro-walkthrough");
+    }
+  }
+
+  void _handleSkip(BuildContext context) {
+    if (onSkip != null) {
+      onSkip!();
+    } else {
+      Navigator.of(context).pushReplacementNamed("/biometric-login");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.primary,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // 1. Top Navigation Bar: Skip Button
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenHorizontal,
+                vertical: 12,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: () => _handleSkip(context),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(48, 36),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    "Skip",
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF99F6E4),
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // 2. Main Content Area (Graphic card + Headline + Subtitle)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.screenHorizontal,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 12),
+
+                    // Center Graphic Card (280 x 280)
+                    Center(
+                      child: Container(
+                        width: 280,
+                        height: 280,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF135858),
+                          borderRadius: BorderRadius.circular(32),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.12),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: const CustomPaint(
+                          painter: TrackVisitsGraphicPainter(),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 48),
+
+                    // Headline: "Track Your Visits"
+                    Text(
+                      "Track Your Visits",
+                      style: GoogleFonts.inter(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.6,
+                        height: 1.15,
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Subtitle
+                    Text(
+                      "GPS-verified check-ins, real-time visit tracking, and automated meeting logs kept instantly in sync.",
+                      style: GoogleFonts.inter(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFFD1FAE5).withOpacity(0.85),
+                        height: 1.45,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // 3. Bottom Control Row: Indicator Dots (2nd active) on Left, Next Button on Right
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenHorizontal,
+                vertical: 24,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // 3-dot carousel indicator with second dot active
+                  Row(
+                    children: [
+                      // Dot 1 (inactive)
+                      Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        width: 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.35),
+                        ),
+                      ),
+                      // Dot 2 (active)
+                      Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        width: 7,
+                        height: 7,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                      ),
+                      // Dot 3 (inactive)
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.35),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Circular white Next button (56 x 56)
+                  GestureDetector(
+                    onTap: () => _handleNext(context),
+                    child: Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.18),
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.arrow_forward_rounded,
+                          color: AppColors.primary,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Custom painter for the Track Your Visits graphic
+class TrackVisitsGraphicPainter extends CustomPainter {
+  const TrackVisitsGraphicPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    // 1. Subtle 4x4 coordinate grid lines
+    final gridPaint = Paint()
+      ..color = Colors.white.withOpacity(0.08)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    for (int i = 1; i < 4; i++) {
+      final x = (w / 4) * i;
+      canvas.drawLine(Offset(x, 0), Offset(x, h), gridPaint);
+      final y = (h / 4) * i;
+      canvas.drawLine(Offset(0, y), Offset(w, y), gridPaint);
+    }
+
+    // Key Anchor Points
+    final buildingCenter = Offset(w * 0.28, h * 0.70);
+    final pinCenter = Offset(w * 0.495, h * 0.17);
+    final checkmarkCenter = Offset(w * 0.715, h * 0.70);
+
+    // 2. Dashed Trajectory Lines
+    final dashPaint = Paint()
+      ..color = const Color(0xFF6EE7B7).withOpacity(0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round;
+
+    // Diagonal dashed line: Building -> Pin
+    final pDiagStart = Offset(buildingCenter.dx + 4, buildingCenter.dy - 16);
+    final pDiagEnd = Offset(pinCenter.dx - 1, pinCenter.dy + 23);
+    _drawDashedLine(canvas, pDiagStart, pDiagEnd, dashPaint, dashLength: 6, dashSpace: 5);
+
+    // Horizontal dashed line: Building -> Checkmark
+    final pHorizStart = Offset(buildingCenter.dx + 16, buildingCenter.dy);
+    final pHorizEnd = Offset(checkmarkCenter.dx - 22, checkmarkCenter.dy);
+    _drawDashedLine(canvas, pHorizStart, pHorizEnd, dashPaint, dashLength: 6, dashSpace: 5);
+
+    // 3. Draw Building Icon at bottom left
+    _drawBuildingIcon(canvas, buildingCenter);
+
+    // 4. Draw Location Pin Icon at top center
+    _drawLocationPin(canvas, pinCenter);
+
+    // 5. Draw White Checkmark Badge at bottom right
+    _drawCheckmarkBadge(canvas, checkmarkCenter);
+  }
+
+  void _drawLocationPin(Canvas canvas, Offset center) {
+    final pinPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.4
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final path = Path();
+    final r = 13.5;
+    final topCenter = Offset(center.dx, center.dy);
+    path.addArc(
+      Rect.fromCircle(center: topCenter, radius: r),
+      3.14159 * 0.75,
+      3.14159 * 1.5,
+    );
+    path.quadraticBezierTo(
+      center.dx + r * 0.9,
+      center.dy + r * 1.0,
+      center.dx,
+      center.dy + r * 1.7,
+    );
+    path.quadraticBezierTo(
+      center.dx - r * 0.9,
+      center.dy + r * 1.0,
+      center.dx - r * 0.707,
+      center.dy + r * 0.707,
+    );
+    canvas.drawPath(path, pinPaint);
+
+    final holePaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+    canvas.drawCircle(topCenter, 4.5, holePaint);
+  }
+
+  void _drawBuildingIcon(Canvas canvas, Offset center) {
+    final whiteStroke = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final w = 22.0;
+    final h = 28.0;
+    final rect = RRect.fromRectAndRadius(
+      Rect.fromCenter(center: center, width: w, height: h),
+      const Radius.circular(5.0),
+    );
+    canvas.drawRRect(rect, whiteStroke);
+
+    // Windows (2 columns, 3 rows of dots)
+    final dotPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    final leftX = center.dx - 4.5;
+    final rightX = center.dx + 4.5;
+    final y1 = center.dy - 7.5;
+    final y2 = center.dy - 2.5;
+    final y3 = center.dy + 2.5;
+
+    canvas.drawCircle(Offset(leftX, y1), 1.2, dotPaint);
+    canvas.drawCircle(Offset(rightX, y1), 1.2, dotPaint);
+    canvas.drawCircle(Offset(leftX, y2), 1.2, dotPaint);
+    canvas.drawCircle(Offset(rightX, y2), 1.2, dotPaint);
+    canvas.drawCircle(Offset(leftX, y3), 1.2, dotPaint);
+    canvas.drawCircle(Offset(rightX, y3), 1.2, dotPaint);
+
+    // Entrance door
+    final doorPath = Path();
+    doorPath.moveTo(center.dx - 3.5, center.dy + h / 2);
+    doorPath.lineTo(center.dx - 3.5, center.dy + h / 2 - 5.5);
+    doorPath.arcToPoint(
+      Offset(center.dx + 3.5, center.dy + h / 2 - 5.5),
+      radius: const Radius.circular(3.5),
+    );
+    doorPath.lineTo(center.dx + 3.5, center.dy + h / 2);
+    canvas.drawPath(doorPath, whiteStroke..style = PaintingStyle.stroke);
+  }
+
+  void _drawCheckmarkBadge(Canvas canvas, Offset center) {
+    final badgePaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, 19.0, badgePaint);
+
+    final checkPaint = Paint()
+      ..color = const Color(0xFF0F4C4C)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.8
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final checkPath = Path();
+    checkPath.moveTo(center.dx - 7.5, center.dy);
+    checkPath.lineTo(center.dx - 2.0, center.dy + 5.5);
+    checkPath.lineTo(center.dx + 7.5, center.dy - 4.5);
+    canvas.drawPath(checkPath, checkPaint);
+  }
+
+  void _drawDashedLine(
+    Canvas canvas,
+    Offset start,
+    Offset end,
+    Paint paint, {
+    double dashLength = 6.0,
+    double dashSpace = 4.0,
+  }) {
+    final dx = end.dx - start.dx;
+    final dy = end.dy - start.dy;
+    final totalDistance = (end - start).distance;
+    if (totalDistance == 0) return;
+
+    final normalizedDx = dx / totalDistance;
+    final normalizedDy = dy / totalDistance;
+
+    double currentDistance = 0.0;
+    while (currentDistance < totalDistance) {
+      final segmentLength = (currentDistance + dashLength > totalDistance)
+          ? totalDistance - currentDistance
+          : dashLength;
+
+      final pStart = Offset(
+        start.dx + normalizedDx * currentDistance,
+        start.dy + normalizedDy * currentDistance,
+      );
+      final pEnd = Offset(
+        start.dx + normalizedDx * (currentDistance + segmentLength),
+        start.dy + normalizedDy * (currentDistance + segmentLength),
+      );
+
+      canvas.drawLine(pStart, pEnd, paint);
+      currentDistance += dashLength + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+`;
+
+  const dashboardDartCode = `import "dart:math" as math;
+import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Dashboard & Notification Screen 1: Screen-Dashboard
+/// Authentic implementation for CRM Pro Field Sales mobile app.
+/// Follows the CRM Pro Flutter/Dart master prompt and design system.
+/// Features:
+/// - Hidden scrollbars for smooth, pristine mobile presentation
+/// - Top bar: Initials avatar "AM", "Good morning,...", "• Synced", Notification bell with "3" badge
+/// - AI Daily Brief Card with highlighted action link
+/// - Horizontal scrollable metric cards carousel (scrollbars hidden)
+/// - Circular gauge Monthly Target progress card (68% completed)
+/// - Today's Schedule section with status badges (completed, upcoming)
+/// - Floating Action Button for quick field actions
+/// - 5-Tab Bottom Navigation Bar with active 'Home' indicator
+class DashboardScreen extends StatefulWidget {
+  final VoidCallback? onNotificationTap;
+  final VoidCallback? onViewAllMapTap;
+  final VoidCallback? onFabTap;
+  final ValueChanged<int>? onNavTap;
+  final VoidCallback? onViewBriefTap;
+  final ValueChanged<String>? onScheduleItemTap;
+
+  const DashboardScreen({
+    super.key,
+    this.onNotificationTap,
+    this.onViewAllMapTap,
+    this.onFabTap,
+    this.onNavTap,
+    this.onViewBriefTap,
+    this.onScheduleItemTap,
+  });
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  int _currentNavIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        bottom: false,
+        child: Stack(
+          children: [
+            // Static Top Bar + Main Content Area
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 12),
+
+                // 1. Static Top Bar (pinned, does not scroll): Avatar, Greeting, Synced Chip, Notification Bell
+                _buildTopHeader(),
+
+                const SizedBox(height: 10),
+
+                // Main content area with scrollbars strictly hidden
+                Expanded(
+                  child: ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.only(bottom: 110),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 2. AI Daily Brief Card
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.screenHorizontal,
+                            ),
+                            child: _buildAiDailyBriefCard(),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // 3. Horizontal Metric Cards Carousel (hidden scrollbar)
+                          _buildMetricsCarousel(),
+
+                          const SizedBox(height: 20),
+
+                          // 4. Monthly Target Progress Card
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.screenHorizontal,
+                            ),
+                            child: _buildMonthlyTargetCard(),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // 5. Section Header: "Today's Schedule" + "View All Map"
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.screenHorizontal,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Today's Schedule",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                    letterSpacing: -0.3,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: widget.onViewAllMapTap,
+                                  child: Text(
+                                    "View All Map",
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF0F4C4C),
+                                      letterSpacing: -0.2,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 14),
+
+                          // 6. Schedule List Cards
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.screenHorizontal,
+                            ),
+                            child: Column(
+                              children: [
+                                _buildScheduleCard(
+                                  time: "09:30 AM",
+                                  status: "completed",
+                                  company: "Acme Corp",
+                                  contact: "John Doe (CTO)",
+                                  location: "Nariman Point, South Mumbai",
+                                  isCompleted: true,
+                                ),
+                                const SizedBox(height: 12),
+                                _buildScheduleCard(
+                                  time: "11:45 AM",
+                                  status: "completed",
+                                  company: "TechVista Ltd",
+                                  contact: "Priya Sharma (HR)",
+                                  location: "Lower Parel, Mumbai",
+                                  isCompleted: true,
+                                ),
+                                const SizedBox(height: 12),
+                                _buildScheduleCard(
+                                  time: "02:30 PM",
+                                  status: "upcoming",
+                                  company: "DataFlow Systems",
+                                  contact: "Karan Malhotra (MD)",
+                                  location: "Andheri East, Mumbai",
+                                  isCompleted: false,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Floating Action Button (placed above bottom navigation) - square with curved edges
+            Positioned(
+              right: 20,
+              bottom: 84,
+              child: GestureDetector(
+                onTap: widget.onFabTap,
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F4C4C),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF0F4C4C).withOpacity(0.35),
+                        blurRadius: 14,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Bottom Navigation Bar
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: _buildBottomNavigationBar(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 1. Top Header Row
+  Widget _buildTopHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenHorizontal,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: const BoxDecoration(
+              color: Color(0xFFE0F2F1),
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              "AM",
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF0F4C4C),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Good morning,...",
+                  style: GoogleFonts.inter(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.4,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  "Thursday, Aug 9",
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF6B7280),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color(0xFFD1FAE5),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF10B981),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  "Synced",
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF059669),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          GestureDetector(
+            onTap: widget.onNotificationTap,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.notifications_none_rounded,
+                      color: Color(0xFF1F2937),
+                      size: 22,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: -2,
+                  right: -2,
+                  child: Container(
+                    width: 18,
+                    height: 18,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFEF4444),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "3",
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 2. AI Daily Brief Card
+  Widget _buildAiDailyBriefCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F4C4C),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F4C4C).withOpacity(0.18),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text("🤖", style: TextStyle(fontSize: 16)),
+              const SizedBox(width: 8),
+              Text(
+                "AI DAILY BRIEF",
+                style: GoogleFonts.inter(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF99F6E4),
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            "You have 6 visits planned today. 2 are high-priority. Start with Acme Corp they viewed your proposal yesterday.",
+            style: GoogleFonts.inter(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w400,
+              color: Colors.white.withOpacity(0.92),
+              height: 1.45,
+              letterSpacing: -0.1,
+            ),
+          ),
+          const SizedBox(height: 14),
+          GestureDetector(
+            onTap: widget.onViewBriefTap,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "View Full Brief",
+                  style: GoogleFonts.inter(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    decoration: TextDecoration.underline,
+                    decorationColor: Colors.white,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Text(
+                  "→",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 3. Horizontally Scrollable Metric Cards Carousel with scrollbars hidden
+  Widget _buildMetricsCarousel() {
+    final metrics = [
+      _MetricItem(
+        title: "Today's Visits",
+        value: "2/6",
+        subtitle: "Goal: 6 visits",
+      ),
+      _MetricItem(
+        title: "Check-ins",
+        value: "2",
+        subtitle: "Completed",
+      ),
+      _MetricItem(
+        title: "Distance",
+        value: "18 km",
+        subtitle: "Estimated tra...",
+      ),
+      _MetricItem(
+        title: "Revenue",
+        value: "₹4.2L",
+        subtitle: "Active leads",
+      ),
+    ];
+
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.screenHorizontal,
+        ),
+        child: Row(
+          children: metrics.map((item) {
+            return Container(
+              width: 124,
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFFE5E7EB),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF6B7280),
+                      letterSpacing: -0.1,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    item.value,
+                    style: GoogleFonts.inter(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF0F4C4C),
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    item.subtitle,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF9CA3AF),
+                      letterSpacing: -0.1,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  /// 4. Monthly Target Card with circular progress
+  Widget _buildMonthlyTargetCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFE5E7EB),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 68,
+            height: 68,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CustomPaint(
+                  size: const Size(68, 68),
+                  painter: _CircularProgressPainter(
+                    percentage: 0.68,
+                    trackColor: const Color(0xFFF1F5F9),
+                    progressColor: const Color(0xFF0F4C4C),
+                    strokeWidth: 6.5,
+                  ),
+                ),
+                Text(
+                  "68%",
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF0F4C4C),
+                    letterSpacing: -0.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 18),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "MONTHLY TARGET",
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF6B7280),
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "₹6,80,000 / ₹10,00,000",
+                  style: GoogleFonts.inter(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "22 days remaining",
+                  style: GoogleFonts.inter(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFFD97706),
+                    letterSpacing: -0.1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 5. Individual Schedule Item Card
+  Widget _buildScheduleCard({
+    required String time,
+    required String status,
+    required String company,
+    required String contact,
+    required String location,
+    required bool isCompleted,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        if (widget.onScheduleItemTap != null) {
+          widget.onScheduleItemTap!(company);
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: const Color(0xFFE5E7EB),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.015),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 90,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    time,
+                    style: GoogleFonts.inter(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF0F4C4C),
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: isCompleted
+                              ? const Color(0xFF10B981)
+                              : const Color(0xFF0F4C4C),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        status,
+                        style: GoogleFonts.inter(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF6B7280),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              height: 48,
+              width: 1,
+              color: const Color(0xFFF3F4F6),
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    company,
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    contact,
+                    style: GoogleFonts.inter(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF4B5563),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    location,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF9CA3AF),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 6. Bottom Navigation Bar with pill highlight for active tab
+  Widget _buildBottomNavigationBar() {
+    final navItems = [
+      _BottomNavItemData(
+        label: "Home",
+        icon: Icons.home_rounded,
+        outlinedIcon: Icons.home_outlined,
+      ),
+      _BottomNavItemData(
+        label: "Leads",
+        icon: Icons.folder_rounded,
+        outlinedIcon: Icons.folder_outlined,
+      ),
+      _BottomNavItemData(
+        label: "Visits",
+        icon: Icons.share_location_rounded,
+        outlinedIcon: Icons.share_location_outlined,
+      ),
+      _BottomNavItemData(
+        label: "Tasks",
+        icon: Icons.format_list_bulleted_rounded,
+        outlinedIcon: Icons.format_list_bulleted_outlined,
+      ),
+      _BottomNavItemData(
+        label: "Profile",
+        icon: Icons.manage_accounts_rounded,
+        outlinedIcon: Icons.manage_accounts_outlined,
+      ),
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: const Border(
+          top: BorderSide(color: Color(0xFFE5E7EB), width: 1),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, -3),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.only(top: 8, bottom: 20, left: 8, right: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(navItems.length, (index) {
+          final item = navItems[index];
+          final isActive = _currentNavIndex == index;
+
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _currentNavIndex = index;
+              });
+              if (widget.onNavTap != null) {
+                widget.onNavTap!(index);
+              }
+            },
+            behavior: HitTestBehavior.opaque,
+            child: isActive
+                ? Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE6F4F2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          item.icon,
+                          size: 22,
+                          color: const Color(0xFF0F4C4C),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          item.label,
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF0F4C4C),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          item.outlinedIcon,
+                          size: 22,
+                          color: const Color(0xFF9CA3AF),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          item.label,
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF6B7280),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class _CircularProgressPainter extends CustomPainter {
+  final double percentage;
+  final Color trackColor;
+  final Color progressColor;
+  final double strokeWidth;
+
+  _CircularProgressPainter({
+    required this.percentage,
+    required this.trackColor,
+    required this.progressColor,
+    required this.strokeWidth,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width - strokeWidth) / 2;
+
+    final trackPaint = Paint()
+      ..color = trackColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawCircle(center, radius, trackPaint);
+
+    final progressPaint = Paint()
+      ..color = progressColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    final sweepAngle = 2 * math.pi * percentage;
+    const startAngle = -math.pi / 2;
+
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      sweepAngle,
+      false,
+      progressPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _CircularProgressPainter oldDelegate) {
+    return oldDelegate.percentage != percentage ||
+        oldDelegate.trackColor != trackColor ||
+        oldDelegate.progressColor != progressColor ||
+        oldDelegate.strokeWidth != strokeWidth;
+  }
+}
+
+class _MetricItem {
+  final String title;
+  final String value;
+  final String subtitle;
+
+  _MetricItem({
+    required this.title,
+    required this.value,
+    required this.subtitle,
+  });
+}
+
+class _BottomNavItemData {
+  final String label;
+  final IconData icon;
+  final IconData outlinedIcon;
+
+  _BottomNavItemData({
+    required this.label,
+    required this.icon,
+    required this.outlinedIcon,
+  });
+}
+`;
+
+  const notificationsDartCode = `import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Notification Item Data Model
+class NotificationItem {
+  final String id;
+  final String title;
+  final String time;
+  final String category; // 'leads', 'visits', 'proposals', 'tasks', 'deals'
+  final bool isUnread;
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBgColor;
+  final String? actionText;
+  final VoidCallback? onAction;
+
+  const NotificationItem({
+    required this.id,
+    required this.title,
+    required this.time,
+    required this.category,
+    required this.isUnread,
+    required this.icon,
+    required this.iconColor,
+    required this.iconBgColor,
+    this.actionText,
+    this.onAction,
+  });
+
+  NotificationItem copyWith({bool? isUnread}) {
+    return NotificationItem(
+      id: id,
+      title: title,
+      time: time,
+      category: category,
+      isUnread: isUnread ?? this.isUnread,
+      icon: icon,
+      iconColor: iconColor,
+      iconBgColor: iconBgColor,
+      actionText: actionText,
+      onAction: onAction,
+    );
+  }
+}
+
+/// Dashboard & Notification Screen 2 - Notifications (screen-notification)
+/// Follows CRM Pro Flutter/Dart master prompt and design system:
+/// - Pinned static top header with count badge & "Mark All Read"
+/// - Filter chips: All, Unread 5, Leads, Visits
+/// - Scrollbars strictly hidden (invisible per specification)
+/// - Bottom navigation bar in floating rounded card style
+class NotificationsScreen extends StatefulWidget {
+  final VoidCallback? onHomeTap;
+  final VoidCallback? onLeadsTap;
+  final VoidCallback? onVisitsTap;
+  final VoidCallback? onTasksTap;
+  final VoidCallback? onProfileTap;
+
+  const NotificationsScreen({
+    super.key,
+    this.onHomeTap,
+    this.onLeadsTap,
+    this.onVisitsTap,
+    this.onTasksTap,
+    this.onProfileTap,
+  });
+
+  @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  String _selectedFilter = "All";
+  int _selectedBottomNavIndex = 0;
+
+  late List<NotificationItem> _notifications;
+
+  @override
+  void initState() {
+    super.initState();
+    _notifications = [
+      NotificationItem(
+        id: "1",
+        title: "New lead assigned: Acme Corp",
+        time: "2 hours ago",
+        category: "leads",
+        isUnread: true,
+        icon: Icons.person_outline_rounded,
+        iconColor: const Color(0xFF0F4C4C),
+        iconBgColor: const Color(0xFFE0F2F1),
+        actionText: "View Lead",
+        onAction: () => _handleLeadTap("Acme Corp"),
+      ),
+      NotificationItem(
+        id: "2",
+        title: "Visit with TechVista in 30 min",
+        time: "30 min ago",
+        category: "visits",
+        isUnread: true,
+        icon: Icons.calendar_today_outlined,
+        iconColor: const Color(0xFFD97706),
+        iconBgColor: const Color(0xFFFEF3C7),
+      ),
+      NotificationItem(
+        id: "3",
+        title: "John at Acme opened your proposal",
+        time: "1 hour ago",
+        category: "leads",
+        isUnread: true,
+        icon: Icons.visibility_outlined,
+        iconColor: const Color(0xFF2563EB),
+        iconBgColor: const Color(0xFFDBEAFE),
+      ),
+      NotificationItem(
+        id: "4",
+        title: "Follow-up with DataFlow is due today",
+        time: "3 hours ago",
+        category: "tasks",
+        isUnread: false,
+        icon: Icons.error_outline_rounded,
+        iconColor: const Color(0xFFD97706),
+        iconBgColor: const Color(0xFFFEF3C7),
+      ),
+      NotificationItem(
+        id: "5",
+        title: "Deal moved to Negotiation",
+        time: "Yesterday",
+        category: "deals",
+        isUnread: false,
+        icon: Icons.handshake_outlined,
+        iconColor: const Color(0xFF7C3AED),
+        iconBgColor: const Color(0xFFEDE9FE),
+      ),
+    ];
+  }
+
+  int get _unreadCount => _notifications.where((item) => item.isUnread).length;
+
+  void _markAllAsRead() {
+    setState(() {
+      _notifications = _notifications.map((n) => n.copyWith(isUnread: false)).toList();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "All notifications marked as read",
+          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: const Color(0xFF0F4C4C),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _handleLeadTap(String company) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "Opening lead details for $company",
+          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: const Color(0xFF0F4C4C),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _toggleReadStatus(String id) {
+    setState(() {
+      _notifications = _notifications.map((n) {
+        if (n.id == id) {
+          return n.copyWith(isUnread: !n.isUnread);
+        }
+        return n;
+      }).toList();
+    });
+  }
+
+  List<NotificationItem> get _filteredNotifications {
+    if (_selectedFilter == "Unread") {
+      return _notifications.where((n) => n.isUnread).toList();
+    } else if (_selectedFilter == "Leads") {
+      return _notifications.where((n) => n.category == "leads").toList();
+    } else if (_selectedFilter == "Visits") {
+      return _notifications.where((n) => n.category == "visits").toList();
+    }
+    return _notifications;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final unreadCount = _unreadCount;
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        bottom: false,
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+
+                // 1. Static Top Header (Title with Badge + "Mark All Read")
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Notifications",
+                            style: GoogleFonts.inter(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textPrimary,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          if (unreadCount > 0) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 7.5, vertical: 2),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFEF4444),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                "\$unreadCount",
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: _markAllAsRead,
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                          child: Text(
+                            "Mark All Read",
+                            style: GoogleFonts.inter(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF0F4C4C),
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 2. Filter Chips (All, Unread 5, Leads, Visits) - Invisible Scrollbar
+                SizedBox(
+                  height: 38,
+                  child: ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
+                      children: [
+                        _buildFilterChip("All", isSelected: _selectedFilter == "All"),
+                        const SizedBox(width: 8),
+                        _buildFilterChip(
+                          "Unread",
+                          badgeCount: unreadCount,
+                          isSelected: _selectedFilter == "Unread",
+                        ),
+                        const SizedBox(width: 8),
+                        _buildFilterChip("Leads", isSelected: _selectedFilter == "Leads"),
+                        const SizedBox(width: 8),
+                        _buildFilterChip("Visits", isSelected: _selectedFilter == "Visits"),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 3. Notification List Items - Scrollbars strictly hidden per requirement
+                Expanded(
+                  child: ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                    child: _filteredNotifications.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.notifications_none_outlined,
+                                  size: 48,
+                                  color: Colors.grey[400],
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  "No notifications in this tab",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey[500],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.separated(
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.only(
+                              left: AppSpacing.screenHorizontal,
+                              right: AppSpacing.screenHorizontal,
+                              bottom: 110,
+                            ),
+                            itemCount: _filteredNotifications.length,
+                            separatorBuilder: (context, index) => const Divider(
+                              color: Color(0xFFF3F4F6),
+                              thickness: 1,
+                              height: 24,
+                            ),
+                            itemBuilder: (context, index) {
+                              final item = _filteredNotifications[index];
+                              return _buildNotificationRow(item);
+                            },
+                          ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Floating Bottom Navigation Bar (matches design system & screenshot)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: _buildFloatingBottomBar(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, {int? badgeCount, required bool isSelected}) {
+    final bool isAllSelected = isSelected;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedFilter = label;
+        });
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: badgeCount != null ? 14 : 18,
+          vertical: 7,
+        ),
+        decoration: BoxDecoration(
+          color: isAllSelected
+              ? const Color(0xFFCCFBF1) // light teal/mint background
+              : const Color(0xFFF3F4F6), // neutral background
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 13.5,
+                fontWeight: isAllSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isAllSelected ? const Color(0xFF0F4C4C) : const Color(0xFF4B5563),
+              ),
+            ),
+            if (badgeCount != null && badgeCount > 0) ...[
+              const SizedBox(width: 6),
+              Container(
+                width: 18,
+                height: 18,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFEF4444),
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  "\$badgeCount",
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationRow(NotificationItem item) {
+    return GestureDetector(
+      onTap: () => _toggleReadStatus(item.id),
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Left Unread Dot Indicator (or aligned spacer)
+            SizedBox(
+              width: 14,
+              child: item.isUnread
+                  ? Container(
+                      width: 7,
+                      height: 7,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF0F4C4C), // Teal dot
+                        shape: BoxShape.circle,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+
+            const SizedBox(width: 4),
+
+            // Circular Icon Avatar
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: item.iconBgColor,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                item.icon,
+                color: item.iconColor,
+                size: 22,
+              ),
+            ),
+
+            const SizedBox(width: 14),
+
+            // Content: Title & Subtitle/Timestamp
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    style: GoogleFonts.inter(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    item.time,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF6B7280),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Optional Right Action Button (e.g. "View Lead")
+            if (item.actionText != null) ...[
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: item.onAction,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F4C4C),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF0F4C4C).withOpacity(0.18),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    item.actionText!,
+                    style: GoogleFonts.inter(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFloatingBottomBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(0, Icons.home_outlined, "Home", onTap: widget.onHomeTap),
+          _buildNavItem(1, Icons.folder_outlined, "Leads", onTap: widget.onLeadsTap),
+          _buildNavItem(2, Icons.alt_route_rounded, "Visits", onTap: widget.onVisitsTap),
+          _buildNavItem(3, Icons.format_list_bulleted_rounded, "Tasks", onTap: widget.onTasksTap),
+          _buildNavItem(4, Icons.person_outline_rounded, "Profile", onTap: widget.onProfileTap),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, String label, {VoidCallback? onTap}) {
+    final isSelected = _selectedBottomNavIndex == index;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedBottomNavIndex = index;
+        });
+        if (onTap != null) {
+          onTap();
+        }
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 22,
+              color: isSelected ? const Color(0xFF0F4C4C) : const Color(0xFF6B7280),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? const Color(0xFF0F4C4C) : const Color(0xFF6B7280),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+`;
+
+  const introSlideThreeDartCode = `import "dart:math" as math;
+import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Onboarding Screen 10: Intro Slide Three (Win with AI Insights)
+/// Authentic reproduction of the CRM Pro Field Sales walkthrough slide three.
+/// Follows the CRM Pro Flutter/Dart master prompt and design system.
+class IntroSlideThreeScreen extends StatelessWidget {
+  final VoidCallback? onGetStarted;
+  final VoidCallback? onSkip;
+
+  const IntroSlideThreeScreen({
+    super.key,
+    this.onGetStarted,
+    this.onSkip,
+  });
+
+  void _handleGetStarted(BuildContext context) {
+    if (onGetStarted != null) {
+      onGetStarted!();
+    } else {
+      Navigator.of(context).pushReplacementNamed("/biometric-login");
+    }
+  }
+
+  void _handleSkip(BuildContext context) {
+    if (onSkip != null) {
+      onSkip!();
+    } else {
+      Navigator.of(context).pushReplacementNamed("/biometric-login");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.primary,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // 1. Top Navigation Bar: Skip Button
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenHorizontal,
+                vertical: 12,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: () => _handleSkip(context),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(48, 36),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    "Skip",
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF99F6E4),
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // 2. Main Content Area (Graphic card + Headline + Subtitle)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.screenHorizontal,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 12),
+
+                    // Center Graphic Card (280 x 280)
+                    Center(
+                      child: Container(
+                        width: 280,
+                        height: 280,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF135858),
+                          borderRadius: BorderRadius.circular(32),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.12),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: const CustomPaint(
+                          painter: AiInsightsGraphicPainter(),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 48),
+
+                    // Headline: "Win with AI Insights"
+                    Text(
+                      "Win with AI Insights",
+                      style: GoogleFonts.inter(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.6,
+                        height: 1.15,
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Subtitle
+                    Text(
+                      "Smart lead scoring, deal win probability, and personalized day-coaching to close deals faster.",
+                      style: GoogleFonts.inter(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFFD1FAE5).withOpacity(0.85),
+                        height: 1.45,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // 3. Bottom Control Row: Indicator Dots on Left, "Get Started" Pill Button on Right
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenHorizontal,
+                vertical: 24,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // 3-dot carousel indicator with third dot active
+                  Row(
+                    children: [
+                      // Dot 1 (inactive)
+                      Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        width: 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.35),
+                        ),
+                      ),
+                      // Dot 2 (inactive)
+                      Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        width: 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.35),
+                        ),
+                      ),
+                      // Dot 3 (active)
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Pill-shaped "Get Started" Button
+                  GestureDetector(
+                    onTap: () => _handleGetStarted(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 28,
+                        vertical: 15,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(28),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.18),
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        "Get Started",
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF0F4C4C),
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Custom painter for the Win with AI Insights graphic
+class AiInsightsGraphicPainter extends CustomPainter {
+  const AiInsightsGraphicPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    // 1. Subtle 4x4 coordinate grid lines
+    final gridPaint = Paint()
+      ..color = Colors.white.withOpacity(0.08)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    for (int i = 1; i < 4; i++) {
+      final x = (w / 4) * i;
+      canvas.drawLine(Offset(x, 0), Offset(x, h), gridPaint);
+      final y = (h / 4) * i;
+      canvas.drawLine(Offset(0, y), Offset(w, y), gridPaint);
+    }
+
+    final yBase = h * 0.72;
+    final barWidth = w * 0.062;
+
+    // Bar 1 (Leftmost, shortest, muted gray-teal)
+    final bar1Left = w * 0.245;
+    final bar1Height = h * 0.26;
+    final bar1Rect = RRect.fromRectAndCorners(
+      Rect.fromLTWH(bar1Left, yBase - bar1Height, bar1Width, bar1Height),
+      topLeft: const Radius.circular(5.5),
+      topRight: const Radius.circular(5.5),
+    );
+    final bar1Paint = Paint()
+      ..color = const Color(0xFF4D8080)
+      ..style = PaintingStyle.fill;
+    canvas.drawRRect(bar1Rect, bar1Paint);
+
+    // Bar 2 (Middle, medium height, brighter teal)
+    final bar2Left = w * 0.368;
+    final bar2Height = h * 0.46;
+    final bar2Rect = RRect.fromRectAndCorners(
+      Rect.fromLTWH(bar2Left, yBase - bar2Height, bar1Width, bar2Height),
+      topLeft: const Radius.circular(5.5),
+      topRight: const Radius.circular(5.5),
+    );
+    final bar2Paint = Paint()
+      ..color = const Color(0xFF6BADA8)
+      ..style = PaintingStyle.fill;
+    canvas.drawRRect(bar2Rect, bar2Paint);
+
+    // Bar 3 (Rightmost, tallest, solid crisp white)
+    final bar3Left = w * 0.493;
+    final bar3Height = h * 0.62;
+    final bar3Rect = RRect.fromRectAndCorners(
+      Rect.fromLTWH(bar3Left, yBase - bar3Height, bar1Width, bar3Height),
+      topLeft: const Radius.circular(5.5),
+      topRight: const Radius.circular(5.5),
+    );
+    final bar3Paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+    canvas.drawRRect(bar3Rect, bar3Paint);
+
+    // Outline Stars on the right of the tallest bar
+    final starPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    // Small outline star
+    final smallStarCenter = Offset(w * 0.65, h * 0.665);
+    final smallStarPath = _createStarPath(smallStarCenter, 7.5, 3.8);
+    canvas.drawPath(
+      smallStarPath,
+      starPaint
+        ..strokeWidth = 1.7
+        ..color = Colors.white.withOpacity(0.9),
+    );
+
+    // Large outline star
+    final largeStarCenter = Offset(w * 0.79, h * 0.63);
+    final largeStarPath = _createStarPath(largeStarCenter, 13.0, 6.2);
+    canvas.drawPath(
+      largeStarPath,
+      starPaint
+        ..strokeWidth = 2.1
+        ..color = Colors.white,
+    );
+  }
+
+  Path _createStarPath(Offset center, double outerRadius, double innerRadius) {
+    final path = Path();
+    const int numPoints = 5;
+    final double step = math.pi / numPoints;
+    double angle = -math.pi / 2;
+
+    for (int i = 0; i < numPoints * 2; i++) {
+      final r = (i % 2 == 0) ? outerRadius : innerRadius;
+      final x = center.dx + r * math.cos(angle);
+      final y = center.dy + r * math.sin(angle);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+      angle += step;
+    }
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+`;
+
+  const appIntroWalkthroughDartCode = `import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Onboarding Screen 7: App Intro Walkthrough Screen
+/// Direct, authentic reproduction of the CRM Pro Field Sales walkthrough intro screen.
+/// Follows the CRM Pro Flutter/Dart master prompt and design system.
+class AppIntroWalkthroughScreen extends StatefulWidget {
+  final VoidCallback? onFinished;
+  final VoidCallback? onSkip;
+
+  const AppIntroWalkthroughScreen({
+    super.key,
+    this.onFinished,
+    this.onSkip,
+  });
+
+  @override
+  State<AppIntroWalkthroughScreen> createState() =>
+      _AppIntroWalkthroughScreenState();
+}
+
+class _AppIntroWalkthroughScreenState extends State<AppIntroWalkthroughScreen>
+    with SingleTickerProviderStateMixin {
+  late final PageController _pageController;
+  int _currentPage = 0;
+
+  final List<_WalkthroughSlideData> _slides = const [
+    _WalkthroughSlideData(
+      title: "Plan Your Day",
+      subtitle:
+          "AI-optimized routes, smart scheduling, and morning briefings to maximize your visits.",
+      type: _SlideGraphicType.mapRoute,
+    ),
+    _WalkthroughSlideData(
+      title: "Close Deals Faster",
+      subtitle:
+          "Voice-to-text meeting logs, instant collateral access, and automatic CRM synchronization.",
+      type: _SlideGraphicType.voiceNotes,
+    ),
+    _WalkthroughSlideData(
+      title: "Work 100% Offline",
+      subtitle:
+          "Full catalog, customer history, and contract signing even with zero cellular signal.",
+      type: _SlideGraphicType.offlineShield,
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _handleNext() {
+    if (_currentPage < _slides.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      _finishWalkthrough();
+    }
+  }
+
+  void _handleSkip() {
+    if (widget.onSkip != null) {
+      widget.onSkip!();
+    } else {
+      _finishWalkthrough();
+    }
+  }
+
+  void _finishWalkthrough() {
+    if (widget.onFinished != null) {
+      widget.onFinished!();
+    } else {
+      Navigator.of(context).pushReplacementNamed("/biometric-login");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.primary,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Top Navigation Bar: Skip Button
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenHorizontal,
+                vertical: 12,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: _handleSkip,
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(48, 36),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    "Skip",
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF99F6E4),
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Carousel Pages
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: _slides.length,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  final slide = _slides[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.screenHorizontal,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 12),
+
+                        // Center Graphic Card
+                        Center(
+                          child: Container(
+                            width: 280,
+                            height: 280,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF135858),
+                              borderRadius: BorderRadius.circular(32),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.12),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: CustomPaint(
+                              painter: _buildPainterForType(slide.type),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 48),
+
+                        Text(
+                          slide.title,
+                          style: GoogleFonts.inter(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            letterSpacing: -0.6,
+                            height: 1.15,
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        Text(
+                          slide.subtitle,
+                          style: GoogleFonts.inter(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xFFD1FAE5).withOpacity(0.85),
+                            height: 1.45,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Bottom Control Row
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenHorizontal,
+                vertical: 24,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    children: List.generate(_slides.length, (index) {
+                      final isActive = index == _currentPage;
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        margin: const EdgeInsets.only(right: 8),
+                        width: 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isActive
+                              ? Colors.white
+                              : Colors.white.withOpacity(0.35),
+                        ),
+                      );
+                    }),
+                  ),
+
+                  GestureDetector(
+                    onTap: _handleNext,
+                    child: Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.18),
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.arrow_forward_rounded,
+                          color: AppColors.primary,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  CustomPainter _buildPainterForType(_SlideGraphicType type) {
+    switch (type) {
+      case _SlideGraphicType.mapRoute:
+        return const _MapRoutePainter();
+      case _SlideGraphicType.voiceNotes:
+        return const _VoiceNotesPainter();
+      case _SlideGraphicType.offlineShield:
+        return const _OfflineShieldPainter();
+    }
+  }
+}
+
+enum _SlideGraphicType { mapRoute, voiceNotes, offlineShield }
+
+class _WalkthroughSlideData {
+  final String title;
+  final String subtitle;
+  final _SlideGraphicType type;
+
+  const _WalkthroughSlideData({
+    required this.title,
+    required this.subtitle,
+    required this.type,
+  });
+}
+
+class _MapRoutePainter extends CustomPainter {
+  const _MapRoutePainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    final gridPaint = Paint()
+      ..color = Colors.white.withOpacity(0.08)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    for (int i = 1; i < 4; i++) {
+      final x = (w / 4) * i;
+      canvas.drawLine(Offset(x, 0), Offset(x, h), gridPaint);
+      final y = (h / 4) * i;
+      canvas.drawLine(Offset(0, y), Offset(w, y), gridPaint);
+    }
+
+    final p1 = Offset(w * 0.28, h * 0.65);
+    final p2 = Offset(w * 0.49, h * 0.38);
+    final p3 = Offset(w * 0.74, h * 0.50);
+
+    final dashPaint = Paint()
+      ..color = const Color(0xFF6EE7B7).withOpacity(0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round;
+
+    _drawDashedLine(canvas, p1, p2, dashPaint, dashLength: 6, dashSpace: 5);
+    _drawDashedLine(canvas, p2, p3, dashPaint, dashLength: 6, dashSpace: 5);
+
+    _drawWaypointNode(canvas, p1, 13.0);
+    _drawWaypointNode(canvas, p2, 12.0);
+    _drawWaypointNode(canvas, p3, 12.0);
+  }
+
+  void _drawDashedLine(
+    Canvas canvas,
+    Offset start,
+    Offset end,
+    Paint paint, {
+    double dashLength = 6.0,
+    double dashSpace = 4.0,
+  }) {
+    final dx = end.dx - start.dx;
+    final dy = end.dy - start.dy;
+    final totalDistance = (end - start).distance;
+    final normalizedDx = dx / totalDistance;
+    final normalizedDy = dy / totalDistance;
+
+    double currentDistance = 0.0;
+    while (currentDistance < totalDistance) {
+      final segmentLength = (currentDistance + dashLength > totalDistance)
+          ? totalDistance - currentDistance
+          : dashLength;
+
+      final pStart = Offset(
+        start.dx + normalizedDx * currentDistance,
+        start.dy + normalizedDy * currentDistance,
+      );
+      final pEnd = Offset(
+        start.dx + normalizedDx * (currentDistance + segmentLength),
+        start.dy + normalizedDy * (currentDistance + segmentLength),
+      );
+
+      canvas.drawLine(pStart, pEnd, paint);
+      currentDistance += dashLength + dashSpace;
+    }
+  }
+
+  void _drawWaypointNode(Canvas canvas, Offset center, double radius) {
+    final ringPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.4;
+    canvas.drawCircle(center, radius, ringPaint);
+
+    final fillPaint = Paint()
+      ..color = const Color(0xFF0F4C4C).withOpacity(0.85)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, radius - 1.2, fillPaint);
+
+    final corePaint = Paint()
+      ..color = const Color(0xFF99F6E4)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, 3.2, corePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+`;
+
+  const onboardingCompleteDartCode = `import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_dimensions.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Screen 7 of Onboarding: Onboarding Complete ("You're All Set!")
+/// Follows the CRM Pro Flutter/Dart master prompt and design system.
+class OnboardingCompleteScreen extends StatefulWidget {
+  final VoidCallback? onContinue;
+
+  const OnboardingCompleteScreen({
+    super.key,
+    this.onContinue,
+  });
+
+  @override
+  State<OnboardingCompleteScreen> createState() => _OnboardingCompleteScreenState();
+}
+
+class _OnboardingCompleteScreenState extends State<OnboardingCompleteScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+
+    _scaleAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutBack,
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    );
+
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _handleContinue() {
+    if (widget.onContinue != null) {
+      widget.onContinue!();
+    } else {
+      Navigator.of(context).pushReplacementNamed("/biometric-login");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenHorizontal,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 32),
+
+              // 1. Hero Graphic: Concentric Emerald Success Badge with Double Checkmark (identical to reset success)
+              Center(
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: Container(
+                      width: 196,
+                      height: 196,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFD1FADF),
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 128,
+                        height: 128,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF10B981),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0x1A10B981),
+                              blurRadius: 16,
+                              offset: Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        alignment: Alignment.center,
+                        child: CustomPaint(
+                          size: const Size(56, 42),
+                          painter: _DoubleCheckPainter(
+                            color: Colors.white,
+                            strokeWidth: 2.4,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 36),
+
+              // 2. Title: "You're All Set!"
+              Text(
+                "You're All Set!",
+                style: GoogleFonts.inter(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.6,
+                  height: 1.15,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // 3. Subtitle: "Your field kit is ready. Time to hit the road."
+              Text(
+                "Your field kit is ready. Time to hit the road.",
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.45,
+                ),
+              ),
+
+              const SizedBox(height: 26),
+
+              // 4. Territory Prep Overview Card
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9FAFB),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFFF3F4F6),
+                    width: 1.0,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "TERRITORY PREP OVERVIEW",
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF6B7280),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.work_outline_rounded,
+                          size: 18,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            "120 leads parsed and mapped",
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF1F2937),
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.calendar_today_outlined,
+                          size: 18,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            "6 priority visits mapped out for today",
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF1F2937),
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.check_circle_outline_rounded,
+                          size: 18,
+                          color: Color(0xFF10B981),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF10B981),
+                                height: 1.35,
+                              ),
+                              children: const [
+                                TextSpan(
+                                  text: "Offline capability fully ready ",
+                                ),
+                                TextSpan(
+                                  text: "(✓ Active)",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const Spacer(),
+
+              // 5. Bottom Action: "Continue" CTA
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24.0, top: 12.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: AppDimensions.buttonHeight,
+                  child: ElevatedButton(
+                    onPressed: _handleContinue,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusButton,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      "Continue",
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DoubleCheckPainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+
+  const _DoubleCheckPainter({
+    required this.color,
+    required this.strokeWidth,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final w = size.width;
+    final h = size.height;
+
+    // First checkmark (left primary tick)
+    final path1 = Path();
+    path1.moveTo(w * 0.12, h * 0.54);
+    path1.lineTo(w * 0.38, h * 0.82);
+    path1.lineTo(w * 0.84, h * 0.28);
+    canvas.drawPath(path1, paint);
+
+    // Second checkmark (nested offset tick to the right)
+    final path2 = Path();
+    path2.moveTo(w * 0.50, h * 0.58);
+    path2.lineTo(w * 0.66, h * 0.76);
+    path2.lineTo(w * 0.98, h * 0.38);
+    canvas.drawPath(path2, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _DoubleCheckPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.strokeWidth != strokeWidth;
+}
+`;
+
+  const biometricLoginDartCode = `import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_typography.dart";
+import "../../../core/theme/app_spacing.dart";
+
+/// Screen: Biometric Login Screen (Face ID / Touch ID)
+/// Authentic, pixel-accurate reproduction of the CRM Pro Field Sales Biometric Login screen.
+/// Follows the CRM Pro Flutter/Dart master prompt and design system.
+class BiometricLoginScreen extends StatefulWidget {
+  final VoidCallback? onAuthenticated;
+  final VoidCallback? onUsePasswordInstead;
+  final String title;
+  final String promptText;
+  final String alternativeOptionText;
+
+  const BiometricLoginScreen({
+    super.key,
+    this.onAuthenticated,
+    this.onUsePasswordInstead,
+    this.title = "CRM Pro Field Sales",
+    this.promptText = "Use Face ID to sign in",
+    this.alternativeOptionText = "Use password instead",
+  });
+
+  @override
+  State<BiometricLoginScreen> createState() => _BiometricLoginScreenState();
+}
+
+class _BiometricLoginScreenState extends State<BiometricLoginScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
+
+  bool _isAuthenticating = false;
+  bool _authSuccess = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOut,
+    );
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.06).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    _fadeController.forward();
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    _fadeController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _triggerBiometricScan() async {
+    if (_isAuthenticating) return;
+
+    setState(() {
+      _isAuthenticating = true;
+    });
+
+    // Simulate authentic biometric sensor read
+    await Future.delayed(const Duration(milliseconds: 1200));
+
+    if (!mounted) return;
+
+    setState(() {
+      _isAuthenticating = false;
+      _authSuccess = true;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 600));
+
+    if (!mounted) return;
+
+    if (widget.onAuthenticated != null) {
+      widget.onAuthenticated!();
+    }
+  }
+
+  void _handleUsePassword() {
+    if (widget.onUsePasswordInstead != null) {
+      widget.onUsePasswordInstead!();
+    } else {
+      Navigator.of(context).pushReplacementNamed("/sign-in");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.primary, // Signature Deep Teal #0F4C4C
+      body: SafeArea(
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
+            child: Column(
+              children: [
+                const Spacer(flex: 3),
+
+                // 1. App Logo Squircle ("LP")
+                Container(
+                  width: 92,
+                  height: 92,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.16),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "LP",
+                    style: TextStyle(
+                      fontFamily: AppTypography.fontFamily,
+                      fontSize: 34,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primary,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 2. App Title: "CRM Pro Field Sales"
+                Text(
+                  widget.title,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.4,
+                    height: 1.25,
+                  ),
+                ),
+
+                const Spacer(flex: 4),
+
+                // 3. Face ID Scanning Disc
+                GestureDetector(
+                  onTap: _triggerBiometricScan,
+                  child: AnimatedBuilder(
+                    animation: _pulseAnimation,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _isAuthenticating ? _pulseAnimation.value : 1.0,
+                        child: Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: const Color(0xFF1E6060),
+                            border: Border.all(
+                              color: _authSuccess
+                                  ? const Color(0xFF10B981)
+                                  : Colors.white.withOpacity(0.15),
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: _authSuccess
+                                    ? const Color(0x3310B981)
+                                    : Colors.black.withOpacity(0.1),
+                                blurRadius: 16,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          alignment: Alignment.center,
+                          child: _authSuccess
+                              ? const Icon(
+                                  Icons.check_rounded,
+                                  color: Colors.white,
+                                  size: 52,
+                                )
+                              : _isAuthenticating
+                                  ? const SizedBox(
+                                      width: 48,
+                                      height: 48,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.8,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      ),
+                                    )
+                                  : const CustomPaint(
+                                      size: Size(54, 54),
+                                      painter: _FaceIdIconPainter(
+                                        color: Colors.white,
+                                        strokeWidth: 2.6,
+                                      ),
+                                    ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // 4. Prompt Text: "Use Face ID to sign in"
+                GestureDetector(
+                  onTap: _triggerBiometricScan,
+                  child: Text(
+                    _isAuthenticating
+                        ? "Verifying Face ID..."
+                        : _authSuccess
+                            ? "Verified!"
+                            : widget.promptText,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withOpacity(0.95),
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+
+                const Spacer(flex: 5),
+
+                // 5. Alternative Option: "Use password instead"
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 24.0),
+                  child: TextButton(
+                    onPressed: _handleUsePassword,
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white.withOpacity(0.85),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    ),
+                    child: Text(
+                      widget.alternativeOptionText,
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.9),
+                        letterSpacing: -0.1,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FaceIdIconPainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+
+  const _FaceIdIconPainter({
+    required this.color,
+    required this.strokeWidth,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final fillPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final w = size.width;
+    final h = size.height;
+
+    const bracketLen = 12.0;
+    const cornerRadius = 4.0;
+
+    // 1. Top-Left
+    final pathTL = Path();
+    pathTL.moveTo(0, bracketLen);
+    pathTL.lineTo(0, cornerRadius);
+    pathTL.arcToPoint(const Offset(cornerRadius, 0), radius: const Radius.circular(cornerRadius));
+    pathTL.lineTo(bracketLen, 0);
+    canvas.drawPath(pathTL, paint);
+
+    // 2. Top-Right
+    final pathTR = Path();
+    pathTR.moveTo(w - bracketLen, 0);
+    pathTR.lineTo(w - cornerRadius, 0);
+    pathTR.arcToPoint(Offset(w, cornerRadius), radius: const Radius.circular(cornerRadius));
+    pathTR.lineTo(w, bracketLen);
+    canvas.drawPath(pathTR, paint);
+
+    // 3. Bottom-Left
+    final pathBL = Path();
+    pathBL.moveTo(0, h - bracketLen);
+    pathBL.lineTo(0, h - cornerRadius);
+    pathBL.arcToPoint(Offset(cornerRadius, h), radius: const Radius.circular(cornerRadius));
+    pathBL.lineTo(bracketLen, h);
+    canvas.drawPath(pathBL, paint);
+
+    // 4. Bottom-Right
+    final pathBR = Path();
+    pathBR.moveTo(w - bracketLen, h);
+    pathBR.lineTo(w - cornerRadius, h);
+    pathBR.arcToPoint(Offset(w, h - cornerRadius), radius: const Radius.circular(cornerRadius));
+    pathBR.lineTo(w, h - bracketLen);
+    canvas.drawPath(pathBR, paint);
+
+    // Eyes
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(
+          center: Offset(w * 0.36, h * 0.42),
+          width: strokeWidth + 0.8,
+          height: strokeWidth + 3.0,
+        ),
+        const Radius.circular(2),
+      ),
+      fillPaint,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(
+          center: Offset(w * 0.64, h * 0.42),
+          width: strokeWidth + 0.8,
+          height: strokeWidth + 3.0,
+        ),
+        const Radius.circular(2),
+      ),
+      fillPaint,
+    );
+
+    // Nose
+    canvas.drawLine(
+      Offset(w * 0.50, h * 0.48),
+      Offset(w * 0.50, h * 0.55),
+      paint,
+    );
+
+    // Smile
+    final smilePath = Path();
+    smilePath.moveTo(w * 0.35, h * 0.68);
+    smilePath.quadraticBezierTo(
+      w * 0.50,
+      h * 0.78,
+      w * 0.65,
+      h * 0.68,
+    );
+    canvas.drawPath(smilePath, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _FaceIdIconPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.strokeWidth != strokeWidth;
+}
+`;
 
   const passwordResetSuccessDartCode = `import "package:flutter/material.dart";
 import "package:google_fonts/google_fonts.dart";
@@ -3067,7 +9232,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
 }`;
 
   const currentDartCode =
-    selectedScreen === 'success'
+    selectedScreen === 'dashboard'
+      ? dashboardDartCode
+      : selectedScreen === 'notifications'
+      ? notificationsDartCode
+      : selectedScreen === 'intro-slide-three'
+      ? introSlideThreeDartCode
+      : selectedScreen === 'intro-slide-two'
+      ? introSlideTwoDartCode
+      : selectedScreen === 'app-intro-walkthrough'
+      ? appIntroWalkthroughDartCode
+      : selectedScreen === 'onboarding-complete'
+      ? onboardingCompleteDartCode
+      : selectedScreen === 'onboarding-offline-setup'
+      ? onboardingOfflineSetupDartCode
+      : selectedScreen === 'onboarding-notifications'
+      ? onboardingNotificationsDartCode
+      : selectedScreen === 'onboarding-microphone'
+      ? onboardingMicrophoneDartCode
+      : selectedScreen === 'onboarding-camera'
+      ? onboardingCameraDartCode
+      : selectedScreen === 'onboarding-location'
+      ? onboardingLocationDartCode
+      : selectedScreen === 'onboarding-welcome'
+      ? onboardingWelcomeDartCode
+      : selectedScreen === 'biometric'
+      ? biometricLoginDartCode
+      : selectedScreen === 'success'
       ? passwordResetSuccessDartCode
       : selectedScreen === 'reset'
       ? resetPasswordDartCode
@@ -3101,8 +9292,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
             <div className="flex items-center space-x-2">
               <h1 className="text-base font-extrabold text-[#111827]">CRM Pro Field Sales</h1>
               <span className="bg-[#ECFDF5] text-[#10B981] text-[11px] font-semibold px-2 py-0.5 rounded-md border border-[#A7F3D0]">
-                {selectedScreen === 'success'
-                  ? 'Screen 8: Password Reset Success'
+                {selectedScreen === 'dashboard'
+                  ? 'Dashboard (Screen 1)'
+                  : selectedScreen === 'notifications'
+                  ? 'Notifications (Screen 2)'
+                  : selectedScreen === 'intro-slide-three'
+                  ? 'Intro 3: Win with AI Insights'
+                  : selectedScreen === 'intro-slide-two'
+                  ? 'Intro 2: Track Your Visits'
+                  : selectedScreen === 'app-intro-walkthrough'
+                  ? 'Walkthrough: Plan Your Day'
+                  : selectedScreen === 'onboarding-complete'
+                  ? 'Onboarding 7: All Set!'
+                  : selectedScreen === 'onboarding-offline-setup'
+                  ? 'Onboarding 6: Offline Setup'
+                  : selectedScreen === 'onboarding-notifications'
+                  ? 'Onboarding 5: Notifications'
+                  : selectedScreen === 'onboarding-microphone'
+                  ? 'Onboarding 4: Microphone'
+                  : selectedScreen === 'onboarding-camera'
+                  ? 'Onboarding 3: Camera'
+                  : selectedScreen === 'onboarding-location'
+                  ? 'Onboarding 2: Location'
+                  : selectedScreen === 'onboarding-welcome'
+                  ? 'Onboarding 1: Welcome'
+                  : selectedScreen === 'biometric'
+                  ? 'Screen 8: Biometric Login'
+                  : selectedScreen === 'success'
+                  ? 'Password Reset Success'
                   : selectedScreen === 'reset'
                   ? 'Screen 7: Set New Password'
                   : selectedScreen === 'otp'
@@ -3119,7 +9336,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
               </span>
             </div>
             <p className="text-xs text-[#4B5563]">
-              Authentication Flow &bull; lib/features/authentication/screens/{selectedScreen === 'success' ? 'password_reset_success_screen.dart' : selectedScreen === 'reset' ? 'reset_password_screen.dart' : selectedScreen === 'otp' ? 'otp_verification_screen.dart' : selectedScreen === 'forgot' ? 'forgot_password_screen.dart' : selectedScreen === 'verification' ? 'email_verification_screen.dart' : selectedScreen === 'signup' ? 'sign_up_screen.dart' : selectedScreen === 'signin' ? 'sign_in_screen.dart' : 'splash_screen.dart'}
+              {selectedScreen === 'dashboard'
+                ? 'Main Flow • lib/features/dashboard/screens/dashboard_screen.dart (screen-dashboard)'
+                : selectedScreen === 'notifications'
+                ? 'Dashboard & Notification • lib/features/dashboard/screens/notifications_screen.dart (screen-notification)'
+                : selectedScreen === 'intro-slide-three'
+                ? 'Onboarding Flow • lib/features/onboarding/screens/intro_slide_three_screen.dart'
+                : selectedScreen === 'intro-slide-two'
+
+                ? 'Onboarding Flow • lib/features/onboarding/screens/intro_slide_two_screen.dart'
+                : selectedScreen === 'app-intro-walkthrough'
+                ? 'Onboarding Flow • lib/features/onboarding/screens/app_intro_walkthrough_screen.dart'
+                : selectedScreen === 'onboarding-complete'
+                ? 'Onboarding Flow • lib/features/onboarding/screens/onboarding_complete_screen.dart'
+                : selectedScreen === 'onboarding-offline-setup'
+                ? 'Onboarding Flow • lib/features/onboarding/screens/onboarding_offline_setup_screen.dart'
+                : selectedScreen === 'onboarding-notifications'
+                ? 'Onboarding Flow • lib/features/onboarding/screens/onboarding_notifications_screen.dart'
+                : selectedScreen === 'onboarding-microphone'
+                ? 'Onboarding Flow • lib/features/onboarding/screens/onboarding_microphone_screen.dart'
+                : selectedScreen === 'onboarding-camera'
+                ? 'Onboarding Flow • lib/features/onboarding/screens/onboarding_camera_screen.dart'
+                : selectedScreen === 'onboarding-location'
+                ? 'Onboarding Flow • lib/features/onboarding/screens/onboarding_location_screen.dart'
+                : selectedScreen === 'onboarding-welcome'
+                ? 'Onboarding Flow • lib/features/onboarding/screens/onboarding_welcome_screen.dart'
+                : `Authentication Flow • lib/features/authentication/screens/${
+                    selectedScreen === 'biometric'
+                      ? 'biometric_login_screen.dart'
+                      : selectedScreen === 'success'
+                      ? 'password_reset_success_screen.dart'
+                      : selectedScreen === 'reset'
+                      ? 'reset_password_screen.dart'
+                      : selectedScreen === 'otp'
+                      ? 'otp_verification_screen.dart'
+                      : selectedScreen === 'forgot'
+                      ? 'forgot_password_screen.dart'
+                      : selectedScreen === 'verification'
+                      ? 'email_verification_screen.dart'
+                      : selectedScreen === 'signup'
+                      ? 'sign_up_screen.dart'
+                      : selectedScreen === 'signin'
+                      ? 'sign_in_screen.dart'
+                      : 'splash_screen.dart'
+                  }`}
             </p>
           </div>
         </div>
@@ -3127,7 +9387,145 @@ class _SignUpScreenState extends State<SignUpScreen> {
         {/* Screen Switcher & View Switcher */}
         <div className="flex items-center space-x-3">
           {/* Switch Between Screens */}
-          <div className="flex bg-[#F3F4F6] p-1 rounded-xl border border-[#E5E7EB] text-xs font-medium">
+          <div className="flex bg-[#F3F4F6] p-1 rounded-xl border border-[#E5E7EB] text-xs font-medium overflow-x-auto max-w-[650px] no-scrollbar">
+            <button
+              onClick={() => setSelectedScreen('dashboard')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                selectedScreen === 'dashboard'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Dashboard (Home)
+            </button>
+            <button
+              onClick={() => setSelectedScreen('notifications')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                selectedScreen === 'notifications'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Notifications (Screen 2)
+            </button>
+            <button
+              onClick={() => setSelectedScreen('intro-slide-three')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                selectedScreen === 'intro-slide-three'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Intro 3 (AI Insights)
+            </button>
+
+            <button
+              onClick={() => setSelectedScreen('intro-slide-two')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                selectedScreen === 'intro-slide-two'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Intro 2 (Track Visits)
+            </button>
+            <button
+              onClick={() => {
+                setSelectedScreen('app-intro-walkthrough');
+                setWalkthroughPage(0);
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                selectedScreen === 'app-intro-walkthrough'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Walkthrough (Intro)
+            </button>
+            <button
+              onClick={() => setSelectedScreen('onboarding-complete')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                selectedScreen === 'onboarding-complete'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Onboarding 7 (Done)
+            </button>
+            <button
+              onClick={() => setSelectedScreen('onboarding-offline-setup')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                selectedScreen === 'onboarding-offline-setup'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Onboarding 6 (Offline)
+            </button>
+            <button
+              onClick={() => setSelectedScreen('onboarding-notifications')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                selectedScreen === 'onboarding-notifications'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Onboarding 5 (Alerts)
+            </button>
+            <button
+              onClick={() => setSelectedScreen('onboarding-microphone')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                selectedScreen === 'onboarding-microphone'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Onboarding 4 (Mic)
+            </button>
+            <button
+              onClick={() => setSelectedScreen('onboarding-camera')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                selectedScreen === 'onboarding-camera'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Onboarding 3 (Camera)
+            </button>
+            <button
+              onClick={() => setSelectedScreen('onboarding-location')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                selectedScreen === 'onboarding-location'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Onboarding 2 (Location)
+            </button>
+            <button
+              onClick={() => setSelectedScreen('onboarding-welcome')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                selectedScreen === 'onboarding-welcome'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Onboarding 1 (Welcome)
+            </button>
+            <button
+              onClick={() => {
+                setSelectedScreen('biometric');
+                setBiometricSuccess(false);
+                setBiometricScanning(false);
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                selectedScreen === 'biometric'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Biometric
+            </button>
             <button
               onClick={() => setSelectedScreen('success')}
               className={`px-3 py-1.5 rounded-lg transition-all ${
@@ -3136,7 +9534,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   : 'text-[#4B5563] hover:text-[#111827]'
               }`}
             >
-              Reset Success (Screen 8)
+              Reset Success
             </button>
             <button
               onClick={() => setSelectedScreen('reset')}
@@ -3146,7 +9544,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   : 'text-[#4B5563] hover:text-[#111827]'
               }`}
             >
-              Set Password (Screen 7)
+              Set Password
             </button>
             <button
               onClick={() => setSelectedScreen('otp')}
@@ -3156,7 +9554,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   : 'text-[#4B5563] hover:text-[#111827]'
               }`}
             >
-              OTP Verify (Screen 6)
+              OTP Verify
             </button>
             <button
               onClick={() => setSelectedScreen('forgot')}
@@ -3166,7 +9564,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   : 'text-[#4B5563] hover:text-[#111827]'
               }`}
             >
-              Forgot Password (Screen 5)
+              Forgot Pwd
             </button>
             <button
               onClick={() => setSelectedScreen('verification')}
@@ -3176,7 +9574,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   : 'text-[#4B5563] hover:text-[#111827]'
               }`}
             >
-              Verify Email (Screen 4)
+              Verify Email
             </button>
             <button
               onClick={() => setSelectedScreen('signup')}
@@ -3186,7 +9584,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   : 'text-[#4B5563] hover:text-[#111827]'
               }`}
             >
-              Sign Up (Screen 3)
+              Sign Up
             </button>
             <button
               onClick={() => setSelectedScreen('signin')}
@@ -3196,7 +9594,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   : 'text-[#4B5563] hover:text-[#111827]'
               }`}
             >
-              Sign In (Screen 2)
+              Sign In
             </button>
             <button
               onClick={() => setSelectedScreen('splash')}
@@ -3206,7 +9604,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   : 'text-[#4B5563] hover:text-[#111827]'
               }`}
             >
-              Splash (Screen 1)
+              Splash
             </button>
           </div>
 
@@ -3259,7 +9657,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Clean Canvas &bull; 390 &times; 844 px
               </span>
               <span className="text-[11px] text-[#6B7280]">
-                {selectedScreen === 'success'
+                {selectedScreen === 'dashboard'
+                  ? 'Dashboard (Screen 1) • Hidden scrollbars, AI Daily Brief, Monthly Target Gauge, Schedule'
+                  : selectedScreen === 'notifications'
+                  ? 'Notifications (Screen 2) • Static Header, Filter Chips, Interactive List, Hidden Scrollbars'
+                  : selectedScreen === 'app-intro-walkthrough'
+                  ? 'App Intro Walkthrough • Plan Your Day, Close Deals Faster, Work 100% Offline'
+                  : selectedScreen === 'onboarding-complete'
+                  ? 'Onboarding Complete • Tap "Continue" to proceed to Biometric Security'
+                  : selectedScreen === 'intro-slide-two'
+                  ? 'Intro Slide 2 (Track Your Visits) • GPS Check-in & Real-time Visit Tracking'
+                  : selectedScreen === 'onboarding-offline-setup'
+                  ? 'Onboarding Offline Setup • Tap "Download Now" to test animated sync'
+                  : selectedScreen === 'onboarding-notifications'
+                  ? 'Onboarding Notifications Screen • Tap "Allow Notifications" or "Skip for now"'
+                  : selectedScreen === 'onboarding-microphone'
+                  ? 'Onboarding Microphone Screen • Tap "Allow Microphone Access" or "Skip for now"'
+                  : selectedScreen === 'onboarding-camera'
+                  ? 'Onboarding Camera Screen • Tap "Allow Camera Access" or "Skip for now"'
+                  : selectedScreen === 'onboarding-location'
+                  ? 'Onboarding Location Screen • Tap "Allow Location Access" or "Skip for now"'
+                  : selectedScreen === 'onboarding-welcome'
+                  ? 'Onboarding Welcome Screen • Tap checklist items or "Let\'s Go"'
+                  : selectedScreen === 'biometric'
+                  ? 'Biometric Login (Face ID) • Tap circle to simulate biometric scan'
+                  : selectedScreen === 'success'
                   ? 'Password Reset Success • Pixel-accurate Screen 8 layout'
                   : selectedScreen === 'reset'
                   ? 'Set New Password &bull; Test real-time validation & strength meter'
@@ -3277,10 +9699,1911 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
             {/* Mobile Screen Canvas */}
             <div
-              className="w-[390px] h-[844px] bg-white rounded-[32px] shadow-2xl border-[6px] border-[#1F2937] flex flex-col overflow-hidden relative select-none"
+              className={`w-[390px] h-[844px] rounded-[32px] shadow-2xl border-[6px] border-[#1F2937] flex flex-col overflow-hidden relative select-none ${
+                selectedScreen === 'biometric' || selectedScreen === 'app-intro-walkthrough' || selectedScreen === 'intro-slide-two' || selectedScreen === 'intro-slide-three'
+                  ? 'bg-[#0F4C4C]'
+                  : 'bg-white'
+              }`}
               style={{ boxShadow: '0 25px 60px -15px rgba(15, 76, 76, 0.35)' }}
             >
-              {selectedScreen === 'success' ? (
+              {selectedScreen === 'dashboard' ? (
+                /* DASHBOARD AND NOTIFICATION SCREEN 1 (SCREEN-DASHBOARD) */
+                <div className="flex-1 flex flex-col bg-white relative select-none h-full overflow-hidden font-['Inter',sans-serif]">
+                  {/* Toast Feedback Notification */}
+                  {dashboardToast && (
+                    <div className="absolute top-4 left-4 right-4 z-40 bg-[#0F4C4C] text-white px-3.5 py-2.5 rounded-xl shadow-lg flex items-center justify-between text-xs animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="flex items-center space-x-2">
+                        <Sparkles className="w-4 h-4 text-[#99F6E4] shrink-0" />
+                        <span className="font-medium">{dashboardToast}</span>
+                      </div>
+                      <button
+                        onClick={() => setDashboardToast(null)}
+                        className="text-white/70 hover:text-white text-xs font-bold px-1"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Static Top Bar (pinned, does not scroll): Avatar, Greeting, Synced Chip, Notification Bell */}
+                  <div className="px-5 pt-4 pb-3 flex items-center justify-between bg-white shrink-0 z-20">
+                    <div className="flex items-center space-x-3">
+                      {/* Avatar */}
+                      <div className="w-11 h-11 rounded-full bg-[#E0F2F1] text-[#0F4C4C] font-bold text-base flex items-center justify-center border border-[#B2DFDB]">
+                        AM
+                      </div>
+                      <div>
+                        <h2 className="text-[18px] font-extrabold text-[#111827] tracking-tight leading-tight">
+                          Good morning,...
+                        </h2>
+                        <p className="text-[12.5px] font-medium text-[#6B7280]">
+                          Thursday, Aug 9
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2.5">
+                      {/* Synced Badge */}
+                      <div className="flex items-center space-x-1.5 bg-[#D1FAE5] text-[#059669] px-2.5 py-1 rounded-full text-[12px] font-semibold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+                        <span>Synced</span>
+                      </div>
+
+                      {/* Notification Bell */}
+                      <button
+                        onClick={() => {
+                          setSelectedScreen('notifications');
+                          triggerNotificationToast('Switched to Notifications (Screen 2)');
+                        }}
+                        className="relative w-10 h-10 rounded-full border border-[#E5E7EB] bg-white flex items-center justify-center shadow-2xs hover:bg-[#F9FAFB] transition-colors cursor-pointer"
+                        title="View Notifications (Screen 2)"
+                      >
+                        <Bell className="w-5 h-5 text-[#1F2937]" />
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#EF4444] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                          {notificationsList.filter(n => n.isUnread).length}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Main Scrollable Content Area - Hidden scrollbars per constraint */}
+                  <div className="flex-1 overflow-y-auto pb-24 pt-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                    {/* AI Daily Brief Card */}
+                    <div className="px-5 mt-1">
+                      <div className="bg-[#0F4C4C] text-white rounded-2xl p-4.5 shadow-md border border-[#0D4444]">
+                        <div className="flex items-center space-x-2 text-[#99F6E4] text-[12px] font-extrabold tracking-wider">
+                          <Bot className="w-4 h-4 text-[#99F6E4]" />
+                          <span>AI DAILY BRIEF</span>
+                        </div>
+                        <p className="mt-2.5 text-[13.5px] text-white/90 leading-relaxed font-normal">
+                          You have 6 visits planned today. 2 are high-priority. Start with <span className="font-semibold text-white">Acme Corp</span> they viewed your proposal yesterday.
+                        </p>
+                        <div className="mt-3.5">
+                          <button
+                            onClick={() => triggerDashboardToast('Opening full AI brief for today...')}
+                            className="text-white text-[13px] font-bold flex items-center space-x-1 underline hover:text-[#99F6E4] transition-colors cursor-pointer"
+                          >
+                            <span>View Full Brief</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Metric Cards Carousel - Horizontal scroll with scrollbars strictly hidden */}
+                    <div className="mt-4">
+                      <div className="flex space-x-3 px-5 overflow-x-auto py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                        {/* Metric 1 */}
+                        <div className="shrink-0 w-[122px] bg-white rounded-2xl p-3.5 border border-[#E5E7EB] shadow-2xs">
+                          <p className="text-[12px] font-medium text-[#6B7280] truncate">Today's Visits</p>
+                          <p className="text-[22px] font-extrabold text-[#0F4C4C] mt-1 tracking-tight">2/6</p>
+                          <p className="text-[11px] text-[#9CA3AF] mt-1 truncate">Goal: 6 visits</p>
+                        </div>
+
+                        {/* Metric 2 */}
+                        <div className="shrink-0 w-[122px] bg-white rounded-2xl p-3.5 border border-[#E5E7EB] shadow-2xs">
+                          <p className="text-[12px] font-medium text-[#6B7280] truncate">Check-ins</p>
+                          <p className="text-[22px] font-extrabold text-[#0F4C4C] mt-1 tracking-tight">2</p>
+                          <p className="text-[11px] text-[#9CA3AF] mt-1 truncate">Completed</p>
+                        </div>
+
+                        {/* Metric 3 */}
+                        <div className="shrink-0 w-[122px] bg-white rounded-2xl p-3.5 border border-[#E5E7EB] shadow-2xs">
+                          <p className="text-[12px] font-medium text-[#6B7280] truncate">Distance</p>
+                          <p className="text-[22px] font-extrabold text-[#0F4C4C] mt-1 tracking-tight">18 km</p>
+                          <p className="text-[11px] text-[#9CA3AF] mt-1 truncate">Estimated tra...</p>
+                        </div>
+
+                        {/* Metric 4 */}
+                        <div className="shrink-0 w-[122px] bg-white rounded-2xl p-3.5 border border-[#E5E7EB] shadow-2xs">
+                          <p className="text-[12px] font-medium text-[#6B7280] truncate">Revenue</p>
+                          <p className="text-[22px] font-extrabold text-[#0F4C4C] mt-1 tracking-tight">₹4.2L</p>
+                          <p className="text-[11px] text-[#9CA3AF] mt-1 truncate">Active leads</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Monthly Target Card */}
+                    <div className="px-5 mt-4">
+                      <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB] shadow-2xs flex items-center space-x-4">
+                        {/* Circular Progress Gauge */}
+                        <div className="relative w-[68px] h-[68px] shrink-0 flex items-center justify-center">
+                          <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                            <circle
+                              cx="18"
+                              cy="18"
+                              r="15"
+                              fill="none"
+                              stroke="#F1F5F9"
+                              strokeWidth="3.4"
+                            />
+                            <circle
+                              cx="18"
+                              cy="18"
+                              r="15"
+                              fill="none"
+                              stroke="#0F4C4C"
+                              strokeWidth="3.4"
+                              strokeDasharray="94.24"
+                              strokeDashoffset={94.24 * (1 - 0.68)}
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          <span className="absolute text-[13.5px] font-extrabold text-[#0F4C4C]">
+                            68%
+                          </span>
+                        </div>
+
+                        {/* Details */}
+                        <div className="flex-1">
+                          <p className="text-[11px] font-bold text-[#6B7280] tracking-wide uppercase">
+                            MONTHLY TARGET
+                          </p>
+                          <p className="text-[16.5px] font-extrabold text-[#111827] mt-0.5 tracking-tight">
+                            ₹6,80,000 / ₹10,00,000
+                          </p>
+                          <p className="text-[12px] font-semibold text-[#D97706] mt-0.5">
+                            22 days remaining
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Today's Schedule Section */}
+                    <div className="px-5 mt-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-[17.5px] font-extrabold text-[#111827] tracking-tight">
+                          Today's Schedule
+                        </h3>
+                        <button
+                          onClick={() => triggerDashboardToast('Opening full map view with 6 visit pins...')}
+                          className="text-[13px] font-bold text-[#0F4C4C] hover:underline cursor-pointer"
+                        >
+                          View All Map
+                        </button>
+                      </div>
+
+                      {/* Schedule Cards */}
+                      <div className="space-y-2.5">
+                        {dashboardScheduleItems.map((item) => (
+                          <div
+                            key={item.id}
+                            onClick={() => triggerDashboardToast(`Selected ${item.company} (${item.contact})`)}
+                            className="bg-white rounded-2xl p-3.5 border border-[#E5E7EB] shadow-2xs hover:border-[#0F4C4C]/40 transition-all cursor-pointer flex items-center"
+                          >
+                            {/* Left Time Block */}
+                            <div className="w-[88px] shrink-0 pr-3 border-r border-[#F3F4F6]">
+                              <p className="text-[13px] font-bold text-[#0F4C4C]">{item.time}</p>
+                              <div className="flex items-center space-x-1.5 mt-1">
+                                <span
+                                  className={`w-2 h-2 rounded-full ${
+                                    item.isCompleted ? 'bg-[#10B981]' : 'bg-[#0F4C4C]'
+                                  }`}
+                                ></span>
+                                <span className="text-[11px] font-medium text-[#6B7280]">
+                                  {item.status}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Right Client Info */}
+                            <div className="pl-3.5 flex-1 min-w-0">
+                              <p className="text-[14.5px] font-bold text-[#111827] truncate">
+                                {item.company}
+                              </p>
+                              <p className="text-[12.5px] font-medium text-[#4B5563] truncate">
+                                {item.contact}
+                              </p>
+                              <p className="text-[11.5px] text-[#9CA3AF] truncate mt-0.5">
+                                {item.location}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Floating Action Button - square with curved edges */}
+                  <button
+                    onClick={() => triggerDashboardToast('Quick Action: Add Visit / Lead initiated')}
+                    className="absolute right-5 bottom-[82px] w-14 h-14 rounded-2xl bg-[#0F4C4C] text-white shadow-xl hover:bg-[#0D4444] active:scale-95 transition-all flex items-center justify-center z-30 cursor-pointer"
+                    style={{ boxShadow: '0 8px 24px -4px rgba(15, 76, 76, 0.45)' }}
+                    title="Add new action"
+                  >
+                    <Plus className="w-7 h-7" />
+                  </button>
+
+                  {/* 5-Tab Bottom Navigation Bar */}
+                  <div className="absolute left-0 right-0 bottom-0 bg-white border-t border-[#E5E7EB] px-3 py-2 flex justify-around items-center z-30">
+                    {/* Home Tab (Active) */}
+                    <button
+                      onClick={() => setDashboardNavIndex(0)}
+                      className={`flex flex-col items-center py-1 px-3.5 rounded-full transition-all cursor-pointer ${
+                        dashboardNavIndex === 0
+                          ? 'bg-[#E6F4F2] text-[#0F4C4C]'
+                          : 'text-[#9CA3AF] hover:text-[#4B5563]'
+                      }`}
+                    >
+                      <Home className="w-5 h-5" />
+                      <span className="text-[10.5px] font-bold mt-0.5">Home</span>
+                    </button>
+
+                    {/* Leads Tab */}
+                    <button
+                      onClick={() => {
+                        setDashboardNavIndex(1);
+                        triggerDashboardToast('Navigating to Leads screen');
+                      }}
+                      className={`flex flex-col items-center py-1 px-2.5 rounded-full transition-all cursor-pointer ${
+                        dashboardNavIndex === 1
+                          ? 'bg-[#E6F4F2] text-[#0F4C4C]'
+                          : 'text-[#9CA3AF] hover:text-[#4B5563]'
+                      }`}
+                    >
+                      <Folder className="w-5 h-5" />
+                      <span className="text-[10.5px] font-medium mt-0.5">Leads</span>
+                    </button>
+
+                    {/* Visits Tab */}
+                    <button
+                      onClick={() => {
+                        setDashboardNavIndex(2);
+                        triggerDashboardToast('Navigating to Visits route map');
+                      }}
+                      className={`flex flex-col items-center py-1 px-2.5 rounded-full transition-all cursor-pointer ${
+                        dashboardNavIndex === 2
+                          ? 'bg-[#E6F4F2] text-[#0F4C4C]'
+                          : 'text-[#9CA3AF] hover:text-[#4B5563]'
+                      }`}
+                    >
+                      <Route className="w-5 h-5" />
+                      <span className="text-[10.5px] font-medium mt-0.5">Visits</span>
+                    </button>
+
+                    {/* Tasks Tab */}
+                    <button
+                      onClick={() => {
+                        setDashboardNavIndex(3);
+                        triggerDashboardToast('Navigating to Tasks checklist');
+                      }}
+                      className={`flex flex-col items-center py-1 px-2.5 rounded-full transition-all cursor-pointer ${
+                        dashboardNavIndex === 3
+                          ? 'bg-[#E6F4F2] text-[#0F4C4C]'
+                          : 'text-[#9CA3AF] hover:text-[#4B5563]'
+                      }`}
+                    >
+                      <ListTodo className="w-5 h-5" />
+                      <span className="text-[10.5px] font-medium mt-0.5">Tasks</span>
+                    </button>
+
+                    {/* Profile Tab */}
+                    <button
+                      onClick={() => {
+                        setDashboardNavIndex(4);
+                        triggerDashboardToast('Navigating to Rep Profile & Settings');
+                      }}
+                      className={`flex flex-col items-center py-1 px-2.5 rounded-full transition-all cursor-pointer ${
+                        dashboardNavIndex === 4
+                          ? 'bg-[#E6F4F2] text-[#0F4C4C]'
+                          : 'text-[#9CA3AF] hover:text-[#4B5563]'
+                      }`}
+                    >
+                      <User className="w-5 h-5" />
+                      <span className="text-[10.5px] font-medium mt-0.5">Profile</span>
+                    </button>
+                  </div>
+                </div>
+              ) : selectedScreen === 'notifications' ? (
+                /* DASHBOARD AND NOTIFICATION SCREEN 2 (NOTIFICATIONS) */
+                <div className="flex-1 flex flex-col bg-white relative select-none h-full overflow-hidden font-['Inter',sans-serif]">
+                  {/* Toast Feedback Notification */}
+                  {notificationToast && (
+                    <div className="absolute top-4 left-4 right-4 z-40 bg-[#0F4C4C] text-white px-3.5 py-2.5 rounded-xl shadow-lg flex items-center justify-between text-xs animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="flex items-center space-x-2">
+                        <Sparkles className="w-4 h-4 text-[#99F6E4] shrink-0" />
+                        <span className="font-medium">{notificationToast}</span>
+                      </div>
+                      <button
+                        onClick={() => setNotificationToast(null)}
+                        className="text-white/70 hover:text-white text-xs font-bold px-1"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Static Top Bar (pinned, does not scroll): Title with Badge & "Mark All Read" */}
+                  <div className="px-5 pt-5 pb-3 flex items-center justify-between bg-white shrink-0 z-20 border-b border-[#F9FAFB]">
+                    <div className="flex items-center space-x-2.5">
+                      <h2 className="text-[26px] font-extrabold text-[#111827] tracking-tight leading-none">
+                        Notifications
+                      </h2>
+                      {notificationsList.filter((n) => n.isUnread).length > 0 && (
+                        <span className="w-5 h-5 bg-[#EF4444] text-white text-[12px] font-bold rounded-full flex items-center justify-center">
+                          {notificationsList.filter((n) => n.isUnread).length}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={handleMarkAllNotificationsRead}
+                      className="text-[#0F4C4C] text-[14.5px] font-semibold hover:text-[#0D4444] cursor-pointer transition-colors"
+                    >
+                      Mark All Read
+                    </button>
+                  </div>
+
+                  {/* Filter Chips - Horizontal row with strictly hidden scrollbars */}
+                  <div className="px-5 py-2.5 shrink-0 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex items-center space-x-2">
+                    <button
+                      onClick={() => setNotificationFilter('All')}
+                      className={`px-4 py-1.5 rounded-xl text-[13.5px] transition-all cursor-pointer whitespace-nowrap ${
+                        notificationFilter === 'All'
+                          ? 'bg-[#CCFBF1] text-[#0F4C4C] font-bold'
+                          : 'bg-[#F3F4F6] text-[#4B5563] font-medium hover:bg-[#E5E7EB]'
+                      }`}
+                    >
+                      All
+                    </button>
+                    <button
+                      onClick={() => setNotificationFilter('Unread')}
+                      className={`px-3.5 py-1.5 rounded-xl text-[13.5px] transition-all cursor-pointer whitespace-nowrap flex items-center space-x-1.5 ${
+                        notificationFilter === 'Unread'
+                          ? 'bg-[#CCFBF1] text-[#0F4C4C] font-bold'
+                          : 'bg-[#F3F4F6] text-[#4B5563] font-medium hover:bg-[#E5E7EB]'
+                      }`}
+                    >
+                      <span>Unread</span>
+                      {notificationsList.filter((n) => n.isUnread).length > 0 && (
+                        <span className="w-4 h-4 bg-[#EF4444] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                          {notificationsList.filter((n) => n.isUnread).length}
+                        </span>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setNotificationFilter('Leads')}
+                      className={`px-4 py-1.5 rounded-xl text-[13.5px] transition-all cursor-pointer whitespace-nowrap ${
+                        notificationFilter === 'Leads'
+                          ? 'bg-[#CCFBF1] text-[#0F4C4C] font-bold'
+                          : 'bg-[#F3F4F6] text-[#4B5563] font-medium hover:bg-[#E5E7EB]'
+                      }`}
+                    >
+                      Leads
+                    </button>
+                    <button
+                      onClick={() => setNotificationFilter('Visits')}
+                      className={`px-4 py-1.5 rounded-xl text-[13.5px] transition-all cursor-pointer whitespace-nowrap ${
+                        notificationFilter === 'Visits'
+                          ? 'bg-[#CCFBF1] text-[#0F4C4C] font-bold'
+                          : 'bg-[#F3F4F6] text-[#4B5563] font-medium hover:bg-[#E5E7EB]'
+                      }`}
+                    >
+                      Visits
+                    </button>
+                  </div>
+
+                  {/* Notifications List - Strictly hidden scrollbars */}
+                  <div className="flex-1 overflow-y-auto px-5 pt-2 pb-24 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden divide-y divide-[#F3F4F6]">
+                    {notificationsList
+                      .filter((n) => {
+                        if (notificationFilter === 'Unread') return n.isUnread;
+                        if (notificationFilter === 'Leads') return n.category === 'leads';
+                        if (notificationFilter === 'Visits') return n.category === 'visits';
+                        return true;
+                      })
+                      .map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => toggleNotificationItemRead(item.id)}
+                          className="py-3.5 flex items-center space-x-3 cursor-pointer hover:bg-gray-50/60 rounded-xl transition-colors px-1"
+                        >
+                          {/* Unread dot */}
+                          <div className="w-2.5 flex justify-center shrink-0">
+                            {item.isUnread && (
+                              <span className="w-2 h-2 rounded-full bg-[#0F4C4C]" />
+                            )}
+                          </div>
+
+                          {/* Avatar icon */}
+                          <div
+                            className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: item.iconBg, color: item.iconColor }}
+                          >
+                            {item.iconType === 'user' && <User className="w-5 h-5" />}
+                            {item.iconType === 'calendar' && <Calendar className="w-5 h-5" />}
+                            {item.iconType === 'eye' && <Eye className="w-5 h-5" />}
+                            {item.iconType === 'alert' && <AlertCircle className="w-5 h-5" />}
+                            {item.iconType === 'handshake' && <Handshake className="w-5 h-5" />}
+                          </div>
+
+                          {/* Text content */}
+                          <div className="flex-1 min-w-0 pr-1">
+                            <p className="text-[14px] font-bold text-[#111827] leading-tight">
+                              {item.title}
+                            </p>
+                            <p className="text-[12.5px] text-[#6B7280] font-normal mt-1">
+                              {item.time}
+                            </p>
+                          </div>
+
+                          {/* Action button if any */}
+                          {item.actionText && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                triggerNotificationToast('Opening Acme Corp lead record');
+                              }}
+                              className="bg-[#0F4C4C] hover:bg-[#0D4444] text-white text-[12px] font-bold px-3 py-1.5 rounded-lg shadow-xs transition-colors shrink-0 cursor-pointer"
+                            >
+                              {item.actionText}
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* Floating Bottom Navigation Bar */}
+                  <div className="absolute bottom-3 left-4 right-4 bg-white rounded-3xl border border-[#E5E7EB] shadow-lg py-2 px-3 flex justify-around items-center z-30">
+                    {/* Home Tab */}
+                    <button
+                      onClick={() => {
+                        setSelectedScreen('dashboard');
+                        triggerDashboardToast('Switched to Dashboard');
+                      }}
+                      className="flex flex-col items-center py-1 px-3.5 rounded-full transition-all cursor-pointer text-[#9CA3AF] hover:text-[#4B5563]"
+                    >
+                      <Home className="w-5 h-5" />
+                      <span className="text-[10.5px] font-medium mt-0.5">Home</span>
+                    </button>
+
+                    {/* Leads Tab */}
+                    <button
+                      onClick={() => triggerNotificationToast('Navigating to Leads screen')}
+                      className="flex flex-col items-center py-1 px-2.5 rounded-full transition-all cursor-pointer text-[#9CA3AF] hover:text-[#4B5563]"
+                    >
+                      <Folder className="w-5 h-5" />
+                      <span className="text-[10.5px] font-medium mt-0.5">Leads</span>
+                    </button>
+
+                    {/* Visits Tab */}
+                    <button
+                      onClick={() => triggerNotificationToast('Navigating to Visits route map')}
+                      className="flex flex-col items-center py-1 px-2.5 rounded-full transition-all cursor-pointer text-[#9CA3AF] hover:text-[#4B5563]"
+                    >
+                      <Route className="w-5 h-5" />
+                      <span className="text-[10.5px] font-medium mt-0.5">Visits</span>
+                    </button>
+
+                    {/* Tasks Tab */}
+                    <button
+                      onClick={() => triggerNotificationToast('Navigating to Tasks checklist')}
+                      className="flex flex-col items-center py-1 px-2.5 rounded-full transition-all cursor-pointer text-[#9CA3AF] hover:text-[#4B5563]"
+                    >
+                      <ListTodo className="w-5 h-5" />
+                      <span className="text-[10.5px] font-medium mt-0.5">Tasks</span>
+                    </button>
+
+                    {/* Profile Tab */}
+                    <button
+                      onClick={() => triggerNotificationToast('Navigating to Rep Profile & Settings')}
+                      className="flex flex-col items-center py-1 px-2.5 rounded-full transition-all cursor-pointer text-[#9CA3AF] hover:text-[#4B5563]"
+                    >
+                      <User className="w-5 h-5" />
+                      <span className="text-[10.5px] font-medium mt-0.5">Profile</span>
+                    </button>
+                  </div>
+                </div>
+              ) : selectedScreen === 'intro-slide-three' ? (
+                /* ONBOARDING SCREEN 10: INTRO SLIDE THREE (WIN WITH AI INSIGHTS) */
+                <div className="flex-1 flex flex-col justify-between bg-[#0F4C4C] relative select-none">
+                  {/* Top Bar: Skip button */}
+                  <div className="px-6 pt-4 pb-2 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={handleSkipIntroSlideThree}
+                      className="text-[#99F6E4] hover:text-white font-medium text-[15px] cursor-pointer transition-colors"
+                    >
+                      Skip
+                    </button>
+                    <span className="text-white/40 text-[12px] font-semibold">
+                      3 of 3
+                    </span>
+                  </div>
+
+                  {/* Feedback Toast */}
+                  {introSlideThreeToast && (
+                    <div className="mx-6 mt-1 p-2.5 bg-emerald-500/20 border border-emerald-400/40 rounded-xl flex items-center space-x-2 text-xs text-emerald-200 animate-fade-in">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0" />
+                      <span className="font-semibold">{introSlideThreeToast}</span>
+                    </div>
+                  )}
+
+
+                  {/* Main Card & Text Content */}
+                  <div className="flex-1 flex flex-col justify-center px-6 py-2">
+                    {/* Center Graphic Card (280x280) */}
+                    <div className="mx-auto w-[280px] h-[280px] rounded-[32px] bg-[#135858] relative overflow-hidden shadow-xl shadow-black/20 flex items-center justify-center">
+                      {/* 4x4 Grid Coordinate Lines */}
+                      <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                        <line x1="25%" y1="0" x2="25%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                        <line x1="50%" y1="0" x2="50%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                        <line x1="75%" y1="0" x2="75%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                        <line x1="0" y1="25%" x2="100%" y2="25%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                        <line x1="0" y1="50%" x2="100%" y2="50%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                        <line x1="0" y1="75%" x2="100%" y2="75%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+
+                        {/* Bar 1 (Left, muted teal) */}
+                        <rect x="24.5%" y="46%" width="6.2%" height="26%" rx="5.5" fill="#4D8080" />
+                        {/* Bar 2 (Middle, medium teal) */}
+                        <rect x="36.8%" y="26%" width="6.2%" height="46%" rx="5.5" fill="#6BADA8" />
+                        {/* Bar 3 (Right, tallest white) */}
+                        <rect x="49.3%" y="10%" width="6.2%" height="62%" rx="5.5" fill="#FFFFFF" />
+
+                        {/* Small Star Outline (Center 65%, 66.5% -> x=182, y=186.2) */}
+                        <path
+                          d="M 182 178.7 L 184.3 183.3 L 189.5 184.1 L 185.7 187.8 L 186.6 193 L 182 190.5 L 177.4 193 L 178.3 187.8 L 174.5 184.1 L 179.7 183.3 Z"
+                          fill="none"
+                          stroke="rgba(255,255,255,0.9)"
+                          strokeWidth="1.7"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+
+                        {/* Large Star Outline (Center 79%, 63% -> x=221.2, y=176.4) */}
+                        <path
+                          d="M 221.2 163.4 L 225.1 171.3 L 233.8 172.6 L 227.5 178.8 L 229 187.5 L 221.2 183.4 L 213.4 187.5 L 214.9 178.8 L 208.6 172.6 L 217.3 171.3 Z"
+                          fill="none"
+                          stroke="#FFFFFF"
+                          strokeWidth="2.1"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+
+                    {/* Title */}
+                    <h2 className="text-[32px] font-extrabold text-white tracking-tight leading-[1.15] mt-10">
+                      Win with AI Insights
+                    </h2>
+
+                    {/* Subtitle */}
+                    <p className="text-[15.5px] text-[#D1FAE5]/85 font-normal mt-3.5 leading-relaxed">
+                      Smart lead scoring, deal win probability, and personalized day-coaching to close deals faster.
+                    </p>
+                  </div>
+
+                  {/* Bottom Navigation Control Row */}
+                  <div className="px-6 py-6 flex items-center justify-between mt-auto">
+                    {/* Dots indicator with 3rd dot active */}
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedScreen('app-intro-walkthrough');
+                          setWalkthroughPage(0);
+                        }}
+                        className="w-2 h-2 rounded-full bg-white/35 hover:bg-white/60 transition-all cursor-pointer"
+                        aria-label="Go to slide 1"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setSelectedScreen('intro-slide-two')}
+                        className="w-2 h-2 rounded-full bg-white/35 hover:bg-white/60 transition-all cursor-pointer"
+                        aria-label="Go to slide 2"
+                      />
+                      <div
+                        className="w-2.5 h-2.5 rounded-full bg-white scale-110 shadow-sm"
+                        aria-label="Slide 3 (Current)"
+                      />
+                    </div>
+
+                    {/* Get Started Pill Button */}
+                    <button
+                      type="button"
+                      onClick={handleGetStartedIntroSlideThree}
+                      className="px-7 py-3.5 rounded-full bg-white text-[#0F4C4C] font-bold text-[15px] shadow-xl shadow-black/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                    >
+                      Get Started
+                    </button>
+                  </div>
+                </div>
+              ) : selectedScreen === 'intro-slide-two' ? (
+                /* ONBOARDING SCREEN 9: INTRO SLIDE TWO (TRACK YOUR VISITS) */
+                <div className="flex-1 flex flex-col justify-between bg-[#0F4C4C] relative select-none">
+                  {/* Top Bar: Skip button */}
+                  <div className="px-6 pt-4 pb-2 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={handleSkipIntroSlideTwo}
+                      className="text-[#99F6E4] hover:text-white font-medium text-[15px] cursor-pointer transition-colors"
+                    >
+                      Skip
+                    </button>
+                    <span className="text-white/40 text-[12px] font-semibold">
+                      2 of 3
+                    </span>
+                  </div>
+
+                  {/* Feedback Toast */}
+                  {introSlideTwoToast && (
+                    <div className="mx-6 mt-1 p-2.5 bg-emerald-500/20 border border-emerald-400/40 rounded-xl flex items-center space-x-2 text-xs text-emerald-200 animate-fade-in">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0" />
+                      <span className="font-semibold">{introSlideTwoToast}</span>
+                    </div>
+                  )}
+
+                  {/* Main Card & Text Content */}
+                  <div className="flex-1 flex flex-col justify-center px-6 py-2">
+                    {/* Center Graphic Card (280x280) */}
+                    <div className="mx-auto w-[280px] h-[280px] rounded-[32px] bg-[#135858] relative overflow-hidden shadow-xl shadow-black/20 flex items-center justify-center">
+                      {/* 4x4 Grid Coordinate Lines */}
+                      <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                        <line x1="25%" y1="0" x2="25%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                        <line x1="50%" y1="0" x2="50%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                        <line x1="75%" y1="0" x2="75%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                        <line x1="0" y1="25%" x2="100%" y2="25%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                        <line x1="0" y1="50%" x2="100%" y2="50%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                        <line x1="0" y1="75%" x2="100%" y2="75%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+
+                        {/* Dashed Connecting Line 1: Building to Pin */}
+                        <line
+                          x1="30%"
+                          y1="64%"
+                          x2="49.5%"
+                          y2="25%"
+                          stroke="#6EE7B7"
+                          strokeOpacity="0.6"
+                          strokeWidth="2.2"
+                          strokeDasharray="6,5"
+                          strokeLinecap="round"
+                        />
+                        {/* Dashed Connecting Line 2: Building to Checkmark Badge */}
+                        <line
+                          x1="34%"
+                          y1="70%"
+                          x2="63%"
+                          y2="70%"
+                          stroke="#6EE7B7"
+                          strokeOpacity="0.6"
+                          strokeWidth="2.2"
+                          strokeDasharray="6,5"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+
+                      {/* Top Location Pin Node (Center ~49.5%, ~17%) */}
+                      <div className="absolute left-1/2 -translate-x-1/2 top-[38px] flex flex-col items-center">
+                        <MapPin className="w-9 h-9 text-white stroke-[2.1]" />
+                      </div>
+
+                      {/* Bottom-Left Building Node (Center ~28%, ~70%) */}
+                      <div className="absolute left-[62px] top-[182px] flex items-center justify-center">
+                        <Building2 className="w-8 h-8 text-white stroke-[2.1]" />
+                      </div>
+
+                      {/* Bottom-Right Verified Checkmark Badge (Center ~71.5%, ~70%) */}
+                      <div className="absolute right-[56px] top-[180px] w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-lg">
+                        <Check className="w-5 h-5 text-[#0F4C4C] stroke-[3]" />
+                      </div>
+                    </div>
+
+                    {/* Title */}
+                    <h2 className="text-[32px] font-extrabold text-white tracking-tight leading-[1.15] mt-10">
+                      Track Your Visits
+                    </h2>
+
+                    {/* Subtitle */}
+                    <p className="text-[15.5px] text-[#D1FAE5]/85 font-normal mt-3.5 leading-relaxed">
+                      GPS-verified check-ins, real-time visit tracking, and automated meeting logs kept instantly in sync.
+                    </p>
+                  </div>
+
+                  {/* Bottom Navigation Control Row */}
+                  <div className="px-6 py-6 flex items-center justify-between mt-auto">
+                    {/* Dots indicator with 2nd dot active */}
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedScreen('app-intro-walkthrough');
+                          setWalkthroughPage(0);
+                        }}
+                        className="w-2 h-2 rounded-full bg-white/35 hover:bg-white/60 transition-all cursor-pointer"
+                        aria-label="Go to slide 1"
+                      />
+                      <div
+                        className="w-2.5 h-2.5 rounded-full bg-white scale-110 shadow-sm"
+                        aria-label="Slide 2 (Current)"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedScreen('app-intro-walkthrough');
+                          setWalkthroughPage(2);
+                        }}
+                        className="w-2 h-2 rounded-full bg-white/35 hover:bg-white/60 transition-all cursor-pointer"
+                        aria-label="Go to slide 3"
+                      />
+                    </div>
+
+                    {/* Next Button (56x56 white circle with dark teal arrow) */}
+                    <button
+                      type="button"
+                      onClick={handleNextIntroSlideTwo}
+                      className="w-[56px] h-[56px] rounded-full bg-white shadow-xl shadow-black/20 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                      title="Next Slide"
+                    >
+                      <ArrowRight className="w-6 h-6 text-[#0F4C4C] stroke-[2.4]" />
+                    </button>
+                  </div>
+                </div>
+              ) : selectedScreen === 'app-intro-walkthrough' ? (
+                /* ONBOARDING SCREEN 7: APP INTRO WALKTHROUGH */
+                <div className="flex-1 flex flex-col justify-between bg-[#0F4C4C] relative select-none">
+                  {/* Top Bar: Skip button */}
+                  <div className="px-6 pt-4 pb-2 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={handleSkipWalkthrough}
+                      className="text-[#99F6E4] hover:text-white font-medium text-[15px] cursor-pointer transition-colors"
+                    >
+                      Skip
+                    </button>
+                    {/* Slide counter indicator */}
+                    <span className="text-white/40 text-[12px] font-semibold">
+                      {walkthroughPage + 1} of {walkthroughSlides.length}
+                    </span>
+                  </div>
+
+                  {/* Feedback Toast */}
+                  {walkthroughToast && (
+                    <div className="mx-6 mt-1 p-2.5 bg-emerald-500/20 border border-emerald-400/40 rounded-xl flex items-center space-x-2 text-xs text-emerald-200 animate-fade-in">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0" />
+                      <span className="font-semibold">{walkthroughToast}</span>
+                    </div>
+                  )}
+
+                  {/* Main Carousel Card & Text Content */}
+                  <div className="flex-1 flex flex-col justify-center px-6 py-2">
+                    {/* Center Graphic Card (280x280) */}
+                    <div className="mx-auto w-[280px] h-[280px] rounded-[32px] bg-[#135858] relative overflow-hidden shadow-xl shadow-black/20 flex items-center justify-center">
+                      {walkthroughSlides[walkthroughPage].type === 'map' ? (
+                        /* Map Route Graphic */
+                        <div className="w-full h-full relative">
+                          {/* 4x4 Grid Coordinate Lines */}
+                          <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                            <line x1="25%" y1="0" x2="25%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="50%" y1="0" x2="50%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="75%" y1="0" x2="75%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="0" y1="25%" x2="100%" y2="25%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="0" y1="50%" x2="100%" y2="50%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="0" y1="75%" x2="100%" y2="75%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+
+                            {/* Dashed Connecting Line */}
+                            <line
+                              x1="28%"
+                              y1="65%"
+                              x2="49%"
+                              y2="38%"
+                              stroke="#6EE7B7"
+                              strokeOpacity="0.6"
+                              strokeWidth="2.2"
+                              strokeDasharray="6,5"
+                              strokeLinecap="round"
+                            />
+                            <line
+                              x1="49%"
+                              y1="38%"
+                              x2="74%"
+                              y2="50%"
+                              stroke="#6EE7B7"
+                              strokeOpacity="0.6"
+                              strokeWidth="2.2"
+                              strokeDasharray="6,5"
+                              strokeLinecap="round"
+                            />
+
+                            {/* Waypoint Nodes */}
+                            {/* P1: 28%, 65% */}
+                            <circle cx="28%" cy="65%" r="13" fill="#0F4C4C" fillOpacity="0.85" stroke="white" strokeWidth="2.4" />
+                            <circle cx="28%" cy="65%" r="3.5" fill="#99F6E4" />
+
+                            {/* P2: 49%, 38% */}
+                            <circle cx="49%" cy="38%" r="12" fill="#0F4C4C" fillOpacity="0.85" stroke="white" strokeWidth="2.4" />
+                            <circle cx="49%" cy="38%" r="3.2" fill="#99F6E4" />
+
+                            {/* P3: 74%, 50% */}
+                            <circle cx="74%" cy="50%" r="12" fill="#0F4C4C" fillOpacity="0.85" stroke="white" strokeWidth="2.4" />
+                            <circle cx="74%" cy="50%" r="3.2" fill="#99F6E4" />
+                          </svg>
+                        </div>
+                      ) : walkthroughSlides[walkthroughPage].type === 'track-visits' ? (
+                        /* Track Your Visits Graphic (GPS + Visits + Verified) */
+                        <div className="w-full h-full relative">
+                          {/* 4x4 Grid Coordinate Lines */}
+                          <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                            <line x1="25%" y1="0" x2="25%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="50%" y1="0" x2="50%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="75%" y1="0" x2="75%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="0" y1="25%" x2="100%" y2="25%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="0" y1="50%" x2="100%" y2="50%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="0" y1="75%" x2="100%" y2="75%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+
+                            {/* Dashed Connecting Line 1: Building to Pin */}
+                            <line
+                              x1="30%"
+                              y1="64%"
+                              x2="49.5%"
+                              y2="25%"
+                              stroke="#6EE7B7"
+                              strokeOpacity="0.6"
+                              strokeWidth="2.2"
+                              strokeDasharray="6,5"
+                              strokeLinecap="round"
+                            />
+                            {/* Dashed Connecting Line 2: Building to Checkmark Badge */}
+                            <line
+                              x1="34%"
+                              y1="70%"
+                              x2="63%"
+                              y2="70%"
+                              stroke="#6EE7B7"
+                              strokeOpacity="0.6"
+                              strokeWidth="2.2"
+                              strokeDasharray="6,5"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+
+                          {/* Top Location Pin Node (Center ~49.5%, ~17%) */}
+                          <div className="absolute left-1/2 -translate-x-1/2 top-[38px] flex flex-col items-center">
+                            <MapPin className="w-9 h-9 text-white stroke-[2.1]" />
+                          </div>
+
+                          {/* Bottom-Left Building Node (Center ~28%, ~70%) */}
+                          <div className="absolute left-[62px] top-[182px] flex items-center justify-center">
+                            <Building2 className="w-8 h-8 text-white stroke-[2.1]" />
+                          </div>
+
+                          {/* Bottom-Right Verified Checkmark Badge (Center ~71.5%, ~70%) */}
+                          <div className="absolute right-[56px] top-[180px] w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-lg">
+                            <Check className="w-5 h-5 text-[#0F4C4C] stroke-[3]" />
+                          </div>
+                        </div>
+                      ) : walkthroughSlides[walkthroughPage].type === 'ai-insights' ? (
+                        /* AI Insights Graphic */
+                        <div className="w-full h-full relative">
+                          <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                            <line x1="25%" y1="0" x2="25%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="50%" y1="0" x2="50%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="75%" y1="0" x2="75%" y2="100%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="0" y1="25%" x2="100%" y2="25%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="0" y1="50%" x2="100%" y2="50%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <line x1="0" y1="75%" x2="100%" y2="75%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+
+                            <rect x="24.5%" y="46%" width="6.2%" height="26%" rx="5.5" fill="#4D8080" />
+                            <rect x="36.8%" y="26%" width="6.2%" height="46%" rx="5.5" fill="#6BADA8" />
+                            <rect x="49.3%" y="10%" width="6.2%" height="62%" rx="5.5" fill="#FFFFFF" />
+
+                            <path
+                              d="M 182 178.7 L 184.3 183.3 L 189.5 184.1 L 185.7 187.8 L 186.6 193 L 182 190.5 L 177.4 193 L 178.3 187.8 L 174.5 184.1 L 179.7 183.3 Z"
+                              fill="none"
+                              stroke="rgba(255,255,255,0.9)"
+                              strokeWidth="1.7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M 221.2 163.4 L 225.1 171.3 L 233.8 172.6 L 227.5 178.8 L 229 187.5 L 221.2 183.4 L 213.4 187.5 L 214.9 178.8 L 208.6 172.6 L 217.3 171.3 Z"
+                              fill="none"
+                              stroke="#FFFFFF"
+                              strokeWidth="2.1"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                      ) : (
+                        /* Fallback */
+                        <div className="w-full h-full relative flex items-center justify-center">
+                          <div className="w-[100px] h-[110px] rounded-2xl bg-[#0F4C4C] border-2 border-white flex items-center justify-center shadow-lg">
+                            <Shield className="w-12 h-12 text-[#99F6E4]" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Title */}
+                    <h2 className="text-[32px] font-extrabold text-white tracking-tight leading-[1.15] mt-10">
+                      {walkthroughSlides[walkthroughPage].title}
+                    </h2>
+
+                    {/* Subtitle */}
+                    <p className="text-[15.5px] text-[#D1FAE5]/85 font-normal mt-3.5 leading-relaxed">
+                      {walkthroughSlides[walkthroughPage].subtitle}
+                    </p>
+                  </div>
+
+                  {/* Bottom Navigation Control Row */}
+                  <div className="px-6 py-6 flex items-center justify-between mt-auto">
+                    {/* Dots indicator */}
+                    <div className="flex items-center space-x-2">
+                      {walkthroughSlides.map((_, idx) => {
+                        const isActive = idx === walkthroughPage;
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setWalkthroughPage(idx)}
+                            className={`transition-all rounded-full cursor-pointer ${
+                              isActive
+                                ? 'w-2.5 h-2.5 bg-white scale-110'
+                                : 'w-2 h-2 bg-white/35 hover:bg-white/60'
+                            }`}
+                            aria-label={`Go to slide ${idx + 1}`}
+                          />
+                        );
+                      })}
+                    </div>
+
+                    {/* Action Button: Pill "Get Started" on slide 3, or circular arrow on slides 1 & 2 */}
+                    {walkthroughPage === walkthroughSlides.length - 1 ? (
+                      <button
+                        type="button"
+                        onClick={handleNextWalkthrough}
+                        className="px-7 py-3.5 rounded-full bg-white text-[#0F4C4C] font-bold text-[15px] shadow-xl shadow-black/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                      >
+                        Get Started
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleNextWalkthrough}
+                        className="w-[56px] h-[56px] rounded-full bg-white shadow-xl shadow-black/20 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                        title="Next Slide"
+                      >
+                        <ArrowRight className="w-6 h-6 text-[#0F4C4C] stroke-[2.4]" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : selectedScreen === 'onboarding-complete' ? (
+                /* ONBOARDING SCREEN 7: ONBOARDING COMPLETE ("YOU'RE ALL SET!") */
+                <div className="flex-1 flex flex-col justify-between px-6 pt-8 pb-6 overflow-y-auto no-scrollbar scroll-smooth bg-white relative">
+                  <div>
+                    {/* 1. Hero Graphic: Concentric Emerald Success Badge with Double Checkmark (identical to reset success) */}
+                    <div className="flex justify-center mt-4">
+                      <div className="flex items-center justify-center w-[196px] h-[196px] rounded-full bg-[#D1FADF] animate-fade-in transition-all">
+                        <div className="flex items-center justify-center w-[128px] h-[128px] rounded-full bg-[#10B981] shadow-lg shadow-[#10B981]/25">
+                          <CheckCheck className="w-14 h-14 text-white stroke-[1.25]" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. Title: "You're All Set!" */}
+                    <h2 className="text-[28px] font-extrabold text-[#111827] mt-9 tracking-tight leading-tight">
+                      You're All Set!
+                    </h2>
+
+                    {/* 3. Subtitle: "Your field kit is ready. Time to hit the road." */}
+                    <p className="text-[15px] text-[#4B5563] mt-2.5 leading-relaxed">
+                      Your field kit is ready. Time to hit the road.
+                    </p>
+
+                    {/* 4. Territory Prep Overview Card */}
+                    <div className="mt-7 p-4.5 bg-[#F9FAFB] rounded-2xl border border-[#F3F4F6] space-y-3.5">
+                      <p className="text-[11px] font-bold text-[#6B7280] tracking-wider uppercase">
+                        TERRITORY PREP OVERVIEW
+                      </p>
+
+                      <div className="flex items-center space-x-2.5">
+                        <Briefcase className="w-4.5 h-4.5 text-[#0F4C4C] shrink-0" />
+                        <span className="text-[13.5px] font-medium text-[#1F2937]">
+                          120 leads parsed and mapped
+                        </span>
+                      </div>
+
+                      <div className="flex items-center space-x-2.5">
+                        <Calendar className="w-4.5 h-4.5 text-[#0F4C4C] shrink-0" />
+                        <span className="text-[13.5px] font-medium text-[#1F2937]">
+                          6 priority visits mapped out for today
+                        </span>
+                      </div>
+
+                      <div className="flex items-center space-x-2.5">
+                        <CheckCircle2 className="w-4.5 h-4.5 text-[#10B981] shrink-0" />
+                        <span className="text-[13.5px] font-medium text-[#10B981]">
+                          Offline capability fully ready{' '}
+                          <strong className="font-bold text-[#059669]">(✓ Active)</strong>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 5. Bottom Action: "Continue" CTA */}
+                  <div className="mt-8 pb-2 space-y-3">
+                    <button
+                      onClick={handleOnboardingFinish}
+                      className="w-full h-[52px] bg-[#0F4C4C] hover:bg-[#0c3c3c] active:scale-[0.99] text-white font-bold text-[15px] rounded-xl transition-all shadow-md flex items-center justify-center cursor-pointer tracking-tight"
+                    >
+                      Continue
+                    </button>
+                  </div>
+
+                  {/* Toast Feedback */}
+                  {completeToast && (
+                    <div className="absolute top-5 left-6 right-6 z-50 bg-[#111827] text-white text-xs font-semibold py-3 px-4 rounded-xl shadow-xl flex items-center space-x-2 border border-gray-700 animate-fade-in">
+                      <CheckCircle2 className="w-4 h-4 text-[#10B981] shrink-0" />
+                      <span>{completeToast}</span>
+                    </div>
+                  )}
+                </div>
+              ) : selectedScreen === 'onboarding-offline-setup' ? (
+                /* ONBOARDING SCREEN 6: PREPARE FOR OFFLINE DATA SETUP SCREEN */
+                <div className="flex-1 flex flex-col justify-between px-6 pt-5 pb-6 overflow-y-auto no-scrollbar scroll-smooth bg-white">
+                  <div>
+                    {/* 1. Top Progress Bar: 100% filled dark teal (Final step) */}
+                    <div className="w-full h-[4.5px] bg-[#E5E7EB] rounded-full overflow-hidden mt-1">
+                      <div className="h-full w-full bg-[#0F4C4C] rounded-full transition-all duration-500" />
+                    </div>
+
+                    {/* 2. Hero Graphic Card: Soft mint card with cloud download vector illustration */}
+                    <div className="mt-5 w-full h-[210px] rounded-[24px] bg-[#F0FDF9] flex items-center justify-center relative overflow-hidden group">
+                      <svg
+                        width="130"
+                        height="115"
+                        viewBox="0 0 100 100"
+                        fill="none"
+                        stroke="#0F4C4C"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="transition-transform duration-300 group-hover:scale-105"
+                      >
+                        {/* Cloud Outline */}
+                        <path d="M 42 66 C 36 66 27 61 26 51 C 25 41 33 33 43 33 C 47 22 61 22 67 32 C 77 33 83 42 82 51 C 81 61 72 66 58 66" />
+                        {/* Downward Arrow */}
+                        <path d="M 50 46 L 50 72" />
+                        <path d="M 43 64 L 50 72 L 57 64" />
+                      </svg>
+                    </div>
+
+                    {/* 3. Title: "Prepare for Offline" */}
+                    <h2 className="mt-6 text-[#111827] text-[28px] font-extrabold tracking-tight leading-tight">
+                      Prepare for Offline
+                    </h2>
+
+                    {/* 4. Subtitle */}
+                    <p className="mt-2 text-[#4B5563] text-[15px] font-normal leading-[1.45]">
+                      Download your leads and customer data so you can work without internet.
+                    </p>
+
+                    {/* Feedback Toast if active */}
+                    {offlineToast && (
+                      <div className="mt-3 p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl flex items-center space-x-2 text-xs text-[#065F46] animate-fade-in">
+                        <CheckCircle2 className="w-4 h-4 text-[#10B981] shrink-0" />
+                        <span className="font-semibold">{offlineToast}</span>
+                      </div>
+                    )}
+
+                    {/* 5. Territory Payload Information Box */}
+                    <div className="mt-5 w-full bg-[#F9FAFB] rounded-[16px] p-4 border border-[#F3F4F6]">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[12px] font-bold text-[#6B7280] tracking-wider uppercase">
+                          SOUTH MUMBAI SYNC PAYLOAD
+                        </span>
+                        <span className="text-[13px] font-extrabold text-[#0F4C4C]">
+                          ~45 MB
+                        </span>
+                      </div>
+                      <div className="mt-2.5 space-y-1.5">
+                        <div className="flex items-center text-[14px] text-[#1F2937]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#374151] mr-2.5 ml-1" />
+                          <span>120 assigned leads</span>
+                        </div>
+                        <div className="flex items-center text-[14px] text-[#1F2937]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#374151] mr-2.5 ml-1" />
+                          <span>85 customers in territory</span>
+                        </div>
+                        <div className="flex items-center text-[14px] text-[#1F2937]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#374151] mr-2.5 ml-1" />
+                          <span>7 days offline visit logs</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 6. Download Progress Indicator Section */}
+                    <div className="mt-5 w-full">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-semibold text-[#1F2937]">
+                          {isDownloadCompleted ? 'Download complete' : isDownloading ? 'Downloading leads...' : 'Downloading leads...'}
+                        </span>
+                        <span className="font-extrabold text-[#0F4C4C]">
+                          {downloadedLeads} / 120 ({downloadProgress}%)
+                        </span>
+                      </div>
+                      <div className="w-full h-[5.5px] bg-[#E5E7EB] rounded-full overflow-hidden mt-2">
+                        <div
+                          className="h-full bg-[#0F4C4C] rounded-full transition-all duration-100"
+                          style={{ width: `${downloadProgress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 7. Bottom Action Controls */}
+                  <div className="pt-4 pb-2 flex flex-col space-y-3">
+                    <button
+                      onClick={handleStartDownload}
+                      disabled={isDownloading || isDownloadCompleted}
+                      className="w-full h-[52px] rounded-[12px] bg-[#0F4C4C] hover:bg-[#0C3E3E] active:scale-[0.99] text-white font-bold text-base transition-all flex items-center justify-center space-x-2 shadow-xs cursor-pointer disabled:opacity-90"
+                    >
+                      {isDownloading ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                          <span>Downloading...</span>
+                        </>
+                      ) : isDownloadCompleted ? (
+                        <span>Sync Completed</span>
+                      ) : (
+                        <span>Download Now</span>
+                      )}
+                    </button>
+                    <button
+                      onClick={handleSkipOffline}
+                      className="w-full text-[#6B7280] hover:text-[#111827] font-medium text-sm py-1 transition-colors cursor-pointer"
+                    >
+                      Skip — I'll sync later
+                    </button>
+                  </div>
+                </div>
+              ) : selectedScreen === 'onboarding-notifications' ? (
+                /* ONBOARDING SCREEN 5: ONBOARDING NOTIFICATIONS PERMISSION SCREEN */
+                <div className="flex-1 flex flex-col justify-between px-6 pt-5 pb-6 overflow-y-auto no-scrollbar scroll-smooth bg-white">
+                  <div>
+                    {/* 1. Top Progress Bar: ~78% filled dark teal */}
+                    <div className="w-full h-[4.5px] bg-[#E5E7EB] rounded-full overflow-hidden mt-1">
+                      <div className="h-full w-[78%] bg-[#0F4C4C] rounded-full transition-all duration-500" />
+                    </div>
+
+                    {/* 2. Hero Graphic Card: Soft mint card with notification bell vector illustration */}
+                    <div className="mt-5 w-full h-[210px] rounded-[24px] bg-[#F0FDF9] flex items-center justify-center relative overflow-hidden group">
+                      <svg
+                        width="130"
+                        height="115"
+                        viewBox="0 0 100 100"
+                        fill="none"
+                        stroke="#0F4C4C"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="transition-transform duration-300 group-hover:scale-105"
+                      >
+                        {/* Bell Body */}
+                        <path d="M 47 17.5 C 42 17 37.5 21 36 28 C 35 35 35 41 33.5 46 C 31.5 52 26 55 24 56.5 A 2.5 2.5 0 0 0 27 58.5 L 71 58.5 A 2.5 2.5 0 0 0 74 56.5 C 72 55 66.5 52 64.5 46 C 63 41 63 36 59.5 31" />
+                        {/* Notification Alert Pip */}
+                        <circle cx="58" cy="20" r="7.5" />
+                        {/* Clapper */}
+                        <path d="M 44 64 Q 49 68 54 64" />
+                      </svg>
+                    </div>
+
+                    {/* 3. Title: "Enable Notifications" */}
+                    <h2 className="mt-6 text-[#111827] text-[28px] font-extrabold tracking-tight leading-tight">
+                      Enable Notifications
+                    </h2>
+
+                    {/* 4. Subtitle */}
+                    <p className="mt-2 text-[#4B5563] text-[15px] font-normal leading-[1.45]">
+                      Get reminders for visits, follow-ups, and new lead assignments.
+                    </p>
+
+                    {/* Toast / Feedback Banner if active */}
+                    {notificationsToast && (
+                      <div className="mt-4 p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl flex items-center space-x-2 text-xs text-[#065F46] animate-fade-in">
+                        <CheckCircle2 className="w-4 h-4 text-[#10B981] shrink-0" />
+                        <span className="font-semibold">{notificationsToast}</span>
+                      </div>
+                    )}
+
+                    {/* 5. Benefits List (3 items with mint check badges) */}
+                    <div className="mt-5 space-y-4">
+                      {/* Benefit 1 */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-[22px] h-[22px] rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-[#0F766E] stroke-[2.8]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                            Real-time Lead Routing
+                          </h4>
+                          <p className="text-[13.5px] text-[#4B5563] leading-[1.4] mt-0.5">
+                            Instant alert the moment a manager scopes a hot lead into your zone.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Benefit 2 */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-[22px] h-[22px] rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-[#0F766E] stroke-[2.8]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                            Next Appointment Alerts
+                          </h4>
+                          <p className="text-[13.5px] text-[#4B5563] leading-[1.4] mt-0.5">
+                            Polite reminders 15 mins prior to keep you moving efficiently.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Benefit 3 */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-[22px] h-[22px] rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-[#0F766E] stroke-[2.8]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                            Daily Summary
+                          </h4>
+                          <p className="text-[13.5px] text-[#4B5563] leading-[1.4] mt-0.5">
+                            Morning heads-up summarizing critical actions for the day.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 6. Bottom Action Controls */}
+                  <div className="pt-6 pb-2 space-y-3">
+                    <button
+                      onClick={handleAllowNotifications}
+                      disabled={notificationsStatus === 'requesting'}
+                      className="w-full h-[52px] bg-[#0F4C4C] hover:bg-[#0c3c3c] active:scale-[0.99] text-white font-bold text-[16px] rounded-xl flex items-center justify-center transition-all shadow-sm"
+                    >
+                      {notificationsStatus === 'requesting' ? (
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : notificationsStatus === 'granted' ? (
+                        <span className="flex items-center space-x-2">
+                          <Check className="w-5 h-5 stroke-[2.5]" />
+                          <span>Notifications Enabled</span>
+                        </span>
+                      ) : (
+                        'Allow Notifications'
+                      )}
+                    </button>
+
+                    <button
+                      onClick={handleSkipNotifications}
+                      className="w-full text-center text-[#6B7280] hover:text-[#111827] text-[15px] font-medium py-1 transition-colors"
+                    >
+                      Skip for now
+                    </button>
+                  </div>
+                </div>
+              ) : selectedScreen === 'onboarding-microphone' ? (
+                /* ONBOARDING SCREEN 4: ONBOARDING MICROPHONE PERMISSION SCREEN */
+                <div className="flex-1 flex flex-col justify-between px-6 pt-5 pb-6 overflow-y-auto no-scrollbar scroll-smooth bg-white">
+                  <div>
+                    {/* 1. Top Progress Bar: ~60% filled dark teal */}
+                    <div className="w-full h-[4.5px] bg-[#E5E7EB] rounded-full overflow-hidden mt-1">
+                      <div className="h-full w-[60%] bg-[#0F4C4C] rounded-full transition-all duration-500" />
+                    </div>
+
+                    {/* 2. Hero Graphic Card: Soft mint card with continuous audio waveform illustration */}
+                    <div className="mt-5 w-full h-[210px] rounded-[24px] bg-[#F0FDF9] flex items-center justify-center relative overflow-hidden group">
+                      <svg
+                        width="125"
+                        height="105"
+                        viewBox="0 0 100 100"
+                        fill="none"
+                        stroke="#0F4C4C"
+                        strokeWidth="2.0"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="transition-transform duration-300 group-hover:scale-105"
+                      >
+                        <path d="M 16 52 C 22 51 26 42 28 32 A 8 8 0 0 1 44 32 L 44 78 A 8 8 0 0 0 60 78 L 60 22 A 8 8 0 0 1 76 22 L 76 62 A 7 7 0 0 0 90 62 C 91 55 94 48 98 44" />
+                      </svg>
+                    </div>
+
+                    {/* 3. Title: "Enable Microphone" */}
+                    <h2 className="mt-6 text-[#111827] text-[28px] font-extrabold tracking-tight leading-tight">
+                      Enable Microphone
+                    </h2>
+
+                    {/* 4. Subtitle */}
+                    <p className="mt-2 text-[#4B5563] text-[15px] font-normal leading-[1.45]">
+                      Record voice notes during or after meetings instead of typing.
+                    </p>
+
+                    {/* Toast / Feedback Banner if active */}
+                    {microphoneToast && (
+                      <div className="mt-4 p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl flex items-center space-x-2 text-xs text-[#065F46] animate-fade-in">
+                        <CheckCircle2 className="w-4 h-4 text-[#10B981] shrink-0" />
+                        <span className="font-semibold">{microphoneToast}</span>
+                      </div>
+                    )}
+
+                    {/* 5. Benefits List (3 items with mint check badges) */}
+                    <div className="mt-5 space-y-4">
+                      {/* Benefit 1 */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-[22px] h-[22px] rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-[#0F766E] stroke-[2.8]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                            Hands-free Minutes
+                          </h4>
+                          <p className="text-[13.5px] text-[#4B5563] leading-[1.4] mt-0.5">
+                            Dictate logs walking back to your car, converted instantly to text.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Benefit 2 */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-[22px] h-[22px] rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-[#0F766E] stroke-[2.8]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                            Quick Client Quotes
+                          </h4>
+                          <p className="text-[13.5px] text-[#4B5563] leading-[1.4] mt-0.5">
+                            Capture precise verbal requests with secure client agreement notes.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Benefit 3 */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-[22px] h-[22px] rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-[#0F766E] stroke-[2.8]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                            Smart Summary
+                          </h4>
+                          <p className="text-[13.5px] text-[#4B5563] leading-[1.4] mt-0.5">
+                            AI distills 5-minute recordings into actionable tasks.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 6. Bottom Action Controls */}
+                  <div className="pt-6 pb-2 space-y-3">
+                    <button
+                      onClick={handleAllowMicrophone}
+                      disabled={microphoneStatus === 'requesting'}
+                      className="w-full h-[52px] bg-[#0F4C4C] hover:bg-[#0c3c3c] active:scale-[0.99] text-white font-bold text-[16px] rounded-xl flex items-center justify-center transition-all shadow-sm"
+                    >
+                      {microphoneStatus === 'requesting' ? (
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : microphoneStatus === 'granted' ? (
+                        <span className="flex items-center space-x-2">
+                          <Check className="w-5 h-5 stroke-[2.5]" />
+                          <span>Microphone Access Granted</span>
+                        </span>
+                      ) : (
+                        'Allow Microphone Access'
+                      )}
+                    </button>
+
+                    <button
+                      onClick={handleSkipMicrophone}
+                      className="w-full text-center text-[#6B7280] hover:text-[#111827] text-[15px] font-medium py-1 transition-colors"
+                    >
+                      Skip for now
+                    </button>
+                  </div>
+                </div>
+              ) : selectedScreen === 'onboarding-camera' ? (
+                /* ONBOARDING SCREEN 3: ONBOARDING CAMERA PERMISSION SCREEN */
+                <div className="flex-1 flex flex-col justify-between px-6 pt-5 pb-6 overflow-y-auto no-scrollbar scroll-smooth bg-white">
+                  <div>
+                    {/* 1. Top Progress Bar: ~42% filled dark teal */}
+                    <div className="w-full h-[4.5px] bg-[#E5E7EB] rounded-full overflow-hidden mt-1">
+                      <div className="h-full w-[42%] bg-[#0F4C4C] rounded-full transition-all duration-500" />
+                    </div>
+
+                    {/* 2. Hero Graphic Card: Soft mint card with camera vector illustration */}
+                    <div className="mt-5 w-full h-[210px] rounded-[24px] bg-[#F0FDF9] flex items-center justify-center relative overflow-hidden group">
+                      <svg
+                        width="106"
+                        height="106"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#0F4C4C"
+                        strokeWidth="0.65"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="transition-transform duration-300 group-hover:scale-105"
+                      >
+                        <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+                        <circle cx="12" cy="13" r="3.4" />
+                      </svg>
+                    </div>
+
+                    {/* 3. Title: "Enable Camera" */}
+                    <h2 className="mt-6 text-[#111827] text-[28px] font-extrabold tracking-tight leading-tight">
+                      Enable Camera
+                    </h2>
+
+                    {/* 4. Subtitle */}
+                    <p className="mt-2 text-[#4B5563] text-[15px] font-normal leading-[1.45]">
+                      Capture visiting cards, customer photos, and documents during visits.
+                    </p>
+
+                    {/* Toast / Feedback Banner if active */}
+                    {cameraToast && (
+                      <div className="mt-4 p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl flex items-center space-x-2 text-xs text-[#065F46] animate-fade-in">
+                        <CheckCircle2 className="w-4 h-4 text-[#10B981] shrink-0" />
+                        <span className="font-semibold">{cameraToast}</span>
+                      </div>
+                    )}
+
+                    {/* 5. Benefits List (3 items with mint check badges) */}
+                    <div className="mt-5 space-y-4">
+                      {/* Benefit 1 */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-[22px] h-[22px] rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-[#0F766E] stroke-[2.8]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                            Business Card OCR
+                          </h4>
+                          <p className="text-[13.5px] text-[#4B5563] leading-[1.4] mt-0.5">
+                            Instant lead translation from physical cards directly to the CRM.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Benefit 2 */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-[22px] h-[22px] rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-[#0F766E] stroke-[2.8]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                            Site Verification
+                          </h4>
+                          <p className="text-[13.5px] text-[#4B5563] leading-[1.4] mt-0.5">
+                            Upload physical storefront images as meeting proof for compliance.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Benefit 3 */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-[22px] h-[22px] rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-[#0F766E] stroke-[2.8]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                            Receipt Scans
+                          </h4>
+                          <p className="text-[13.5px] text-[#4B5563] leading-[1.4] mt-0.5">
+                            Instantly log client lunch bills to expenses on the fly.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 6. Bottom Action Controls */}
+                  <div className="mt-auto pt-4 pb-2 flex flex-col items-center space-y-3">
+                    <button
+                      type="button"
+                      onClick={handleAllowCamera}
+                      disabled={cameraStatus === 'requesting'}
+                      className="w-full h-[52px] bg-[#0F4C4C] hover:bg-[#0C3E3E] active:scale-[0.99] text-white font-bold text-[16px] rounded-xl flex items-center justify-center transition-all shadow-xs cursor-pointer disabled:opacity-80"
+                    >
+                      {cameraStatus === 'requesting' ? (
+                        <RotateCcw className="w-5 h-5 animate-spin" />
+                      ) : cameraStatus === 'granted' ? (
+                        <span className="flex items-center space-x-2">
+                          <Check className="w-5 h-5 stroke-[2.8]" />
+                          <span>Camera Access Granted</span>
+                        </span>
+                      ) : (
+                        'Allow Camera Access'
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleSkipCamera}
+                      className="text-[15px] font-medium text-[#6B7280] hover:text-[#111827] transition-colors py-1 cursor-pointer"
+                    >
+                      Skip for now
+                    </button>
+                  </div>
+                </div>
+              ) : selectedScreen === 'onboarding-location' ? (
+                /* ONBOARDING SCREEN 2: ONBOARDING LOCATION PERMISSION SCREEN */
+                <div className="flex-1 flex flex-col justify-between px-6 pt-5 pb-6 overflow-y-auto no-scrollbar scroll-smooth bg-white">
+                  <div>
+                    {/* 1. Top Progress Bar: 25% filled dark teal */}
+                    <div className="w-full h-[4.5px] bg-[#E5E7EB] rounded-full overflow-hidden mt-1">
+                      <div className="h-full w-[25%] bg-[#0F4C4C] rounded-full transition-all duration-500" />
+                    </div>
+
+                    {/* 2. Hero Graphic Card: Soft mint card with route nodes vector */}
+                    <div className="mt-5 w-full h-[210px] rounded-[24px] bg-[#F0FDF9] flex items-center justify-center relative overflow-hidden group">
+                      <svg
+                        width="140"
+                        height="140"
+                        viewBox="0 0 140 140"
+                        fill="none"
+                        className="transition-transform duration-300 group-hover:scale-105"
+                      >
+                        {/* Outer boundary L-bracket frame */}
+                        <path
+                          d="M 28 25 L 28 108 Q 28 122 42 122 L 122 122"
+                          stroke="#0F4C4C"
+                          strokeWidth="2.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        {/* Lead-in line from top-right into upper node */}
+                        <line
+                          x1="116"
+                          y1="32"
+                          x2="78"
+                          y2="42"
+                          stroke="#0F4C4C"
+                          strokeWidth="2.6"
+                          strokeLinecap="round"
+                        />
+                        {/* Connecting segment: Node A to Node B */}
+                        <line
+                          x1="78"
+                          y1="42"
+                          x2="100"
+                          y2="72"
+                          stroke="#0F4C4C"
+                          strokeWidth="2.6"
+                          strokeLinecap="round"
+                        />
+                        {/* Connecting segment: Node B to Node C */}
+                        <line
+                          x1="100"
+                          y1="72"
+                          x2="62"
+                          y2="98"
+                          stroke="#0F4C4C"
+                          strokeWidth="2.6"
+                          strokeLinecap="round"
+                        />
+                        {/* Node A: Upper waypoint */}
+                        <circle
+                          cx="78"
+                          cy="42"
+                          r="9"
+                          fill="#F0FDF9"
+                          stroke="#0F4C4C"
+                          strokeWidth="2.6"
+                        />
+                        {/* Node B: Middle-right waypoint */}
+                        <circle
+                          cx="100"
+                          cy="72"
+                          r="9"
+                          fill="#F0FDF9"
+                          stroke="#0F4C4C"
+                          strokeWidth="2.6"
+                        />
+                        {/* Node C: Lower-left waypoint */}
+                        <circle
+                          cx="62"
+                          cy="98"
+                          r="9"
+                          fill="#F0FDF9"
+                          stroke="#0F4C4C"
+                          strokeWidth="2.6"
+                        />
+                      </svg>
+                    </div>
+
+                    {/* 3. Title: "Enable Location" */}
+                    <h2 className="mt-6 text-[#111827] text-[28px] font-extrabold tracking-tight leading-tight">
+                      Enable Location
+                    </h2>
+
+                    {/* 4. Subtitle */}
+                    <p className="mt-2 text-[#4B5563] text-[15px] font-normal leading-[1.45]">
+                      We use GPS to verify your check-ins, optimize your routes, and show nearby leads.
+                    </p>
+
+                    {/* Toast / Feedback Banner if active */}
+                    {locationToast && (
+                      <div className="mt-4 p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl flex items-center space-x-2 text-xs text-[#065F46] animate-fade-in">
+                        <CheckCircle2 className="w-4 h-4 text-[#10B981] shrink-0" />
+                        <span className="font-semibold">{locationToast}</span>
+                      </div>
+                    )}
+
+                    {/* 5. Benefits List (3 items with mint check badges) */}
+                    <div className="mt-5 space-y-4">
+                      {/* Benefit 1 */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-[22px] h-[22px] rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-[#0F766E] stroke-[2.8]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                            Accurate Check-ins
+                          </h4>
+                          <p className="text-[13.5px] text-[#4B5563] leading-[1.4] mt-0.5">
+                            Geofenced visits automatically logs meetings at the client's office.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Benefit 2 */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-[22px] h-[22px] rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-[#0F766E] stroke-[2.8]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                            Smart Route Optimization
+                          </h4>
+                          <p className="text-[13.5px] text-[#4B5563] leading-[1.4] mt-0.5">
+                            Minimize commute fatigue with dynamic sequence plans.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Benefit 3 */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-[22px] h-[22px] rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-[#0F766E] stroke-[2.8]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                            Nearby Client Alerts
+                          </h4>
+                          <p className="text-[13.5px] text-[#4B5563] leading-[1.4] mt-0.5">
+                            Discover unassigned hot prospects within 1 km of your current site.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 6. Bottom Action Controls */}
+                  <div className="mt-auto pt-4 pb-2 flex flex-col items-center space-y-3">
+                    <button
+                      type="button"
+                      onClick={handleAllowLocation}
+                      disabled={locationStatus === 'requesting'}
+                      className="w-full h-[52px] bg-[#0F4C4C] hover:bg-[#0C3E3E] active:scale-[0.99] text-white font-bold text-[16px] rounded-xl flex items-center justify-center transition-all shadow-xs cursor-pointer disabled:opacity-80"
+                    >
+                      {locationStatus === 'requesting' ? (
+                        <RotateCcw className="w-5 h-5 animate-spin" />
+                      ) : locationStatus === 'granted' ? (
+                        <span className="flex items-center space-x-2">
+                          <Check className="w-5 h-5 stroke-[2.8]" />
+                          <span>Location Access Granted</span>
+                        </span>
+                      ) : (
+                        'Allow Location Access'
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleSkipLocation}
+                      className="text-[15px] font-medium text-[#6B7280] hover:text-[#111827] transition-colors py-1 cursor-pointer"
+                    >
+                      Skip for now
+                    </button>
+                  </div>
+                </div>
+              ) : selectedScreen === 'onboarding-welcome' ? (
+                /* ONBOARDING SCREEN 1: ONBOARDING WELCOME SCREEN */
+                <div className="flex-1 flex flex-col justify-between px-6 pt-11 pb-6 overflow-y-auto no-scrollbar scroll-smooth bg-white">
+                  <div>
+                    {/* 1. Top Avatar Badge: Centered dark teal squircle with white initials */}
+                    <div className="flex justify-center">
+                      <div className="w-[72px] h-[72px] rounded-[22px] bg-[#0F4C4C] text-white flex items-center justify-center font-extrabold text-[24px] tracking-tight shadow-md shadow-[#0F4C4C]/25">
+                        AM
+                      </div>
+                    </div>
+
+                    {/* 2. Greeting Headline */}
+                    <h2 className="mt-6 text-[#111827] text-[28px] font-extrabold tracking-tight leading-tight">
+                      Hi Arjun!
+                    </h2>
+
+                    {/* 3. Subtitle / Description */}
+                    <p className="mt-2 text-[#4B5563] text-[14.5px] font-normal leading-[1.45]">
+                      Let's set up your field kit in under a minute to prepare for South Mumbai territory operations.
+                    </p>
+
+                    {/* 4. Company & Territory Info Card */}
+                    <div className="mt-5 bg-[#F3F4F6] rounded-xl p-3.5 flex items-center space-x-3.5 border border-[#E5E7EB]">
+                      <div className="w-11 h-11 rounded-full bg-[#D1FADF] flex items-center justify-center shrink-0">
+                        <Briefcase className="w-5 h-5 text-[#0F766E] stroke-[2]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-[15px] font-bold text-[#111827] leading-snug">
+                          Acme Industries
+                        </h4>
+                        <p className="text-[13px] text-[#4B5563] font-normal leading-snug mt-0.5 truncate">
+                          Assigned Territory: South Mumbai
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Feedback Toast */}
+                    {onboardingSuccessMessage && (
+                      <div className="mt-4 p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl flex items-center space-x-2 text-xs text-[#065F46] animate-fade-in">
+                        <CheckCircle2 className="w-4 h-4 text-[#10B981] shrink-0" />
+                        <span className="font-semibold">{onboardingSuccessMessage}</span>
+                      </div>
+                    )}
+
+                    {/* 5. Section Header */}
+                    <div className="mt-6 mb-2">
+                      <span className="text-[12px] font-semibold text-[#6B7280] tracking-wider uppercase">
+                        REQUIRED SETUP PROGRESS
+                      </span>
+                    </div>
+
+                    {/* 6. Checklist Items */}
+                    <div className="space-y-1">
+                      {[
+                        { id: 'location', title: 'Location Access', icon: MapPin },
+                        { id: 'camera', title: 'Camera Access', icon: Camera },
+                        { id: 'microphone', title: 'Microphone Access', icon: Mic },
+                        { id: 'notifications', title: 'Notifications', icon: Bell },
+                        { id: 'offline_data', title: 'Offline Data Setup', icon: Database },
+                      ].map((step) => {
+                        const isCompleted = completedSteps.includes(step.id);
+                        const IconComponent = step.icon;
+
+                        return (
+                          <div
+                            key={step.id}
+                            onClick={() => toggleOnboardingStep(step.id)}
+                            className="flex items-center justify-between py-3 px-1 rounded-lg hover:bg-gray-50/80 active:bg-gray-100 transition-colors cursor-pointer group select-none"
+                          >
+                            <div className="flex items-center space-x-3.5">
+                              <IconComponent
+                                className={`w-[22px] h-[22px] transition-colors ${
+                                  isCompleted ? 'text-[#0F4C4C]' : 'text-[#4B5563] group-hover:text-[#111827]'
+                                }`}
+                                strokeWidth={1.8}
+                              />
+                              <span className="text-[15px] font-medium text-[#111827] group-hover:text-[#0F4C4C] transition-colors">
+                                {step.title}
+                              </span>
+                            </div>
+
+                            {/* Circular status indicator */}
+                            <div
+                              className={`w-[22px] h-[22px] rounded-full flex items-center justify-center transition-all duration-200 ${
+                                isCompleted
+                                  ? 'bg-[#10B981] border-[1.8px] border-[#10B981] text-white shadow-xs'
+                                  : 'border-[1.8px] border-[#D1D5DB] bg-transparent group-hover:border-[#9CA3AF]'
+                              }`}
+                            >
+                              {isCompleted && <Check className="w-3.5 h-3.5 stroke-[2.8]" />}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 7. Bottom Action Button: "Let's Go" */}
+                  <div className="pt-4 mt-auto">
+                    <button
+                      type="button"
+                      onClick={handleLetsGo}
+                      className="w-full h-[52px] bg-[#0F4C4C] hover:bg-[#0C3E3E] active:scale-[0.99] text-white font-bold text-[16px] rounded-xl flex items-center justify-center transition-all shadow-xs cursor-pointer"
+                    >
+                      Let's Go
+                    </button>
+                  </div>
+                </div>
+              ) : selectedScreen === 'biometric' ? (
+                /* SCREEN 8: BIOMETRIC LOGIN SCREEN (FACE ID) */
+                <div className="flex-1 flex flex-col justify-between items-center px-6 pt-16 pb-8 text-white overflow-y-auto no-scrollbar scroll-smooth">
+                  {/* 1. App Logo & Title */}
+                  <div className="flex flex-col items-center animate-fade-in">
+                    <div className="w-[92px] h-[92px] rounded-[24px] bg-white shadow-xl flex items-center justify-center">
+                      <span className="text-[#0F4C4C] font-extrabold text-[34px] tracking-tight">LP</span>
+                    </div>
+                    <h2 className="mt-6 text-white text-[24px] font-extrabold tracking-tight text-center">
+                      CRM Pro Field Sales
+                    </h2>
+                  </div>
+
+                  {/* 2. Biometric Scan Disc & Prompt */}
+                  <div className="flex flex-col items-center my-auto">
+                    <button
+                      type="button"
+                      onClick={handleTriggerBiometric}
+                      className={`relative group flex items-center justify-center w-[124px] h-[124px] rounded-full transition-all duration-300 cursor-pointer ${
+                        biometricSuccess
+                          ? 'bg-[#10B981] shadow-xl shadow-[#10B981]/30 ring-4 ring-[#10B981]/40'
+                          : biometricScanning
+                          ? 'bg-[#1E6060] ring-4 ring-white/30 animate-pulse'
+                          : 'bg-[#1E6060] hover:bg-[#246f6f] border border-white/20 active:scale-95 shadow-lg shadow-black/20'
+                      }`}
+                      title="Tap to scan Face ID"
+                    >
+                      {biometricSuccess ? (
+                        <Check className="w-14 h-14 text-white stroke-[2.8] animate-fade-in" />
+                      ) : biometricScanning ? (
+                        <RotateCcw className="w-10 h-10 text-white animate-spin stroke-[2.2]" />
+                      ) : (
+                        <ScanFace className="w-16 h-16 text-white stroke-[2] transition-transform group-hover:scale-105" />
+                      )}
+                    </button>
+
+                    {/* Prompt Text */}
+                    <button
+                      type="button"
+                      onClick={handleTriggerBiometric}
+                      className="mt-5 text-white/95 hover:text-white text-[16px] font-medium tracking-tight cursor-pointer transition-colors"
+                    >
+                      {biometricScanning
+                        ? 'Verifying Face ID...'
+                        : biometricSuccess
+                        ? 'Face ID Verified!'
+                        : 'Use Face ID to sign in'}
+                    </button>
+
+                    {/* Helper hint */}
+                    <p className="text-[12px] text-white/60 mt-1.5">
+                      {biometricSuccess
+                        ? 'Authenticated successfully'
+                        : 'Tap circle to simulate biometric scan'}
+                    </p>
+                  </div>
+
+                  {/* 3. Bottom Alternative Option: Use password instead */}
+                  <div className="pt-4 pb-2 text-center w-full">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedScreen('signin')}
+                      className="text-white/90 hover:text-white hover:underline text-[15px] font-medium cursor-pointer transition-all"
+                    >
+                      Use password instead
+                    </button>
+                  </div>
+                </div>
+              ) : selectedScreen === 'success' ? (
                 /* SCREEN 8: PASSWORD RESET SUCCESS */
                 <div className="flex-1 flex flex-col justify-between px-6 pt-12 pb-8 overflow-y-auto no-scrollbar scroll-smooth">
                   <div className="flex-1 flex flex-col items-center justify-center">
@@ -4325,14 +12648,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       <div className="flex-1 border-t border-[#E5E7EB]" />
                     </div>
 
-                    {/* Company SSO */}
-                    <button
-                      type="button"
-                      className="w-full h-[52px] bg-white border border-[#E5E7EB] hover:bg-[#F9FAFB] active:scale-[0.99] text-[#111827] rounded-xl font-bold text-[15px] transition-all flex items-center justify-center space-x-2.5 shadow-2xs"
-                    >
-                      <Building2 className="w-5 h-5 text-[#0F4C4C]" />
-                      <span>Company SSO</span>
-                    </button>
+                    {/* Secondary Auth Options */}
+                    <div className="space-y-2.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedScreen('biometric');
+                          setBiometricSuccess(false);
+                          setBiometricScanning(false);
+                        }}
+                        className="w-full h-[52px] bg-white border border-[#E5E7EB] hover:bg-[#F9FAFB] active:scale-[0.99] text-[#111827] rounded-xl font-bold text-[15px] transition-all flex items-center justify-center space-x-2.5 shadow-2xs cursor-pointer"
+                      >
+                        <ScanFace className="w-5 h-5 text-[#0F4C4C]" />
+                        <span>Sign in with Face ID</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="w-full h-[52px] bg-white border border-[#E5E7EB] hover:bg-[#F9FAFB] active:scale-[0.99] text-[#111827] rounded-xl font-bold text-[15px] transition-all flex items-center justify-center space-x-2.5 shadow-2xs"
+                      >
+                        <Building2 className="w-5 h-5 text-[#0F4C4C]" />
+                        <span>Company SSO</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Footer */}
@@ -4391,7 +12729,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
               <div className="flex items-center space-x-2">
                 <FileCode className="w-4 h-4 text-[#10B981]" />
                 <span className="font-mono text-xs text-gray-200 font-semibold">
-                  lib/features/authentication/screens/{selectedScreen === 'reset' ? 'reset_password_screen.dart' : selectedScreen === 'otp' ? 'otp_verification_screen.dart' : selectedScreen === 'forgot' ? 'forgot_password_screen.dart' : selectedScreen === 'verification' ? 'email_verification_screen.dart' : selectedScreen === 'signup' ? 'sign_up_screen.dart' : selectedScreen === 'signin' ? 'sign_in_screen.dart' : 'splash_screen.dart'}
+                  {selectedScreen === 'dashboard'
+                    ? 'lib/features/dashboard/screens/dashboard_screen.dart (screen-dashboard)'
+                    : selectedScreen === 'notifications'
+                    ? 'lib/features/dashboard/screens/notifications_screen.dart (screen-notification)'
+                    : selectedScreen === 'intro-slide-three'
+                    ? 'lib/features/onboarding/screens/intro_slide_three_screen.dart'
+                    : selectedScreen === 'intro-slide-two'
+
+                    ? 'lib/features/onboarding/screens/intro_slide_two_screen.dart'
+                    : selectedScreen === 'app-intro-walkthrough'
+                    ? 'lib/features/onboarding/screens/app_intro_walkthrough_screen.dart'
+                    : selectedScreen === 'onboarding-complete'
+                    ? 'lib/features/onboarding/screens/onboarding_complete_screen.dart'
+                    : selectedScreen === 'onboarding-offline-setup'
+                    ? 'lib/features/onboarding/screens/onboarding_offline_setup_screen.dart'
+                    : selectedScreen === 'onboarding-notifications'
+                    ? 'lib/features/onboarding/screens/onboarding_notifications_screen.dart'
+                    : selectedScreen === 'onboarding-microphone'
+                    ? 'lib/features/onboarding/screens/onboarding_microphone_screen.dart'
+                    : selectedScreen === 'onboarding-camera'
+                    ? 'lib/features/onboarding/screens/onboarding_camera_screen.dart'
+                    : selectedScreen === 'onboarding-location'
+                    ? 'lib/features/onboarding/screens/onboarding_location_screen.dart'
+                    : selectedScreen === 'onboarding-welcome'
+                    ? 'lib/features/onboarding/screens/onboarding_welcome_screen.dart'
+                    : `lib/features/authentication/screens/${
+                        selectedScreen === 'biometric'
+                          ? 'biometric_login_screen.dart'
+                          : selectedScreen === 'success'
+                          ? 'password_reset_success_screen.dart'
+                          : selectedScreen === 'reset'
+                          ? 'reset_password_screen.dart'
+                          : selectedScreen === 'otp'
+                          ? 'otp_verification_screen.dart'
+                          : selectedScreen === 'forgot'
+                          ? 'forgot_password_screen.dart'
+                          : selectedScreen === 'verification'
+                          ? 'email_verification_screen.dart'
+                          : selectedScreen === 'signup'
+                          ? 'sign_up_screen.dart'
+                          : selectedScreen === 'signin'
+                          ? 'sign_in_screen.dart'
+                          : 'splash_screen.dart'
+                      }`}
                 </span>
               </div>
               <button

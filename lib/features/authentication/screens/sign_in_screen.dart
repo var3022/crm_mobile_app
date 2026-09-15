@@ -10,6 +10,7 @@ class SignInScreen extends StatefulWidget {
   final VoidCallback? onSignInSuccess;
   final VoidCallback? onForgotPassword;
   final VoidCallback? onCompanySSO;
+  final VoidCallback? onBiometricLogin;
   final VoidCallback? onContactSupport;
 
   const SignInScreen({
@@ -17,6 +18,7 @@ class SignInScreen extends StatefulWidget {
     this.onSignInSuccess,
     this.onForgotPassword,
     this.onCompanySSO,
+    this.onBiometricLogin,
     this.onContactSupport,
   });
 
@@ -337,7 +339,55 @@ class _SignInScreenState extends State<SignInScreen> {
 
                       const SizedBox(height: 20),
 
-                      // 8. Company SSO Button
+                      // 8a. Face ID Biometric Button
+                      SizedBox(
+                        width: double.infinity,
+                        height: AppDimensions.buttonHeight,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            if (widget.onBiometricLogin != null) {
+                              widget.onBiometricLogin!();
+                            } else {
+                              Navigator.of(context).pushNamed("/biometric-login");
+                            }
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(
+                              color: AppColors.border,
+                              width: 1.0,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(
+                                Icons.fingerprint_rounded,
+                                size: 20,
+                                color: AppColors.primary,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                "Sign in with Face ID",
+                                style: TextStyle(
+                                  fontFamily: AppTypography.fontFamily,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // 8b. Company SSO Button
                       SizedBox(
                         width: double.infinity,
                         height: AppDimensions.buttonHeight,
