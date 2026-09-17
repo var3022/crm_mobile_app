@@ -46,12 +46,18 @@ class NotificationItem {
 }
 
 /// Dashboard & Notification Screen 2 - Notifications (`screen-notification`)
+/// and Screen 3 - Empty Notification (`screen-empty-notification`)
 /// Follows CRM Pro Flutter/Dart design system:
-/// - Pinned static top header with count badge & "Mark All Read"
+/// - Pinned static top header with count badge & actions ("Mark All Read" / "Clear All" / "Reset Demo")
 /// - Filter chips: All, Unread 5, Leads, Visits
+/// - When no notifications exist (empty-notification for new users or cleared):
+///   Displays soft mint circle with outline bell icon, "All Caught Up!",
+///   explanatory subtitle, and "View notification settings →" link.
 /// - Scrollbars strictly hidden (invisible per specification)
 /// - Bottom navigation bar in floating rounded card style
 class NotificationsScreen extends StatefulWidget {
+  final bool startEmpty;
+  final List<NotificationItem>? initialNotifications;
   final VoidCallback? onHomeTap;
   final VoidCallback? onLeadsTap;
   final VoidCallback? onVisitsTap;
@@ -60,6 +66,8 @@ class NotificationsScreen extends StatefulWidget {
 
   const NotificationsScreen({
     super.key,
+    this.startEmpty = false,
+    this.initialNotifications,
     this.onHomeTap,
     this.onLeadsTap,
     this.onVisitsTap,
@@ -77,10 +85,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   late List<NotificationItem> _notifications;
 
-  @override
-  void initState() {
-    super.initState();
-    _notifications = [
+  List<NotificationItem> _getDefaultNotifications() {
+    return [
       NotificationItem(
         id: "1",
         title: "New lead assigned: Acme Corp",
@@ -136,6 +142,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     ];
   }
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.startEmpty) {
+      _notifications = [];
+    } else if (widget.initialNotifications != null) {
+      _notifications = List.from(widget.initialNotifications!);
+    } else {
+      _notifications = _getDefaultNotifications();
+    }
+  }
+
   int get _unreadCount => _notifications.where((item) => item.isUnread).length;
 
   void _markAllAsRead() {
@@ -146,6 +164,43 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       SnackBar(
         content: Text(
           "All notifications marked as read",
+          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: const Color(0xFF0F4C4C),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _clearAllNotifications() {
+    setState(() {
+      _notifications = [];
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "All notifications cleared",
+          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: const Color(0xFF0F4C4C),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _restoreDemoNotifications() {
+    setState(() {
+      _notifications = _getDefaultNotifications();
+      _selectedFilter = "All";
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "Demo notifications restored",
           style: GoogleFonts.inter(fontWeight: FontWeight.w500),
         ),
         backgroundColor: const Color(0xFF0F4C4C),
@@ -193,6 +248,212 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return _notifications;
   }
 
+  void _showNotificationSettings() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE5E7EB),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "Notification Preferences",
+                style: GoogleFonts.inter(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF111827),
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                "Control which alerts and push notifications appear on your field device.",
+                style: GoogleFonts.inter(
+                  fontSize: 13.5,
+                  color: const Color(0xFF6B7280),
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 18),
+              _buildSettingRow("Lead Assignments", true),
+              _buildSettingRow("Visit & Meeting Reminders", true),
+              _buildSettingRow("Proposal Opened Alerts", true),
+              _buildSettingRow("Deal Status Updates", true),
+              const SizedBox(height: 22),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "Notification preferences saved",
+                          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+                        ),
+                        backgroundColor: const Color(0xFF0F4C4C),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0F4C4C),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    "Save Preferences",
+                    style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSettingRow(String title, bool initialVal) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.inter(
+              fontSize: 14.5,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF374151),
+            ),
+          ),
+          Switch(
+            value: initialVal,
+            activeColor: const Color(0xFF0F4C4C),
+            onChanged: (val) {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyNotificationState({String? message}) {
+    return Center(
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Soft mint/teal circular container with outline bell
+            Container(
+              width: 140,
+              height: 140,
+              decoration: const BoxDecoration(
+                color: Color(0xFFE8F6F4), // Pale soft mint / seafoam matching screenshot
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.notifications_none_rounded,
+                  size: 52,
+                  color: Color(0xFF0F4C4C), // Primary deep teal brand color
+                ),
+              ),
+            ),
+            const SizedBox(height: 28),
+
+            // Bold headline "All Caught Up!"
+            Text(
+              "All Caught Up!",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF111827),
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // Subtitle
+            SizedBox(
+              width: 290,
+              child: Text(
+                message ??
+                    "You have no new notifications. We'll alert you when something needs your attention.",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xFF6B7280),
+                  height: 1.45,
+                ),
+              ),
+            ),
+            const SizedBox(height: 28),
+
+            // "View notification settings →"
+            GestureDetector(
+              onTap: _showNotificationSettings,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "View notification settings",
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF0F4C4C),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 16,
+                      color: Color(0xFF0F4C4C),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final unreadCount = _unreadCount;
@@ -208,7 +469,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               children: [
                 const SizedBox(height: 16),
 
-                // 1. Static Top Header (Title with Badge + "Mark All Read")
+                // 1. Static Top Header (Title with Badge + Actions)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
                   child: Row(
@@ -247,100 +508,124 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           ],
                         ],
                       ),
-                      GestureDetector(
-                        onTap: _markAllAsRead,
-                        behavior: HitTestBehavior.opaque,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-                          child: Text(
-                            "Mark All Read",
-                            style: GoogleFonts.inter(
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF0F4C4C),
-                              letterSpacing: -0.2,
+                      if (_notifications.isNotEmpty)
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: _markAllAsRead,
+                              behavior: HitTestBehavior.opaque,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                                child: Text(
+                                  "Mark All Read",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF0F4C4C),
+                                    letterSpacing: -0.2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: _clearAllNotifications,
+                              behavior: HitTestBehavior.opaque,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                child: Text(
+                                  "Clear",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color(0xFF9CA3AF),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        GestureDetector(
+                          onTap: _restoreDemoNotifications,
+                          behavior: HitTestBehavior.opaque,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                            child: Text(
+                              "Load Demo",
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF0F4C4C),
+                              ),
                             ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ),
 
                 const SizedBox(height: 16),
 
-                // 2. Filter Chips (All, Unread 5, Leads, Visits) - Invisible Scrollbar
-                SizedBox(
-                  height: 38,
-                  child: ScrollConfiguration(
-                    behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
-                      children: [
-                        _buildFilterChip("All", isSelected: _selectedFilter == "All"),
-                        const SizedBox(width: 8),
-                        _buildFilterChip(
-                          "Unread",
-                          badgeCount: unreadCount,
-                          isSelected: _selectedFilter == "Unread",
-                        ),
-                        const SizedBox(width: 8),
-                        _buildFilterChip("Leads", isSelected: _selectedFilter == "Leads"),
-                        const SizedBox(width: 8),
-                        _buildFilterChip("Visits", isSelected: _selectedFilter == "Visits"),
-                      ],
+                // 2. Filter Chips (shown when notifications exist)
+                if (_notifications.isNotEmpty) ...[
+                  SizedBox(
+                    height: 38,
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
+                        children: [
+                          _buildFilterChip("All", isSelected: _selectedFilter == "All"),
+                          const SizedBox(width: 8),
+                          _buildFilterChip(
+                            "Unread",
+                            badgeCount: unreadCount,
+                            isSelected: _selectedFilter == "Unread",
+                          ),
+                          const SizedBox(width: 8),
+                          _buildFilterChip("Leads", isSelected: _selectedFilter == "Leads"),
+                          const SizedBox(width: 8),
+                          _buildFilterChip("Visits", isSelected: _selectedFilter == "Visits"),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+                ],
 
-                const SizedBox(height: 16),
-
-                // 3. Notification List Items - Scrollbars strictly hidden per requirement
+                // 3. Notification List Items OR Empty State
                 Expanded(
                   child: ScrollConfiguration(
                     behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-                    child: _filteredNotifications.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.notifications_none_outlined,
-                                  size: 48,
-                                  color: Colors.grey[400],
+                    child: _notifications.isEmpty
+                        ? _buildEmptyNotificationState()
+                        : _filteredNotifications.isEmpty
+                            ? _buildEmptyNotificationState(
+                                message: _selectedFilter == "Unread"
+                                    ? "You have read all your notifications."
+                                    : "No notifications found in the $_selectedFilter category.",
+                              )
+                            : ListView.separated(
+                                physics: const BouncingScrollPhysics(),
+                                padding: const EdgeInsets.only(
+                                  left: AppSpacing.screenHorizontal,
+                                  right: AppSpacing.screenHorizontal,
+                                  bottom: 110,
                                 ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  "No notifications in this tab",
-                                  style: GoogleFonts.inter(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey[500],
-                                  ),
+                                itemCount: _filteredNotifications.length,
+                                separatorBuilder: (context, index) => const Divider(
+                                  color: Color(0xFFF3F4F6),
+                                  thickness: 1,
+                                  height: 24,
                                 ),
-                              ],
-                            ),
-                          )
-                        : ListView.separated(
-                            physics: const BouncingScrollPhysics(),
-                            padding: const EdgeInsets.only(
-                              left: AppSpacing.screenHorizontal,
-                              right: AppSpacing.screenHorizontal,
-                              bottom: 110,
-                            ),
-                            itemCount: _filteredNotifications.length,
-                            separatorBuilder: (context, index) => const Divider(
-                              color: Color(0xFFF3F4F6),
-                              thickness: 1,
-                              height: 24,
-                            ),
-                            itemBuilder: (context, index) {
-                              final item = _filteredNotifications[index];
-                              return _buildNotificationRow(item);
-                            },
-                          ),
+                                itemBuilder: (context, index) {
+                                  final item = _filteredNotifications[index];
+                                  return _buildNotificationRow(item);
+                                },
+                              ),
                   ),
                 ),
               ],

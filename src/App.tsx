@@ -38,24 +38,61 @@ import {
   Bell,
   Database,
   Calendar,
+  Cloud,
   Home,
   Folder,
   Route,
   ListTodo,
   Plus,
   Bot,
-  Handshake
+  Handshake,
+  Settings,
+  ChevronRight,
+  UserPlus
 } from 'lucide-react';
+import { LeadsListSimulator } from './components/LeadsListSimulator';
+import { leadsListDartCode } from './data/leadsDartCode';
 
 export default function App() {
-  const [selectedScreen, setSelectedScreen] = useState<'dashboard' | 'notifications' | 'intro-slide-three' | 'intro-slide-two' | 'app-intro-walkthrough' | 'onboarding-complete' | 'onboarding-offline-setup' | 'onboarding-notifications' | 'onboarding-microphone' | 'onboarding-camera' | 'onboarding-location' | 'onboarding-welcome' | 'biometric' | 'success' | 'reset' | 'otp' | 'forgot' | 'verification' | 'signup' | 'signin' | 'splash'>('dashboard');
+  const [selectedScreen, setSelectedScreen] = useState<'leads-list' | 'dashboard' | 'notifications' | 'empty-notifications' | 'intro-slide-three' | 'intro-slide-two' | 'app-intro-walkthrough' | 'onboarding-complete' | 'onboarding-offline-setup' | 'onboarding-notifications' | 'onboarding-microphone' | 'onboarding-camera' | 'onboarding-location' | 'onboarding-welcome' | 'biometric' | 'biometric-fail' | 'logout-confirmation' | 'onboarding-skip-confirmation' | 'success' | 'reset' | 'otp' | 'forgot' | 'verification' | 'signup' | 'signin' | 'splash'>('leads-list');
   const [activeTab, setActiveTab] = useState<'preview' | 'code' | 'instructions'>('preview');
   const [copied, setCopied] = useState(false);
 
-  // Dashboard & Notification Screen 2 (Notifications) State
+  // Logout Confirmation Screen State
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(true);
+  const [logoutSigningOut, setLogoutSigningOut] = useState(false);
+  const [logoutToast, setLogoutToast] = useState<string | null>(null);
+
+  // Onboarding Skip Confirmation Screen State
+  const [isSkipModalOpen, setIsSkipModalOpen] = useState(true);
+  const [skipConfirmationToast, setSkipConfirmationToast] = useState<string | null>(null);
+  const [skippedFromScreen, setSkippedFromScreen] = useState<
+    'onboarding-location' | 'onboarding-camera' | 'onboarding-microphone' | 'onboarding-notifications' | 'onboarding-offline-setup'
+  >('onboarding-offline-setup');
+
+  const triggerSkipConfirmation = (
+    fromScreen: 'onboarding-location' | 'onboarding-camera' | 'onboarding-microphone' | 'onboarding-notifications' | 'onboarding-offline-setup',
+    message?: string
+  ) => {
+    setSkippedFromScreen(fromScreen);
+    setIsSkipModalOpen(true);
+    if (message) {
+      setSkipConfirmationToast(message);
+    }
+    setSelectedScreen('onboarding-skip-confirmation');
+  };
+
+  // Dashboard & Notification Screen 2 (Notifications) & Screen 3 (Empty Notifications) State
   const [notificationToast, setNotificationToast] = useState<string | null>(null);
   const [notificationFilter, setNotificationFilter] = useState<'All' | 'Unread' | 'Leads' | 'Visits'>('All');
   const [notificationNavIndex, setNotificationNavIndex] = useState(0);
+  const [showNotificationSettingsModal, setShowNotificationSettingsModal] = useState(false);
+  const [notificationSettings, setNotificationSettings] = useState({
+    leads: true,
+    visits: true,
+    proposals: true,
+    deals: true,
+  });
   const [notificationsList, setNotificationsList] = useState([
     {
       id: '1',
@@ -126,6 +163,72 @@ export default function App() {
     setNotificationsList(prev =>
       prev.map(n => (n.id === id ? { ...n, isUnread: !n.isUnread } : n))
     );
+  };
+
+  const handleClearAllNotifications = () => {
+    setNotificationsList([]);
+    triggerNotificationToast('All notifications cleared • Empty state active');
+  };
+
+  const handleRestoreNotifications = () => {
+    setNotificationsList([
+      {
+        id: '1',
+        title: 'New lead assigned: Acme Corp',
+        time: '2 hours ago',
+        category: 'leads',
+        isUnread: true,
+        iconType: 'user',
+        iconBg: '#E0F2F1',
+        iconColor: '#0F4C4C',
+        actionText: 'View Lead',
+      },
+      {
+        id: '2',
+        title: 'Visit with TechVista in 30 min',
+        time: '30 min ago',
+        category: 'visits',
+        isUnread: true,
+        iconType: 'calendar',
+        iconBg: '#FEF3C7',
+        iconColor: '#D97706',
+        actionText: '',
+      },
+      {
+        id: '3',
+        title: 'John at Acme opened your proposal',
+        time: '1 hour ago',
+        category: 'leads',
+        isUnread: true,
+        iconType: 'eye',
+        iconBg: '#DBEAFE',
+        iconColor: '#2563EB',
+        actionText: '',
+      },
+      {
+        id: '4',
+        title: 'Follow-up with DataFlow is due today',
+        time: '3 hours ago',
+        category: 'tasks',
+        isUnread: false,
+        iconType: 'alert',
+        iconBg: '#FEF3C7',
+        iconColor: '#D97706',
+        actionText: '',
+      },
+      {
+        id: '5',
+        title: 'Deal moved to Negotiation',
+        time: 'Yesterday',
+        category: 'deals',
+        isUnread: false,
+        iconType: 'handshake',
+        iconBg: '#EDE9FE',
+        iconColor: '#7C3AED',
+        actionText: '',
+      },
+    ]);
+    triggerNotificationToast('Demo notifications loaded');
   };
 
   // Dashboard & Notification Screen 1 State
@@ -292,11 +395,7 @@ export default function App() {
   };
 
   const handleSkipOffline = () => {
-    setOfflineToast("Offline sync skipped. Proceeding to Onboarding Complete...");
-    setTimeout(() => {
-      setOfflineToast(null);
-      setSelectedScreen('onboarding-complete');
-    }, 700);
+    triggerSkipConfirmation('onboarding-offline-setup');
   };
 
   // Onboarding Notifications State (Screen 5)
@@ -317,11 +416,7 @@ export default function App() {
   };
 
   const handleSkipNotifications = () => {
-    setNotificationsToast('Notifications skipped. Proceeding to Offline Setup...');
-    setTimeout(() => {
-      setNotificationsToast(null);
-      setSelectedScreen('onboarding-offline-setup');
-    }, 700);
+    triggerSkipConfirmation('onboarding-notifications');
   };
 
   // Onboarding Microphone State (Screen 4)
@@ -342,11 +437,7 @@ export default function App() {
   };
 
   const handleSkipMicrophone = () => {
-    setMicrophoneToast('Microphone access skipped. Proceeding to Notifications setup...');
-    setTimeout(() => {
-      setMicrophoneToast(null);
-      setSelectedScreen('onboarding-notifications');
-    }, 700);
+    triggerSkipConfirmation('onboarding-microphone');
   };
 
   // Onboarding Camera State (Screen 3)
@@ -367,11 +458,7 @@ export default function App() {
   };
 
   const handleSkipCamera = () => {
-    setCameraToast('Camera access skipped. Proceeding to Microphone setup...');
-    setTimeout(() => {
-      setCameraToast(null);
-      setSelectedScreen('onboarding-microphone');
-    }, 700);
+    triggerSkipConfirmation('onboarding-camera');
   };
 
   // Onboarding Location State (Screen 2)
@@ -392,11 +479,7 @@ export default function App() {
   };
 
   const handleSkipLocation = () => {
-    setLocationToast('Location skipped. Proceeding to Camera setup...');
-    setTimeout(() => {
-      setLocationToast(null);
-      setSelectedScreen('onboarding-camera');
-    }, 700);
+    triggerSkipConfirmation('onboarding-location');
   };
 
   // Onboarding Welcome State
@@ -7090,6 +7173,541 @@ class _FaceIdIconPainter extends CustomPainter {
 }
 `;
 
+  const logoutConfirmationDartCode = `import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_dimensions.dart";
+import "../../../core/theme/app_spacing.dart";
+import "../../../core/theme/app_typography.dart";
+
+/// Screen: Logout Confirmation Screen (\`screen-logout-confirmation\`)
+/// Authentic, pixel-perfect reproduction of the CRM Pro Field Sales Logout Confirmation dialog/sheet.
+class LogoutConfirmationScreen extends StatefulWidget {
+  final VoidCallback? onSignOut;
+  final VoidCallback? onCancel;
+
+  const LogoutConfirmationScreen({
+    super.key,
+    this.onSignOut,
+    this.onCancel,
+  });
+
+  @override
+  State<LogoutConfirmationScreen> createState() => _LogoutConfirmationScreenState();
+}
+
+class _LogoutConfirmationScreenState extends State<LogoutConfirmationScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
+      body: Stack(
+        children: [
+          // Underlying Settings page (dimmed)
+          // Modal bottom sheet with Marcus Vance avatar and Sign Out / Cancel buttons
+          // Bottom Navigation bar with Profile active
+        ],
+      ),
+    );
+  }
+}
+`;
+
+  const onboardingSkipConfirmationDartCode = `import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../core/theme/app_dimensions.dart";
+import "../../../core/theme/app_spacing.dart";
+import "../../../core/theme/app_typography.dart";
+
+/// Onboarding Screen: Skip Confirmation Screen (\`screen-onboarding-skip-confirmation\`)
+///
+/// Pixel-accurate implementation matching the CRM Pro Field Sales design system.
+/// Features a dimmed background showing the Permissions setup screen, overlaid
+/// by a modal bottom sheet warning reps about feature limitations when permissions are skipped.
+class OnboardingSkipConfirmationScreen extends StatefulWidget {
+  final String? skippedFromRoute;
+  final VoidCallback? onGoBack;
+  final VoidCallback? onSkipAnyway;
+  final ValueChanged<int>? onBottomNavTap;
+
+  const OnboardingSkipConfirmationScreen({
+    super.key,
+    this.skippedFromRoute,
+    this.onGoBack,
+    this.onSkipAnyway,
+    this.onBottomNavTap,
+  });
+
+  /// Static helper to show the skip confirmation as a modal bottom sheet
+  static Future<bool?> show(
+    BuildContext context, {
+    String? skippedFromRoute,
+    VoidCallback? onGoBack,
+    VoidCallback? onSkipAnyway,
+  }) {
+    return showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => OnboardingSkipConfirmationSheet(
+        onGoBack: () {
+          Navigator.of(ctx).pop(false);
+          onGoBack?.call();
+        },
+        onSkipAnyway: () {
+          Navigator.of(ctx).pop(true);
+          onSkipAnyway?.call();
+        },
+      ),
+    );
+  }
+
+  @override
+  State<OnboardingSkipConfirmationScreen> createState() =>
+      _OnboardingSkipConfirmationScreenState();
+}
+
+class _OnboardingSkipConfirmationScreenState
+    extends State<OnboardingSkipConfirmationScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
+  late Animation<double> _slideAnimation;
+  late Animation<double> _fadeAnimation;
+  int _currentNavIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 320),
+    );
+    _slideAnimation = Tween<double>(begin: 40.0, end: 0.0).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOut),
+    );
+    _animController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  void _handleGoBack() {
+    if (widget.onGoBack != null) {
+      widget.onGoBack!();
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else if (widget.skippedFromRoute != null) {
+      Navigator.of(context).pushReplacementNamed(widget.skippedFromRoute!);
+    } else {
+      Navigator.of(context).pushReplacementNamed("/onboarding-offline-setup");
+    }
+  }
+
+  void _handleSkipAnyway() {
+    if (widget.onSkipAnyway != null) {
+      widget.onSkipAnyway!();
+    } else {
+      Navigator.of(context).pushReplacementNamed("/onboarding-complete");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF8E95A0),
+      body: Stack(
+        children: [
+          // 1. Underlying Permissions Screen (Dimmed Context)
+          Positioned.fill(
+            child: Container(
+              color: const Color(0xFF88929E),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.screenHorizontal,
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 80),
+                      // Rounded Square Permissions Placeholder Graphic
+                      Container(
+                        width: 84,
+                        height: 84,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF6B7482).withOpacity(0.65),
+                          borderRadius: BorderRadius.circular(22),
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      // Title: Permissions
+                      Text(
+                        "Permissions",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF1E293B),
+                          letterSpacing: -0.4,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Subtitle
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 300),
+                        child: Text(
+                          "Enable the following permissions to ensure a smooth CRM field sales workflow.",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xFF334155),
+                            height: 1.45,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // 2. Dimmed Scrim Overlay (Greyed-out backdrop)
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _fadeAnimation,
+              builder: (context, child) => Container(
+                color: Colors.black.withOpacity(0.20 * _fadeAnimation.value),
+              ),
+            ),
+          ),
+
+          // 3. Foreground Bottom Sheet Modal + Bottom Navigation
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: AnimatedBuilder(
+              animation: _animController,
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: Offset(0, _slideAnimation.value),
+                  child: Opacity(
+                    opacity: _fadeAnimation.value,
+                    child: child,
+                  ),
+                );
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: AppDimensions.maxContentWidth,
+                      ),
+                      child: OnboardingSkipConfirmationSheet(
+                        onGoBack: _handleGoBack,
+                        onSkipAnyway: _handleSkipAnyway,
+                      ),
+                    ),
+                  ),
+                  _buildBottomNavigation(),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigation() {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          top: BorderSide(color: Color(0xFFE5E7EB), width: 1.0),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(0, "Home", Icons.home_outlined),
+              _buildNavItem(1, "Leads", Icons.person_add_alt_outlined),
+              _buildNavItem(2, "Visits", Icons.location_on_outlined),
+              _buildNavItem(3, "Tasks", Icons.assignment_turned_in_outlined),
+              _buildNavItem(4, "Profile", Icons.person_outline_rounded),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, String label, IconData icon) {
+    final navColor = const Color(0xFF0F4C4C);
+
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _currentNavIndex = index;
+        });
+        widget.onBottomNavTap?.call(index);
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: SizedBox(
+        width: 64,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 22,
+              color: navColor,
+            ),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: navColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Standalone Reusable Skip Confirmation Bottom Sheet
+class OnboardingSkipConfirmationSheet extends StatelessWidget {
+  final VoidCallback? onGoBack;
+  final VoidCallback? onSkipAnyway;
+
+  const OnboardingSkipConfirmationSheet({
+    super.key,
+    this.onGoBack,
+    this.onSkipAnyway,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x1A000000),
+            blurRadius: 20,
+            offset: Offset(0, -4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.only(
+        top: 10,
+        left: 20,
+        right: 20,
+        bottom: 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Drag handle pill
+          Container(
+            width: 38,
+            height: 4,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE2E8F0),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Title: "Skip Permissions?"
+          Text(
+            "Skip Permissions?",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF111827),
+              letterSpacing: -0.4,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Subtitle / Description
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Text(
+              "Some features will be limited without these permissions. You can enable them later in Settings.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFF4B5563),
+                height: 1.45,
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          // Feature Limitation Warning Box (Location, Camera, Notifications)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF9FAFB),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: const Color(0xFFF1F5F9),
+                width: 1.0,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildLimitationItem(
+                  category: "Location",
+                  description: "Nearby leads & check-in won't work",
+                ),
+                const SizedBox(height: 10),
+                _buildLimitationItem(
+                  category: "Camera",
+                  description: "Can't capture visit photos",
+                ),
+                const SizedBox(height: 10),
+                _buildLimitationItem(
+                  category: "Notifications",
+                  description: "You'll miss important updates",
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 22),
+
+          // Primary Button: "Go Back" (Deep Teal #0F4C4C)
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: onGoBack,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0F4C4C),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                "Go Back",
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Secondary Button: "Skip Anyway" (White Outlined)
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: OutlinedButton(
+              onPressed: onSkipAnyway,
+              style: OutlinedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: const Color(0xFF374151),
+                side: const BorderSide(
+                  color: Color(0xFFE5E7EB),
+                  width: 1.2,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                "Skip Anyway",
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF374151),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLimitationItem({
+    required String category,
+    required String description,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "•  ",
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFF111827),
+          ),
+        ),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: GoogleFonts.inter(
+                fontSize: 13.5,
+                color: const Color(0xFF334155),
+                height: 1.35,
+              ),
+              children: [
+                TextSpan(
+                  text: "$category: ",
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF0F172A),
+                  ),
+                ),
+                TextSpan(
+                  text: description,
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF475569),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+`;
+
   const passwordResetSuccessDartCode = `import "package:flutter/material.dart";
 import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
@@ -9232,7 +9850,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 }`;
 
   const currentDartCode =
-    selectedScreen === 'dashboard'
+    selectedScreen === 'leads-list'
+      ? leadsListDartCode
+      : selectedScreen === 'dashboard'
       ? dashboardDartCode
       : selectedScreen === 'notifications'
       ? notificationsDartCode
@@ -9258,6 +9878,38 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ? onboardingWelcomeDartCode
       : selectedScreen === 'biometric'
       ? biometricLoginDartCode
+      : selectedScreen === 'biometric-fail'
+      ? `// Authentication Biometric Fail Screen (screen-biometric-fail)
+// Reuses the BiometricLoginScreen component with isFailed: true
+import 'package:flutter/material.dart';
+import 'biometric_login_screen.dart';
+
+class BiometricFailScreen extends StatelessWidget {
+  final VoidCallback? onUsePasswordInstead;
+  final VoidCallback? onTryAgain;
+  final VoidCallback? onAuthenticated;
+
+  const BiometricFailScreen({
+    super.key,
+    this.onUsePasswordInstead,
+    this.onTryAgain,
+    this.onAuthenticated,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BiometricLoginScreen(
+      isFailed: true,
+      onUsePasswordInstead: onUsePasswordInstead,
+      onTryAgain: onTryAgain,
+      onAuthenticated: onAuthenticated,
+    );
+  }
+}`
+      : selectedScreen === 'logout-confirmation'
+      ? logoutConfirmationDartCode
+      : selectedScreen === 'onboarding-skip-confirmation'
+      ? onboardingSkipConfirmationDartCode
       : selectedScreen === 'success'
       ? passwordResetSuccessDartCode
       : selectedScreen === 'reset'
@@ -9292,10 +9944,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
             <div className="flex items-center space-x-2">
               <h1 className="text-base font-extrabold text-[#111827]">CRM Pro Field Sales</h1>
               <span className="bg-[#ECFDF5] text-[#10B981] text-[11px] font-semibold px-2 py-0.5 rounded-md border border-[#A7F3D0]">
-                {selectedScreen === 'dashboard'
+                {selectedScreen === 'leads-list'
+                  ? 'Leads (Screen 1)'
+                  : selectedScreen === 'dashboard'
                   ? 'Dashboard (Screen 1)'
                   : selectedScreen === 'notifications'
                   ? 'Notifications (Screen 2)'
+                  : selectedScreen === 'empty-notifications'
+                  ? 'Empty Notifications (Screen 3)'
                   : selectedScreen === 'intro-slide-three'
                   ? 'Intro 3: Win with AI Insights'
                   : selectedScreen === 'intro-slide-two'
@@ -9318,6 +9974,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ? 'Onboarding 1: Welcome'
                   : selectedScreen === 'biometric'
                   ? 'Screen 8: Biometric Login'
+                  : selectedScreen === 'biometric-fail'
+                  ? 'Screen: Biometric Fail'
+                  : selectedScreen === 'logout-confirmation'
+                  ? 'Logout Confirmation (Modal Sheet)'
+                  : selectedScreen === 'onboarding-skip-confirmation'
+                  ? 'Onboarding: Skip Confirmation'
                   : selectedScreen === 'success'
                   ? 'Password Reset Success'
                   : selectedScreen === 'reset'
@@ -9336,10 +9998,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
               </span>
             </div>
             <p className="text-xs text-[#4B5563]">
-              {selectedScreen === 'dashboard'
+              {selectedScreen === 'leads-list'
+                ? 'Leads Flow • lib/features/leads/screens/leads_list_screen.dart (screen-leads-list)'
+                : selectedScreen === 'dashboard'
                 ? 'Main Flow • lib/features/dashboard/screens/dashboard_screen.dart (screen-dashboard)'
                 : selectedScreen === 'notifications'
                 ? 'Dashboard & Notification • lib/features/dashboard/screens/notifications_screen.dart (screen-notification)'
+                : selectedScreen === 'empty-notifications'
+                ? 'Dashboard & Notification 3 • lib/features/dashboard/screens/screen_empty_notification.dart (screen-empty-notification)'
                 : selectedScreen === 'intro-slide-three'
                 ? 'Onboarding Flow • lib/features/onboarding/screens/intro_slide_three_screen.dart'
                 : selectedScreen === 'intro-slide-two'
@@ -9359,11 +10025,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ? 'Onboarding Flow • lib/features/onboarding/screens/onboarding_camera_screen.dart'
                 : selectedScreen === 'onboarding-location'
                 ? 'Onboarding Flow • lib/features/onboarding/screens/onboarding_location_screen.dart'
+                : selectedScreen === 'onboarding-skip-confirmation'
+                ? 'Onboarding Flow • lib/features/onboarding/screens/onboarding_skip_confirmation_screen.dart (screen-onboarding-skip-confirmation)'
                 : selectedScreen === 'onboarding-welcome'
                 ? 'Onboarding Flow • lib/features/onboarding/screens/onboarding_welcome_screen.dart'
                 : `Authentication Flow • lib/features/authentication/screens/${
                     selectedScreen === 'biometric'
                       ? 'biometric_login_screen.dart'
+                      : selectedScreen === 'biometric-fail'
+                      ? 'biometric_fail_screen.dart (reusing biometric_login_screen.dart)'
+                      : selectedScreen === 'logout-confirmation'
+                      ? 'logout_confirmation_screen.dart (screen-logout-confirmation)'
                       : selectedScreen === 'success'
                       ? 'password_reset_success_screen.dart'
                       : selectedScreen === 'reset'
@@ -9389,6 +10061,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
           {/* Switch Between Screens */}
           <div className="flex bg-[#F3F4F6] p-1 rounded-xl border border-[#E5E7EB] text-xs font-medium overflow-x-auto max-w-[650px] no-scrollbar">
             <button
+              onClick={() => setSelectedScreen('leads-list')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                selectedScreen === 'leads-list'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Leads (Screen 1)
+            </button>
+            <button
               onClick={() => setSelectedScreen('dashboard')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                 selectedScreen === 'dashboard'
@@ -9407,6 +10089,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
               }`}
             >
               Notifications (Screen 2)
+            </button>
+            <button
+              onClick={() => setSelectedScreen('empty-notifications')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                selectedScreen === 'empty-notifications'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Empty Alerts (Screen 3)
             </button>
             <button
               onClick={() => setSelectedScreen('intro-slide-three')}
@@ -9525,6 +10217,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
               }`}
             >
               Biometric
+            </button>
+            <button
+              onClick={() => {
+                setSelectedScreen('biometric-fail');
+                setBiometricSuccess(false);
+                setBiometricScanning(false);
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap ${
+                selectedScreen === 'biometric-fail'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Biometric Fail
+            </button>
+            <button
+              onClick={() => setSelectedScreen('logout-confirmation')}
+              className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap cursor-pointer ${
+                selectedScreen === 'logout-confirmation'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Logout Confirmation
+            </button>
+            <button
+              onClick={() => setSelectedScreen('onboarding-skip-confirmation')}
+              className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap cursor-pointer ${
+                selectedScreen === 'onboarding-skip-confirmation'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Onboarding Skip Confirm
             </button>
             <button
               onClick={() => setSelectedScreen('success')}
@@ -9657,7 +10383,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Clean Canvas &bull; 390 &times; 844 px
               </span>
               <span className="text-[11px] text-[#6B7280]">
-                {selectedScreen === 'dashboard'
+                {selectedScreen === 'leads-list'
+                  ? 'Leads (Screen 1) • AI Score Cards, Filter Chips, Swipe Call & Log Visit, Bottom Nav'
+                  : selectedScreen === 'dashboard'
                   ? 'Dashboard (Screen 1) • Hidden scrollbars, AI Daily Brief, Monthly Target Gauge, Schedule'
                   : selectedScreen === 'notifications'
                   ? 'Notifications (Screen 2) • Static Header, Filter Chips, Interactive List, Hidden Scrollbars'
@@ -9681,6 +10409,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ? 'Onboarding Welcome Screen • Tap checklist items or "Let\'s Go"'
                   : selectedScreen === 'biometric'
                   ? 'Biometric Login (Face ID) • Tap circle to simulate biometric scan'
+                  : selectedScreen === 'biometric-fail'
+                  ? 'Biometric Fail Screen • Too many attempts warning & action buttons'
+                  : selectedScreen === 'logout-confirmation'
+                  ? 'Logout Confirmation (Modal Sheet) • Replicating exact Marcus Vance sign-out sheet'
+                  : selectedScreen === 'onboarding-skip-confirmation'
+                  ? 'Onboarding Skip Confirmation • Bottom sheet warning reps about feature limits'
                   : selectedScreen === 'success'
                   ? 'Password Reset Success • Pixel-accurate Screen 8 layout'
                   : selectedScreen === 'reset'
@@ -9706,7 +10440,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
               }`}
               style={{ boxShadow: '0 25px 60px -15px rgba(15, 76, 76, 0.35)' }}
             >
-              {selectedScreen === 'dashboard' ? (
+              {selectedScreen === 'leads-list' ? (
+                /* LEADS SCREEN 1 (LEADS-LIST) */
+                <LeadsListSimulator
+                  onNavigateToDashboard={() => setSelectedScreen('dashboard')}
+                  onNavigateToNotifications={() => setSelectedScreen('notifications')}
+                />
+              ) : selectedScreen === 'dashboard' ? (
                 /* DASHBOARD AND NOTIFICATION SCREEN 1 (SCREEN-DASHBOARD) */
                 <div className="flex-1 flex flex-col bg-white relative select-none h-full overflow-hidden font-['Inter',sans-serif]">
                   {/* Toast Feedback Notification */}
@@ -9952,17 +10692,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     {/* Leads Tab */}
                     <button
                       onClick={() => {
-                        setDashboardNavIndex(1);
-                        triggerDashboardToast('Navigating to Leads screen');
+                        setSelectedScreen('leads-list');
                       }}
-                      className={`flex flex-col items-center py-1 px-2.5 rounded-full transition-all cursor-pointer ${
+                      className={`flex flex-col items-center py-1 rounded-full transition-all cursor-pointer ${
                         dashboardNavIndex === 1
-                          ? 'bg-[#E6F4F2] text-[#0F4C4C]'
-                          : 'text-[#9CA3AF] hover:text-[#4B5563]'
+                          ? 'bg-[#E6F4F2] text-[#0F4C4C] px-3.5'
+                          : 'text-[#9CA3AF] hover:text-[#4B5563] px-2.5'
                       }`}
                     >
                       <Folder className="w-5 h-5" />
-                      <span className="text-[10.5px] font-medium mt-0.5">Leads</span>
+                      <span className={`text-[10.5px] mt-0.5 ${dashboardNavIndex === 1 ? 'font-bold' : 'font-medium'}`}>
+                        Leads
+                      </span>
                     </button>
 
                     {/* Visits Tab */}
@@ -10014,12 +10755,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     </button>
                   </div>
                 </div>
-              ) : selectedScreen === 'notifications' ? (
-                /* DASHBOARD AND NOTIFICATION SCREEN 2 (NOTIFICATIONS) */
+              ) : (selectedScreen === 'notifications' || selectedScreen === 'empty-notifications') ? (
+                /* DASHBOARD AND NOTIFICATION SCREEN 2 (NOTIFICATIONS) & SCREEN 3 (EMPTY-NOTIFICATION) */
                 <div className="flex-1 flex flex-col bg-white relative select-none h-full overflow-hidden font-['Inter',sans-serif]">
                   {/* Toast Feedback Notification */}
                   {notificationToast && (
-                    <div className="absolute top-4 left-4 right-4 z-40 bg-[#0F4C4C] text-white px-3.5 py-2.5 rounded-xl shadow-lg flex items-center justify-between text-xs animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute top-4 left-4 right-4 z-50 bg-[#0F4C4C] text-white px-3.5 py-2.5 rounded-xl shadow-lg flex items-center justify-between text-xs animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="flex items-center space-x-2">
                         <Sparkles className="w-4 h-4 text-[#99F6E4] shrink-0" />
                         <span className="font-medium">{notificationToast}</span>
@@ -10033,134 +10774,200 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     </div>
                   )}
 
-                  {/* Static Top Bar (pinned, does not scroll): Title with Badge & "Mark All Read" */}
+                  {/* Static Top Bar (pinned, does not scroll): Title with Badge & Actions */}
                   <div className="px-5 pt-5 pb-3 flex items-center justify-between bg-white shrink-0 z-20 border-b border-[#F9FAFB]">
                     <div className="flex items-center space-x-2.5">
                       <h2 className="text-[26px] font-extrabold text-[#111827] tracking-tight leading-none">
                         Notifications
                       </h2>
-                      {notificationsList.filter((n) => n.isUnread).length > 0 && (
+                      {selectedScreen !== 'empty-notifications' && notificationsList.filter((n) => n.isUnread).length > 0 && (
                         <span className="w-5 h-5 bg-[#EF4444] text-white text-[12px] font-bold rounded-full flex items-center justify-center">
                           {notificationsList.filter((n) => n.isUnread).length}
                         </span>
                       )}
                     </div>
-                    <button
-                      onClick={handleMarkAllNotificationsRead}
-                      className="text-[#0F4C4C] text-[14.5px] font-semibold hover:text-[#0D4444] cursor-pointer transition-colors"
-                    >
-                      Mark All Read
-                    </button>
-                  </div>
-
-                  {/* Filter Chips - Horizontal row with strictly hidden scrollbars */}
-                  <div className="px-5 py-2.5 shrink-0 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex items-center space-x-2">
-                    <button
-                      onClick={() => setNotificationFilter('All')}
-                      className={`px-4 py-1.5 rounded-xl text-[13.5px] transition-all cursor-pointer whitespace-nowrap ${
-                        notificationFilter === 'All'
-                          ? 'bg-[#CCFBF1] text-[#0F4C4C] font-bold'
-                          : 'bg-[#F3F4F6] text-[#4B5563] font-medium hover:bg-[#E5E7EB]'
-                      }`}
-                    >
-                      All
-                    </button>
-                    <button
-                      onClick={() => setNotificationFilter('Unread')}
-                      className={`px-3.5 py-1.5 rounded-xl text-[13.5px] transition-all cursor-pointer whitespace-nowrap flex items-center space-x-1.5 ${
-                        notificationFilter === 'Unread'
-                          ? 'bg-[#CCFBF1] text-[#0F4C4C] font-bold'
-                          : 'bg-[#F3F4F6] text-[#4B5563] font-medium hover:bg-[#E5E7EB]'
-                      }`}
-                    >
-                      <span>Unread</span>
-                      {notificationsList.filter((n) => n.isUnread).length > 0 && (
-                        <span className="w-4 h-4 bg-[#EF4444] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                          {notificationsList.filter((n) => n.isUnread).length}
-                        </span>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => setNotificationFilter('Leads')}
-                      className={`px-4 py-1.5 rounded-xl text-[13.5px] transition-all cursor-pointer whitespace-nowrap ${
-                        notificationFilter === 'Leads'
-                          ? 'bg-[#CCFBF1] text-[#0F4C4C] font-bold'
-                          : 'bg-[#F3F4F6] text-[#4B5563] font-medium hover:bg-[#E5E7EB]'
-                      }`}
-                    >
-                      Leads
-                    </button>
-                    <button
-                      onClick={() => setNotificationFilter('Visits')}
-                      className={`px-4 py-1.5 rounded-xl text-[13.5px] transition-all cursor-pointer whitespace-nowrap ${
-                        notificationFilter === 'Visits'
-                          ? 'bg-[#CCFBF1] text-[#0F4C4C] font-bold'
-                          : 'bg-[#F3F4F6] text-[#4B5563] font-medium hover:bg-[#E5E7EB]'
-                      }`}
-                    >
-                      Visits
-                    </button>
-                  </div>
-
-                  {/* Notifications List - Strictly hidden scrollbars */}
-                  <div className="flex-1 overflow-y-auto px-5 pt-2 pb-24 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden divide-y divide-[#F3F4F6]">
-                    {notificationsList
-                      .filter((n) => {
-                        if (notificationFilter === 'Unread') return n.isUnread;
-                        if (notificationFilter === 'Leads') return n.category === 'leads';
-                        if (notificationFilter === 'Visits') return n.category === 'visits';
-                        return true;
-                      })
-                      .map((item) => (
-                        <div
-                          key={item.id}
-                          onClick={() => toggleNotificationItemRead(item.id)}
-                          className="py-3.5 flex items-center space-x-3 cursor-pointer hover:bg-gray-50/60 rounded-xl transition-colors px-1"
+                    
+                    <div className="flex items-center space-x-2">
+                      {selectedScreen === 'empty-notifications' || notificationsList.length === 0 ? (
+                        <button
+                          onClick={() => {
+                            handleRestoreNotifications();
+                            if (selectedScreen === 'empty-notifications') {
+                              setSelectedScreen('notifications');
+                            }
+                          }}
+                          className="bg-[#E6F4F2] text-[#0F4C4C] text-[13px] font-bold px-3 py-1.5 rounded-lg hover:bg-[#CCECE8] cursor-pointer transition-colors"
                         >
-                          {/* Unread dot */}
-                          <div className="w-2.5 flex justify-center shrink-0">
-                            {item.isUnread && (
-                              <span className="w-2 h-2 rounded-full bg-[#0F4C4C]" />
+                          Load Demo
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            onClick={handleMarkAllNotificationsRead}
+                            className="text-[#0F4C4C] text-[13.5px] font-semibold hover:text-[#0D4444] cursor-pointer transition-colors"
+                          >
+                            Mark All Read
+                          </button>
+                          <span className="text-[#D1D5DB]">•</span>
+                          <button
+                            onClick={handleClearAllNotifications}
+                            className="text-[#6B7280] text-[13px] font-medium hover:text-[#EF4444] cursor-pointer transition-colors"
+                            title="Clear all to see empty state"
+                          >
+                            Clear
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Filter Chips - Only show when items exist */}
+                  {(selectedScreen !== 'empty-notifications' && notificationsList.length > 0) && (
+                    <div className="px-5 py-2.5 shrink-0 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex items-center space-x-2">
+                      <button
+                        onClick={() => setNotificationFilter('All')}
+                        className={`px-4 py-1.5 rounded-xl text-[13.5px] transition-all cursor-pointer whitespace-nowrap ${
+                          notificationFilter === 'All'
+                            ? 'bg-[#CCFBF1] text-[#0F4C4C] font-bold'
+                            : 'bg-[#F3F4F6] text-[#4B5563] font-medium hover:bg-[#E5E7EB]'
+                        }`}
+                      >
+                        All
+                      </button>
+                      <button
+                        onClick={() => setNotificationFilter('Unread')}
+                        className={`px-3.5 py-1.5 rounded-xl text-[13.5px] transition-all cursor-pointer whitespace-nowrap flex items-center space-x-1.5 ${
+                          notificationFilter === 'Unread'
+                            ? 'bg-[#CCFBF1] text-[#0F4C4C] font-bold'
+                            : 'bg-[#F3F4F6] text-[#4B5563] font-medium hover:bg-[#E5E7EB]'
+                        }`}
+                      >
+                        <span>Unread</span>
+                        {notificationsList.filter((n) => n.isUnread).length > 0 && (
+                          <span className="w-4 h-4 bg-[#EF4444] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                            {notificationsList.filter((n) => n.isUnread).length}
+                          </span>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setNotificationFilter('Leads')}
+                        className={`px-4 py-1.5 rounded-xl text-[13.5px] transition-all cursor-pointer whitespace-nowrap ${
+                          notificationFilter === 'Leads'
+                            ? 'bg-[#CCFBF1] text-[#0F4C4C] font-bold'
+                            : 'bg-[#F3F4F6] text-[#4B5563] font-medium hover:bg-[#E5E7EB]'
+                        }`}
+                      >
+                        Leads
+                      </button>
+                      <button
+                        onClick={() => setNotificationFilter('Visits')}
+                        className={`px-4 py-1.5 rounded-xl text-[13.5px] transition-all cursor-pointer whitespace-nowrap ${
+                          notificationFilter === 'Visits'
+                            ? 'bg-[#CCFBF1] text-[#0F4C4C] font-bold'
+                            : 'bg-[#F3F4F6] text-[#4B5563] font-medium hover:bg-[#E5E7EB]'
+                        }`}
+                      >
+                        Visits
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Main Content Area: Empty State or Notification Items */}
+                  {selectedScreen === 'empty-notifications' ||
+                  notificationsList.length === 0 ||
+                  notificationsList.filter((n) => {
+                    if (notificationFilter === 'Unread') return n.isUnread;
+                    if (notificationFilter === 'Leads') return n.category === 'leads';
+                    if (notificationFilter === 'Visits') return n.category === 'visits';
+                    return true;
+                  }).length === 0 ? (
+                    /* SCREEN 3: EMPTY NOTIFICATION STATE (Exact design from image.png) */
+                    <div className="flex-1 flex flex-col items-center justify-center px-6 pb-24 text-center animate-in fade-in duration-300">
+                      {/* Pale Mint Circular Container */}
+                      <div className="w-[140px] h-[140px] rounded-full bg-[#E8F6F4] flex items-center justify-center mb-6">
+                        <Bell className="w-14 h-14 text-[#0F4C4C]" strokeWidth={1.75} />
+                      </div>
+
+                      {/* Headline */}
+                      <h3 className="text-[24px] font-extrabold text-[#111827] tracking-tight">
+                        All Caught Up!
+                      </h3>
+
+                      {/* Subtitle */}
+                      <p className="text-[14.5px] text-[#6B7280] font-normal max-w-[280px] mt-2.5 leading-relaxed">
+                        You have no new notifications. We'll alert you when something needs your attention.
+                      </p>
+
+                      {/* Action Link with Arrow */}
+                      <button
+                        onClick={() => setShowNotificationSettingsModal(true)}
+                        className="mt-7 text-[#0F4C4C] hover:text-[#0D4444] text-[15px] font-semibold flex items-center justify-center space-x-1.5 cursor-pointer group transition-colors"
+                      >
+                        <span className="group-hover:underline">View notification settings</span>
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    /* Notifications List */
+                    <div className="flex-1 overflow-y-auto px-5 pt-2 pb-24 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden divide-y divide-[#F3F4F6]">
+                      {notificationsList
+                        .filter((n) => {
+                          if (notificationFilter === 'Unread') return n.isUnread;
+                          if (notificationFilter === 'Leads') return n.category === 'leads';
+                          if (notificationFilter === 'Visits') return n.category === 'visits';
+                          return true;
+                        })
+                        .map((item) => (
+                          <div
+                            key={item.id}
+                            onClick={() => toggleNotificationItemRead(item.id)}
+                            className="py-3.5 flex items-center space-x-3 cursor-pointer hover:bg-gray-50/60 rounded-xl transition-colors px-1"
+                          >
+                            {/* Unread dot */}
+                            <div className="w-2.5 flex justify-center shrink-0">
+                              {item.isUnread && (
+                                <span className="w-2 h-2 rounded-full bg-[#0F4C4C]" />
+                              )}
+                            </div>
+
+                            {/* Avatar icon */}
+                            <div
+                              className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+                              style={{ backgroundColor: item.iconBg, color: item.iconColor }}
+                            >
+                              {item.iconType === 'user' && <User className="w-5 h-5" />}
+                              {item.iconType === 'calendar' && <Calendar className="w-5 h-5" />}
+                              {item.iconType === 'eye' && <Eye className="w-5 h-5" />}
+                              {item.iconType === 'alert' && <AlertCircle className="w-5 h-5" />}
+                              {item.iconType === 'handshake' && <Handshake className="w-5 h-5" />}
+                            </div>
+
+                            {/* Text content */}
+                            <div className="flex-1 min-w-0 pr-1">
+                              <p className="text-[14px] font-bold text-[#111827] leading-tight">
+                                {item.title}
+                              </p>
+                              <p className="text-[12.5px] text-[#6B7280] font-normal mt-1">
+                                {item.time}
+                              </p>
+                            </div>
+
+                            {/* Action button if any */}
+                            {item.actionText && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  triggerNotificationToast('Opening Acme Corp lead record');
+                                }}
+                                className="bg-[#0F4C4C] hover:bg-[#0D4444] text-white text-[12px] font-bold px-3 py-1.5 rounded-lg shadow-xs transition-colors shrink-0 cursor-pointer"
+                              >
+                                {item.actionText}
+                              </button>
                             )}
                           </div>
-
-                          {/* Avatar icon */}
-                          <div
-                            className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-                            style={{ backgroundColor: item.iconBg, color: item.iconColor }}
-                          >
-                            {item.iconType === 'user' && <User className="w-5 h-5" />}
-                            {item.iconType === 'calendar' && <Calendar className="w-5 h-5" />}
-                            {item.iconType === 'eye' && <Eye className="w-5 h-5" />}
-                            {item.iconType === 'alert' && <AlertCircle className="w-5 h-5" />}
-                            {item.iconType === 'handshake' && <Handshake className="w-5 h-5" />}
-                          </div>
-
-                          {/* Text content */}
-                          <div className="flex-1 min-w-0 pr-1">
-                            <p className="text-[14px] font-bold text-[#111827] leading-tight">
-                              {item.title}
-                            </p>
-                            <p className="text-[12.5px] text-[#6B7280] font-normal mt-1">
-                              {item.time}
-                            </p>
-                          </div>
-
-                          {/* Action button if any */}
-                          {item.actionText && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                triggerNotificationToast('Opening Acme Corp lead record');
-                              }}
-                              className="bg-[#0F4C4C] hover:bg-[#0D4444] text-white text-[12px] font-bold px-3 py-1.5 rounded-lg shadow-xs transition-colors shrink-0 cursor-pointer"
-                            >
-                              {item.actionText}
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                  </div>
+                        ))}
+                    </div>
+                  )}
 
                   {/* Floating Bottom Navigation Bar */}
                   <div className="absolute bottom-3 left-4 right-4 bg-white rounded-3xl border border-[#E5E7EB] shadow-lg py-2 px-3 flex justify-around items-center z-30">
@@ -10212,6 +11019,151 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       <span className="text-[10.5px] font-medium mt-0.5">Profile</span>
                     </button>
                   </div>
+
+                  {/* Notification Settings Bottom Sheet Modal */}
+                  {showNotificationSettingsModal && (
+                    <div className="absolute inset-0 z-50 bg-black/50 backdrop-blur-xs flex flex-col justify-end animate-in fade-in duration-200">
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="bg-white rounded-t-3xl p-6 shadow-2xl border-t border-[#E5E7EB] animate-in slide-in-from-bottom duration-250"
+                      >
+                        {/* Drag handle */}
+                        <div className="w-10 h-1.5 bg-[#E5E7EB] rounded-full mx-auto mb-4" />
+
+                        {/* Title and Close */}
+                        <div className="flex items-center justify-between mb-5">
+                          <div>
+                            <h4 className="text-[18px] font-extrabold text-[#111827] tracking-tight">
+                              Notification Preferences
+                            </h4>
+                            <p className="text-[12.5px] text-[#6B7280] mt-0.5">
+                              Customize alerts for your field sales workflow
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => setShowNotificationSettingsModal(false)}
+                            className="w-8 h-8 rounded-full bg-[#F3F4F6] text-[#4B5563] hover:text-[#111827] flex items-center justify-center text-sm font-bold cursor-pointer"
+                          >
+                            ✕
+                          </button>
+                        </div>
+
+                        {/* Toggles */}
+                        <div className="space-y-4">
+                          {/* Item 1 */}
+                          <div className="flex items-center justify-between py-1">
+                            <div>
+                              <p className="text-[14px] font-bold text-[#111827]">Lead Assignments</p>
+                              <p className="text-[12px] text-[#6B7280]">Instant alerts when new leads are allocated</p>
+                            </div>
+                            <button
+                              onClick={() =>
+                                setNotificationSettings((prev) => ({
+                                  ...prev,
+                                  leads: !prev.leads,
+                                }))
+                              }
+                              className={`w-12 h-6.5 rounded-full transition-colors relative cursor-pointer ${
+                                notificationSettings.leads ? 'bg-[#0F4C4C]' : 'bg-[#E5E7EB]'
+                              }`}
+                            >
+                              <span
+                                className={`absolute top-0.5 w-5.5 h-5.5 rounded-full bg-white transition-transform ${
+                                  notificationSettings.leads ? 'right-0.5' : 'left-0.5'
+                                } shadow-sm`}
+                              />
+                            </button>
+                          </div>
+
+                          {/* Item 2 */}
+                          <div className="flex items-center justify-between py-1">
+                            <div>
+                              <p className="text-[14px] font-bold text-[#111827]">Visit Reminders</p>
+                              <p className="text-[12px] text-[#6B7280]">30-minute advance warnings for scheduled visits</p>
+                            </div>
+                            <button
+                              onClick={() =>
+                                setNotificationSettings((prev) => ({
+                                  ...prev,
+                                  visits: !prev.visits,
+                                }))
+                              }
+                              className={`w-12 h-6.5 rounded-full transition-colors relative cursor-pointer ${
+                                notificationSettings.visits ? 'bg-[#0F4C4C]' : 'bg-[#E5E7EB]'
+                              }`}
+                            >
+                              <span
+                                className={`absolute top-0.5 w-5.5 h-5.5 rounded-full bg-white transition-transform ${
+                                  notificationSettings.visits ? 'right-0.5' : 'left-0.5'
+                                } shadow-sm`}
+                              />
+                            </button>
+                          </div>
+
+                          {/* Item 3 */}
+                          <div className="flex items-center justify-between py-1">
+                            <div>
+                              <p className="text-[14px] font-bold text-[#111827]">Proposal Activity</p>
+                              <p className="text-[12px] text-[#6B7280]">When clients open, view, or sign proposals</p>
+                            </div>
+                            <button
+                              onClick={() =>
+                                setNotificationSettings((prev) => ({
+                                  ...prev,
+                                  proposals: !prev.proposals,
+                                }))
+                              }
+                              className={`w-12 h-6.5 rounded-full transition-colors relative cursor-pointer ${
+                                notificationSettings.proposals ? 'bg-[#0F4C4C]' : 'bg-[#E5E7EB]'
+                              }`}
+                            >
+                              <span
+                                className={`absolute top-0.5 w-5.5 h-5.5 rounded-full bg-white transition-transform ${
+                                  notificationSettings.proposals ? 'right-0.5' : 'left-0.5'
+                                } shadow-sm`}
+                              />
+                            </button>
+                          </div>
+
+                          {/* Item 4 */}
+                          <div className="flex items-center justify-between py-1">
+                            <div>
+                              <p className="text-[14px] font-bold text-[#111827]">Deal Stage Milestones</p>
+                              <p className="text-[12px] text-[#6B7280]">Pipeline stage changes and closing updates</p>
+                            </div>
+                            <button
+                              onClick={() =>
+                                setNotificationSettings((prev) => ({
+                                  ...prev,
+                                  deals: !prev.deals,
+                                }))
+                              }
+                              className={`w-12 h-6.5 rounded-full transition-colors relative cursor-pointer ${
+                                notificationSettings.deals ? 'bg-[#0F4C4C]' : 'bg-[#E5E7EB]'
+                              }`}
+                            >
+                              <span
+                                className={`absolute top-0.5 w-5.5 h-5.5 rounded-full bg-white transition-transform ${
+                                  notificationSettings.deals ? 'right-0.5' : 'left-0.5'
+                                } shadow-sm`}
+                              />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Done button */}
+                        <button
+                          onClick={() => {
+                            setShowNotificationSettingsModal(false);
+                            triggerNotificationToast('Preferences saved');
+                          }}
+                          className="w-full mt-6 bg-[#0F4C4C] hover:bg-[#0D4444] text-white font-bold py-3.5 rounded-xl shadow-sm transition-all cursor-pointer text-sm"
+                        >
+                          Save & Close
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : selectedScreen === 'intro-slide-three' ? (
                 /* ONBOARDING SCREEN 10: INTRO SLIDE THREE (WIN WITH AI INSIGHTS) */
@@ -11535,73 +12487,730 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     </button>
                   </div>
                 </div>
-              ) : selectedScreen === 'biometric' ? (
-                /* SCREEN 8: BIOMETRIC LOGIN SCREEN (FACE ID) */
-                <div className="flex-1 flex flex-col justify-between items-center px-6 pt-16 pb-8 text-white overflow-y-auto no-scrollbar scroll-smooth">
+              ) : selectedScreen === 'biometric' || selectedScreen === 'biometric-fail' ? (
+                /* SCREEN 8 & BIOMETRIC FAIL SCREEN: REUSED BIOMETRIC LOGIN COMPONENT */
+                <div className="flex-1 flex flex-col justify-between items-center px-6 pt-14 pb-6 text-white overflow-y-auto no-scrollbar scroll-smooth">
                   {/* 1. App Logo & Title */}
                   <div className="flex flex-col items-center animate-fade-in">
-                    <div className="w-[92px] h-[92px] rounded-[24px] bg-white shadow-xl flex items-center justify-center">
-                      <span className="text-[#0F4C4C] font-extrabold text-[34px] tracking-tight">LP</span>
+                    <div className="w-[88px] h-[88px] rounded-[22px] bg-white shadow-xl flex items-center justify-center">
+                      <span className="text-[#0F4C4C] font-extrabold text-[32px] tracking-tight">LP</span>
                     </div>
-                    <h2 className="mt-6 text-white text-[24px] font-extrabold tracking-tight text-center">
+                    <h2 className="mt-5 text-white text-[23px] font-extrabold tracking-tight text-center">
                       CRM Pro Field Sales
                     </h2>
                   </div>
 
                   {/* 2. Biometric Scan Disc & Prompt */}
-                  <div className="flex flex-col items-center my-auto">
-                    <button
-                      type="button"
-                      onClick={handleTriggerBiometric}
-                      className={`relative group flex items-center justify-center w-[124px] h-[124px] rounded-full transition-all duration-300 cursor-pointer ${
-                        biometricSuccess
-                          ? 'bg-[#10B981] shadow-xl shadow-[#10B981]/30 ring-4 ring-[#10B981]/40'
-                          : biometricScanning
-                          ? 'bg-[#1E6060] ring-4 ring-white/30 animate-pulse'
-                          : 'bg-[#1E6060] hover:bg-[#246f6f] border border-white/20 active:scale-95 shadow-lg shadow-black/20'
-                      }`}
-                      title="Tap to scan Face ID"
-                    >
-                      {biometricSuccess ? (
-                        <Check className="w-14 h-14 text-white stroke-[2.8] animate-fade-in" />
-                      ) : biometricScanning ? (
-                        <RotateCcw className="w-10 h-10 text-white animate-spin stroke-[2.2]" />
+                  <div className="flex flex-col items-center my-auto w-full max-w-[320px]">
+                    {selectedScreen === 'biometric-fail' ? (
+                      /* FAILED STATE BIOMETRIC COMPONENT: Coral Red Circle with Corner Brackets */
+                      <div className="flex flex-col items-center">
+                        <div
+                          className="relative flex items-center justify-center w-[124px] h-[124px] rounded-full bg-[#133B3B] border-[1.8px] border-[#EF4444] shadow-lg shadow-[#EF4444]/20 animate-fade-in"
+                        >
+                          {/* Face ID Icon in Coral Red */}
+                          <svg
+                            className="w-[58px] h-[58px] text-[#EF4444]"
+                            viewBox="0 0 54 54"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            {/* Top Left Bracket */}
+                            <path d="M4 14V8C4 5.79086 5.79086 4 8 4H14" stroke="#EF4444" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
+                            {/* Top Right Bracket */}
+                            <path d="M40 4H46C48.2091 4 50 5.79086 50 8V14" stroke="#EF4444" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
+                            {/* Bottom Left Bracket */}
+                            <path d="M4 40V46C4 48.2091 5.79086 50 8 50H14" stroke="#EF4444" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
+                            {/* Bottom Right Bracket */}
+                            <path d="M40 50H46C48.2091 50 50 48.2091 50 46V40" stroke="#EF4444" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
+                            {/* Eye Slits */}
+                            <path d="M19 20V23" stroke="#EF4444" strokeWidth="3" strokeLinecap="round"/>
+                            <path d="M35 20V23" stroke="#EF4444" strokeWidth="3" strokeLinecap="round"/>
+                            {/* Nose */}
+                            <path d="M27 24V30" stroke="#EF4444" strokeWidth="2.6" strokeLinecap="round"/>
+                            {/* Smile */}
+                            <path d="M19 36C21.5 39 32.5 39 35 36" stroke="#EF4444" strokeWidth="2.6" strokeLinecap="round"/>
+                          </svg>
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="text-white text-[22px] font-extrabold tracking-tight text-center mt-5">
+                          Face ID Failed
+                        </h3>
+
+                        {/* Subtitle */}
+                        <p className="text-white/75 text-[14px] leading-relaxed text-center px-2 mt-2">
+                          We couldn't verify your identity. Please try again or use your password.
+                        </p>
+                      </div>
+                    ) : (
+                      /* NORMAL BIOMETRIC STATE */
+                      <div className="flex flex-col items-center">
+                        <button
+                          type="button"
+                          onClick={handleTriggerBiometric}
+                          className={`relative group flex items-center justify-center w-[124px] h-[124px] rounded-full transition-all duration-300 cursor-pointer ${
+                            biometricSuccess
+                              ? 'bg-[#10B981] shadow-xl shadow-[#10B981]/30 ring-4 ring-[#10B981]/40'
+                              : biometricScanning
+                              ? 'bg-[#1E6060] ring-4 ring-white/30 animate-pulse'
+                              : 'bg-[#1E6060] hover:bg-[#246f6f] border border-white/20 active:scale-95 shadow-lg shadow-black/20'
+                          }`}
+                          title="Tap to scan Face ID"
+                        >
+                          {biometricSuccess ? (
+                            <Check className="w-14 h-14 text-white stroke-[2.8] animate-fade-in" />
+                          ) : biometricScanning ? (
+                            <RotateCcw className="w-10 h-10 text-white animate-spin stroke-[2.2]" />
+                          ) : (
+                            <ScanFace className="w-16 h-16 text-white stroke-[2] transition-transform group-hover:scale-105" />
+                          )}
+                        </button>
+
+                        {/* Prompt Text */}
+                        <button
+                          type="button"
+                          onClick={handleTriggerBiometric}
+                          className="mt-5 text-white/95 hover:text-white text-[16px] font-medium tracking-tight cursor-pointer transition-colors"
+                        >
+                          {biometricScanning
+                            ? 'Verifying Face ID...'
+                            : biometricSuccess
+                            ? 'Face ID Verified!'
+                            : 'Use Face ID to sign in'}
+                        </button>
+
+                        <p className="text-[12px] text-white/60 mt-1.5">
+                          {biometricSuccess
+                            ? 'Authenticated successfully'
+                            : 'Tap circle to simulate biometric scan'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. Bottom Actions */}
+                  <div className="w-full max-w-[340px] pt-4 pb-2">
+                    {selectedScreen === 'biometric-fail' ? (
+                      /* Actions for Biometric Failure */
+                      <div className="flex flex-col items-center w-full">
+                        {/* Error warning text */}
+                        <div className="text-[#EF4444] text-[12.5px] font-bold tracking-wider text-center uppercase mb-4">
+                          TOO MANY ATTEMPTS. PLEASE USE PASSWORD.
+                        </div>
+
+                        {/* Try Again Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedScreen('biometric');
+                            handleTriggerBiometric();
+                          }}
+                          className="w-full h-[52px] bg-[#5E8585] hover:bg-[#527777] active:scale-[0.99] text-[#1B3B3B] rounded-xl font-bold text-[16px] transition-all flex items-center justify-center cursor-pointer mb-3 shadow-xs"
+                        >
+                          Try Again
+                        </button>
+
+                        {/* Use Password Instead Button */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedScreen('signin')}
+                          className="w-full h-[52px] bg-transparent border-[1.5px] border-white hover:bg-white/10 active:scale-[0.99] text-white rounded-xl font-bold text-[16px] transition-all flex items-center justify-center cursor-pointer"
+                        >
+                          Use Password Instead
+                        </button>
+                      </div>
+                    ) : (
+                      /* Normal Action: "Use password instead" link */
+                      <div className="text-center w-full">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedScreen('signin')}
+                          className="text-white/90 hover:text-white hover:underline text-[15px] font-medium cursor-pointer transition-all"
+                        >
+                          Use password instead
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : selectedScreen === 'logout-confirmation' ? (
+                /* AUTHENTICATION: LOGOUT CONFIRMATION SCREEN (screen-logout-confirmation) */
+                <div className="flex-1 flex flex-col bg-[#F9FAFB] relative select-none h-full overflow-hidden font-['Inter',sans-serif]">
+                  {/* Toast Notification */}
+                  {logoutToast && (
+                    <div className="absolute top-4 left-4 right-4 z-50 bg-[#111827] text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center justify-between text-xs animate-in fade-in slide-in-from-top duration-200">
+                      <div className="flex items-center space-x-2">
+                        <Check className="w-4 h-4 text-[#10B981] shrink-0" />
+                        <span className="font-medium">{logoutToast}</span>
+                      </div>
+                      <button
+                        onClick={() => setLogoutToast(null)}
+                        className="text-white/70 hover:text-white text-xs font-bold ml-2 cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+
+                  {/* 1. Underlying Settings Page */}
+                  <div className="flex-1 flex flex-col overflow-y-auto no-scrollbar">
+                    {/* Top Status Bar & App Header */}
+                    <div className="px-5 pt-3 pb-3 flex items-center justify-between">
+                      <h2 className="text-[26px] font-extrabold text-[#111827] tracking-tight">
+                        Settings
+                      </h2>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLogoutToast('Settings options');
+                          setTimeout(() => setLogoutToast(null), 2500);
+                        }}
+                        className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-gray-100 transition-colors text-[#111827]"
+                      >
+                        <Settings className="w-6 h-6 stroke-[1.8]" />
+                      </button>
+                    </div>
+
+                    {/* Section Header: ACCOUNT */}
+                    <div className="px-5 mt-3">
+                      <p className="text-[12px] font-bold text-[#6B7280] tracking-wider uppercase">
+                        ACCOUNT
+                      </p>
+
+                      {/* Account Options List */}
+                      <div className="mt-3 space-y-2.5">
+                        {/* Option 1: Personal Information */}
+                        <div
+                          onClick={() => {
+                            setLogoutToast('Opening Personal Information');
+                            setTimeout(() => setLogoutToast(null), 2000);
+                          }}
+                          className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex items-center justify-between shadow-2xs hover:border-[#D1D5DB] transition-all cursor-pointer group"
+                        >
+                          <div className="flex items-center space-x-3.5">
+                            <User className="w-5 h-5 text-[#4B5563] group-hover:text-[#111827] transition-colors" strokeWidth={1.8} />
+                            <span className="text-[15px] font-medium text-[#111827]">
+                              Personal Information
+                            </span>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-[#9CA3AF] group-hover:text-[#4B5563] transition-colors" />
+                        </div>
+
+                        {/* Option 2: Change Password */}
+                        <div
+                          onClick={() => {
+                            setLogoutToast('Opening Change Password');
+                            setTimeout(() => setLogoutToast(null), 2000);
+                          }}
+                          className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex items-center justify-between shadow-2xs hover:border-[#D1D5DB] transition-all cursor-pointer group"
+                        >
+                          <div className="flex items-center space-x-3.5">
+                            <Lock className="w-5 h-5 text-[#4B5563] group-hover:text-[#111827] transition-colors" strokeWidth={1.8} />
+                            <span className="text-[15px] font-medium text-[#111827]">
+                              Change Password
+                            </span>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-[#9CA3AF] group-hover:text-[#4B5563] transition-colors" />
+                        </div>
+
+                        {/* Option 3: Notification Preferences */}
+                        <div
+                          onClick={() => {
+                            setLogoutToast('Opening Notification Preferences');
+                            setTimeout(() => setLogoutToast(null), 2000);
+                          }}
+                          className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex items-center justify-between shadow-2xs hover:border-[#D1D5DB] transition-all cursor-pointer group"
+                        >
+                          <div className="flex items-center space-x-3.5">
+                            <Bell className="w-5 h-5 text-[#4B5563] group-hover:text-[#111827] transition-colors" strokeWidth={1.8} />
+                            <span className="text-[15px] font-medium text-[#111827]">
+                              Notification Preferences
+                            </span>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-[#9CA3AF] group-hover:text-[#4B5563] transition-colors" />
+                        </div>
+
+                        {/* Option 4: Re-open sign out modal if dismissed */}
+                        {!isLogoutModalOpen && (
+                          <div
+                            onClick={() => setIsLogoutModalOpen(true)}
+                            className="bg-red-50/60 rounded-xl border border-red-200 p-4 flex items-center justify-between hover:bg-red-50 transition-all cursor-pointer mt-4"
+                          >
+                            <span className="text-[15px] font-bold text-[#EF4444]">
+                              Sign Out of Account
+                            </span>
+                            <span className="text-xs bg-[#EF4444] text-white font-semibold px-2 py-1 rounded-md">
+                              Open Sheet
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. Dimmed Scrim / Overlay */}
+                  {isLogoutModalOpen && (
+                    <div
+                      onClick={() => setIsLogoutModalOpen(false)}
+                      className="absolute inset-0 bg-black/45 z-30 transition-opacity duration-300"
+                    />
+                  )}
+
+                  {/* 3. Modal Bottom Sheet */}
+                  {isLogoutModalOpen && (
+                    <div className="absolute left-0 right-0 bottom-0 z-40 bg-white rounded-t-[28px] shadow-2xl animate-in slide-in-from-bottom duration-300 border-t border-[#F3F4F6] flex flex-col">
+                      <div className="px-6 pt-3 pb-5 flex flex-col items-center">
+                        {/* Drag Handle Bar */}
+                        <div className="w-9 h-1 bg-[#E5E7EB] rounded-full mb-4" />
+
+                        {/* Marcus Vance Avatar Photo */}
+                        <div className="relative">
+                          <img
+                            src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=256&auto=format&fit=crop&q=80"
+                            alt="Marcus Vance"
+                            className="w-[72px] h-[72px] rounded-full object-cover ring-2 ring-white shadow-md"
+                          />
+                        </div>
+
+                        {/* Marcus Vance Profile Title & Subtitle */}
+                        <h3 className="mt-3 text-[19px] font-extrabold text-[#111827] tracking-tight">
+                          Marcus Vance
+                        </h3>
+                        <p className="mt-0.5 text-[13.5px] text-[#64748B] font-normal">
+                          Pacific Northwest Territory
+                        </p>
+
+                        {/* Dialog Heading: Sign Out? */}
+                        <h4 className="mt-4 text-[22px] font-extrabold text-[#111827] tracking-tight">
+                          Sign Out?
+                        </h4>
+
+                        {/* Body description */}
+                        <p className="mt-1.5 text-[14px] text-[#4B5563] text-center max-w-[290px] leading-relaxed">
+                          Are you sure you want to sign out? You will need to sign in again to access your account.
+                        </p>
+
+                        {/* Action 1: Primary Sign Out Button (Coral Red) */}
+                        <button
+                          type="button"
+                          disabled={logoutSigningOut}
+                          onClick={() => {
+                            setLogoutSigningOut(true);
+                            setLogoutToast('Signing out...');
+                            setTimeout(() => {
+                              setLogoutSigningOut(false);
+                              setLogoutToast('Signed out successfully');
+                              setSelectedScreen('signin');
+                            }, 800);
+                          }}
+                          className="w-full h-[50px] bg-[#EF4444] hover:bg-[#DC2626] active:scale-[0.99] text-white font-bold text-[16px] rounded-xl flex items-center justify-center transition-all mt-6 shadow-xs cursor-pointer disabled:opacity-75"
+                        >
+                          {logoutSigningOut ? (
+                            <span className="flex items-center space-x-2">
+                              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              <span>Signing out...</span>
+                            </span>
+                          ) : (
+                            'Sign Out'
+                          )}
+                        </button>
+
+                        {/* Action 2: Secondary Cancel Button (White Outlined) */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsLogoutModalOpen(false);
+                            setLogoutToast('Sign out cancelled');
+                            setTimeout(() => setLogoutToast(null), 2000);
+                          }}
+                          className="w-full h-[50px] bg-white hover:bg-gray-50 active:scale-[0.99] border border-[#E5E7EB] text-[#374151] font-bold text-[16px] rounded-xl flex items-center justify-center transition-all mt-3 cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+
+                      {/* Bottom Navigation Bar pinned beneath sheet */}
+                      <div className="bg-white border-t border-[#E5E7EB] px-3 pt-2 pb-2">
+                        <div className="flex items-center justify-around">
+                          {/* Home */}
+                          <div
+                            onClick={() => setSelectedScreen('dashboard')}
+                            className="flex flex-col items-center cursor-pointer group py-1"
+                          >
+                            <Home className="w-5 h-5 text-[#6B7280] group-hover:text-[#111827]" strokeWidth={1.8} />
+                            <span className="text-[11px] font-medium text-[#6B7280] mt-1 group-hover:text-[#111827]">
+                              Home
+                            </span>
+                          </div>
+
+                          {/* Leads */}
+                          <div
+                            onClick={() => {
+                              setLogoutToast('Navigating to Leads');
+                              setTimeout(() => setLogoutToast(null), 1500);
+                            }}
+                            className="flex flex-col items-center cursor-pointer group py-1"
+                          >
+                            <UserPlus className="w-5 h-5 text-[#6B7280] group-hover:text-[#111827]" strokeWidth={1.8} />
+                            <span className="text-[11px] font-medium text-[#6B7280] mt-1 group-hover:text-[#111827]">
+                              Leads
+                            </span>
+                          </div>
+
+                          {/* Visits */}
+                          <div
+                            onClick={() => {
+                              setLogoutToast('Navigating to Visits');
+                              setTimeout(() => setLogoutToast(null), 1500);
+                            }}
+                            className="flex flex-col items-center cursor-pointer group py-1"
+                          >
+                            <MapPin className="w-5 h-5 text-[#6B7280] group-hover:text-[#111827]" strokeWidth={1.8} />
+                            <span className="text-[11px] font-medium text-[#6B7280] mt-1 group-hover:text-[#111827]">
+                              Visits
+                            </span>
+                          </div>
+
+                          {/* Tasks */}
+                          <div
+                            onClick={() => {
+                              setLogoutToast('Navigating to Tasks');
+                              setTimeout(() => setLogoutToast(null), 1500);
+                            }}
+                            className="flex flex-col items-center cursor-pointer group py-1"
+                          >
+                            <ListTodo className="w-5 h-5 text-[#6B7280] group-hover:text-[#111827]" strokeWidth={1.8} />
+                            <span className="text-[11px] font-medium text-[#6B7280] mt-1 group-hover:text-[#111827]">
+                              Tasks
+                            </span>
+                          </div>
+
+                          {/* Profile (Active) */}
+                          <div className="flex flex-col items-center cursor-pointer py-1">
+                            <User className="w-5 h-5 text-[#0F4C4C]" strokeWidth={2.2} />
+                            <span className="text-[11px] font-bold text-[#0F4C4C] mt-1">
+                              Profile
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* When modal is closed: standard bottom navigation bar */}
+                  {!isLogoutModalOpen && (
+                    <div className="bg-white border-t border-[#E5E7EB] px-3 pt-2 pb-2 mt-auto">
+                      <div className="flex items-center justify-around">
+                        <div onClick={() => setSelectedScreen('dashboard')} className="flex flex-col items-center cursor-pointer py-1">
+                          <Home className="w-5 h-5 text-[#6B7280]" strokeWidth={1.8} />
+                          <span className="text-[11px] font-medium text-[#6B7280] mt-1">Home</span>
+                        </div>
+                        <div className="flex flex-col items-center cursor-pointer py-1">
+                          <UserPlus className="w-5 h-5 text-[#6B7280]" strokeWidth={1.8} />
+                          <span className="text-[11px] font-medium text-[#6B7280] mt-1">Leads</span>
+                        </div>
+                        <div className="flex flex-col items-center cursor-pointer py-1">
+                          <MapPin className="w-5 h-5 text-[#6B7280]" strokeWidth={1.8} />
+                          <span className="text-[11px] font-medium text-[#6B7280] mt-1">Visits</span>
+                        </div>
+                        <div className="flex flex-col items-center cursor-pointer py-1">
+                          <ListTodo className="w-5 h-5 text-[#6B7280]" strokeWidth={1.8} />
+                          <span className="text-[11px] font-medium text-[#6B7280] mt-1">Tasks</span>
+                        </div>
+                        <div className="flex flex-col items-center cursor-pointer py-1">
+                          <User className="w-5 h-5 text-[#0F4C4C]" strokeWidth={2.2} />
+                          <span className="text-[11px] font-bold text-[#0F4C4C] mt-1">Profile</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : selectedScreen === 'onboarding-skip-confirmation' ? (
+                /* ONBOARDING: SKIP CONFIRMATION SCREEN (screen-onboarding-skip-confirmation) */
+                <div className="flex-1 flex flex-col bg-[#88929E] relative select-none h-full overflow-hidden font-['Inter',sans-serif]">
+                  {/* Toast Notification */}
+                  {skipConfirmationToast && (
+                    <div className="absolute top-4 left-4 right-4 z-50 bg-[#111827] text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center justify-between text-xs animate-in fade-in slide-in-from-top duration-200">
+                      <div className="flex items-center space-x-2">
+                        <Check className="w-4 h-4 text-[#10B981] shrink-0" />
+                        <span className="font-medium">{skipConfirmationToast}</span>
+                      </div>
+                      <button
+                        onClick={() => setSkipConfirmationToast(null)}
+                        className="text-white/70 hover:text-white text-xs font-bold ml-2 cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+
+                  {/* 1. Underlying Screen (Dimmed Context - dynamically reflects which screen was skipped) */}
+                  <div className="flex-1 flex flex-col items-center justify-center px-6 text-center pb-28">
+                    {/* Context switcher chips for simulator testing */}
+                    <div className="mb-6 flex flex-wrap items-center justify-center gap-1.5 opacity-85">
+                      <span className="text-[11px] font-bold text-[#1E293B] mr-1">Skipped From:</span>
+                      {[
+                        { id: 'onboarding-offline-setup', label: 'Offline Setup' },
+                        { id: 'onboarding-location', label: 'Location' },
+                        { id: 'onboarding-camera', label: 'Camera' },
+                        { id: 'onboarding-microphone', label: 'Mic' },
+                        { id: 'onboarding-notifications', label: 'Notifications' },
+                      ].map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => {
+                            setSkippedFromScreen(item.id as any);
+                            setIsSkipModalOpen(true);
+                          }}
+                          className={`px-2 py-0.5 text-[10px] rounded-md font-semibold transition-all cursor-pointer ${
+                            skippedFromScreen === item.id
+                              ? 'bg-[#0F4C4C] text-white shadow-xs'
+                              : 'bg-white/40 text-[#1E293B] hover:bg-white/60'
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Contextual Graphic */}
+                    <div className="w-[84px] h-[84px] bg-[#6B7482]/60 rounded-[22px] mb-5 shadow-inner flex items-center justify-center">
+                      {skippedFromScreen === 'onboarding-offline-setup' ? (
+                        <Cloud className="w-10 h-10 text-white/70" strokeWidth={1.7} />
+                      ) : skippedFromScreen === 'onboarding-location' ? (
+                        <MapPin className="w-10 h-10 text-white/70" strokeWidth={1.7} />
+                      ) : skippedFromScreen === 'onboarding-camera' ? (
+                        <Camera className="w-10 h-10 text-white/70" strokeWidth={1.7} />
+                      ) : skippedFromScreen === 'onboarding-microphone' ? (
+                        <Mic className="w-10 h-10 text-white/70" strokeWidth={1.7} />
                       ) : (
-                        <ScanFace className="w-16 h-16 text-white stroke-[2] transition-transform group-hover:scale-105" />
+                        <Bell className="w-10 h-10 text-white/70" strokeWidth={1.7} />
                       )}
-                    </button>
+                    </div>
 
-                    {/* Prompt Text */}
-                    <button
-                      type="button"
-                      onClick={handleTriggerBiometric}
-                      className="mt-5 text-white/95 hover:text-white text-[16px] font-medium tracking-tight cursor-pointer transition-colors"
-                    >
-                      {biometricScanning
-                        ? 'Verifying Face ID...'
-                        : biometricSuccess
-                        ? 'Face ID Verified!'
-                        : 'Use Face ID to sign in'}
-                    </button>
+                    {/* Title */}
+                    <h2 className="text-[24px] font-extrabold text-[#1E293B] tracking-tight mb-2">
+                      {skippedFromScreen === 'onboarding-offline-setup'
+                        ? 'Prepare for Offline'
+                        : skippedFromScreen === 'onboarding-location'
+                        ? 'Location Access'
+                        : skippedFromScreen === 'onboarding-camera'
+                        ? 'Camera Access'
+                        : skippedFromScreen === 'onboarding-microphone'
+                        ? 'Microphone Access'
+                        : 'Notifications'}
+                    </h2>
 
-                    {/* Helper hint */}
-                    <p className="text-[12px] text-white/60 mt-1.5">
-                      {biometricSuccess
-                        ? 'Authenticated successfully'
-                        : 'Tap circle to simulate biometric scan'}
+                    {/* Subtitle */}
+                    <p className="text-[13.5px] text-[#334155] max-w-[290px] leading-relaxed font-normal">
+                      {skippedFromScreen === 'onboarding-offline-setup'
+                        ? 'Download your assigned territory data for seamless offline CRM access in field operations.'
+                        : skippedFromScreen === 'onboarding-location'
+                        ? 'GPS coordinates are used for automated client check-in and calculating fastest travel routes.'
+                        : skippedFromScreen === 'onboarding-camera'
+                        ? 'Required to scan visiting cards, perform OCR data extraction, and verify site audits.'
+                        : skippedFromScreen === 'onboarding-microphone'
+                        ? 'Voice notes transcribe customer meeting discussions into structured deal summaries.'
+                        : 'Receive real-time push alerts for new hot inbound leads, priority tasks, and scheduled visits.'}
                     </p>
+
+                    {/* If modal is dismissed, show button to re-trigger skip modal */}
+                    {!isSkipModalOpen && (
+                      <button
+                        onClick={() => setIsSkipModalOpen(true)}
+                        className="mt-6 px-5 py-2.5 bg-[#0F4C4C] text-white rounded-xl font-bold text-xs shadow-md hover:bg-[#0C3B3B] transition-all cursor-pointer"
+                      >
+                        Open Skip Confirmation
+                      </button>
+                    )}
                   </div>
 
-                  {/* 3. Bottom Alternative Option: Use password instead */}
-                  <div className="pt-4 pb-2 text-center w-full">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedScreen('signin')}
-                      className="text-white/90 hover:text-white hover:underline text-[15px] font-medium cursor-pointer transition-all"
-                    >
-                      Use password instead
-                    </button>
-                  </div>
+                  {/* 2. Dimmed Scrim Overlay */}
+                  {isSkipModalOpen && (
+                    <div
+                      onClick={() => setIsSkipModalOpen(false)}
+                      className="absolute inset-0 bg-black/25 z-20 backdrop-blur-[0.5px] transition-opacity"
+                    />
+                  )}
+
+                  {/* 3. Foreground Modal Bottom Sheet + Bottom Navigation */}
+                  {isSkipModalOpen && (
+                    <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col justify-end animate-in slide-in-from-bottom duration-300">
+                      {/* Modal Sheet Content */}
+                      <div className="bg-white rounded-t-[28px] px-6 pt-3 pb-5 shadow-2xl">
+                        {/* Drag Handle Bar */}
+                        <div className="w-10 h-1 bg-[#E2E8F0] rounded-full mx-auto my-2" />
+
+                        {/* Title: Skip Permissions? */}
+                        <h3 className="text-[22px] font-extrabold text-[#0F172A] tracking-tight text-center mt-3">
+                          Skip Permissions?
+                        </h3>
+
+                        {/* Subtitle */}
+                        <p className="text-[14px] text-[#4B5563] text-center mt-2 leading-snug px-1">
+                          Some features will be limited without these permissions. You can enable them later in Settings.
+                        </p>
+
+                        {/* Limitations Warning Card */}
+                        <div className="bg-[#F9FAFB] rounded-2xl p-4 mt-4 border border-[#F1F5F9] space-y-2.5">
+                          {/* Location */}
+                          <div className="flex items-start text-[13.5px] text-[#334155]">
+                            <span className="font-extrabold text-[#111827] mr-2 leading-tight">•</span>
+                            <span className="leading-snug">
+                              <strong className="text-[#0F172A] font-bold">Location</strong>: Nearby leads &amp; check-in won't work
+                            </span>
+                          </div>
+
+                          {/* Camera */}
+                          <div className="flex items-start text-[13.5px] text-[#334155]">
+                            <span className="font-extrabold text-[#111827] mr-2 leading-tight">•</span>
+                            <span className="leading-snug">
+                              <strong className="text-[#0F172A] font-bold">Camera</strong>: Can't capture visit photos
+                            </span>
+                          </div>
+
+                          {/* Notifications */}
+                          <div className="flex items-start text-[13.5px] text-[#334155]">
+                            <span className="font-extrabold text-[#111827] mr-2 leading-tight">•</span>
+                            <span className="leading-snug">
+                              <strong className="text-[#0F172A] font-bold">Notifications</strong>: You'll miss important updates
+                            </span>
+                          </div>
+
+                          {/* Offline Sync */}
+                          <div className="flex items-start text-[13.5px] text-[#334155]">
+                            <span className="font-extrabold text-[#111827] mr-2 leading-tight">•</span>
+                            <span className="leading-snug">
+                              <strong className="text-[#0F172A] font-bold">Offline Sync</strong>: Data won't be available without internet
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="mt-5 space-y-3">
+                          {/* Primary: Go Back - navigates back to the skipped screen */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsSkipModalOpen(false);
+                              const target = skippedFromScreen;
+                              const screenName =
+                                target === 'onboarding-offline-setup'
+                                  ? 'Offline Setup'
+                                  : target === 'onboarding-location'
+                                  ? 'Location Access'
+                                  : target === 'onboarding-camera'
+                                  ? 'Camera Access'
+                                  : target === 'onboarding-microphone'
+                                  ? 'Microphone Access'
+                                  : 'Notifications';
+                              setSkipConfirmationToast(`Returning to ${screenName}...`);
+                              setTimeout(() => {
+                                setSkipConfirmationToast(null);
+                                setSelectedScreen(target);
+                              }, 220);
+                            }}
+                            className="w-full h-[52px] bg-[#0F4C4C] hover:bg-[#0C3B3B] active:scale-[0.99] text-white rounded-xl font-bold text-[16px] transition-all flex items-center justify-center cursor-pointer shadow-xs"
+                          >
+                            Go Back
+                          </button>
+
+                          {/* Secondary: Skip Anyway - proceeds to onboarding-complete */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSkipConfirmationToast('Permissions skipped. Proceeding to Onboarding Complete...');
+                              setTimeout(() => {
+                                setSkipConfirmationToast(null);
+                                setSelectedScreen('onboarding-complete');
+                              }, 400);
+                            }}
+                            className="w-full h-[52px] bg-white border border-[#E5E7EB] hover:bg-gray-50 active:scale-[0.99] text-[#374151] rounded-xl font-bold text-[16px] transition-all flex items-center justify-center cursor-pointer"
+                          >
+                            Skip Anyway
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Pinned Bottom Navigation Bar (No bottom line) */}
+                      <div className="bg-white border-t border-[#E5E7EB] px-3 py-2">
+                        <div className="flex items-center justify-around">
+                          {/* Home */}
+                          <div
+                            onClick={() => setSelectedScreen('dashboard')}
+                            className="flex flex-col items-center cursor-pointer py-1 group"
+                          >
+                            <Home className="w-5 h-5 text-[#0F4C4C]" strokeWidth={1.8} />
+                            <span className="text-[11px] font-semibold text-[#0F4C4C] mt-1">
+                              Home
+                            </span>
+                          </div>
+
+                          {/* Leads */}
+                          <div className="flex flex-col items-center cursor-pointer py-1 group">
+                            <UserPlus className="w-5 h-5 text-[#0F4C4C]" strokeWidth={1.8} />
+                            <span className="text-[11px] font-semibold text-[#0F4C4C] mt-1">
+                              Leads
+                            </span>
+                          </div>
+
+                          {/* Visits */}
+                          <div className="flex flex-col items-center cursor-pointer py-1 group">
+                            <MapPin className="w-5 h-5 text-[#0F4C4C]" strokeWidth={1.8} />
+                            <span className="text-[11px] font-semibold text-[#0F4C4C] mt-1">
+                              Visits
+                            </span>
+                          </div>
+
+                          {/* Tasks */}
+                          <div className="flex flex-col items-center cursor-pointer py-1 group">
+                            <ListTodo className="w-5 h-5 text-[#0F4C4C]" strokeWidth={1.8} />
+                            <span className="text-[11px] font-semibold text-[#0F4C4C] mt-1">
+                              Tasks
+                            </span>
+                          </div>
+
+                          {/* Profile */}
+                          <div className="flex flex-col items-center cursor-pointer py-1 group">
+                            <User className="w-5 h-5 text-[#0F4C4C]" strokeWidth={1.8} />
+                            <span className="text-[11px] font-semibold text-[#0F4C4C] mt-1">
+                              Profile
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* If modal is closed, still show bottom nav */}
+                  {!isSkipModalOpen && (
+                    <div className="bg-white border-t border-[#E5E7EB] px-3 py-2 mt-auto">
+                      <div className="flex items-center justify-around">
+                        <div onClick={() => setSelectedScreen('dashboard')} className="flex flex-col items-center cursor-pointer py-1">
+                          <Home className="w-5 h-5 text-[#0F4C4C]" strokeWidth={1.8} />
+                          <span className="text-[11px] font-semibold text-[#0F4C4C] mt-1">Home</span>
+                        </div>
+                        <div className="flex flex-col items-center cursor-pointer py-1">
+                          <UserPlus className="w-5 h-5 text-[#0F4C4C]" strokeWidth={1.8} />
+                          <span className="text-[11px] font-semibold text-[#0F4C4C] mt-1">Leads</span>
+                        </div>
+                        <div className="flex flex-col items-center cursor-pointer py-1">
+                          <MapPin className="w-5 h-5 text-[#0F4C4C]" strokeWidth={1.8} />
+                          <span className="text-[11px] font-semibold text-[#0F4C4C] mt-1">Visits</span>
+                        </div>
+                        <div className="flex flex-col items-center cursor-pointer py-1">
+                          <ListTodo className="w-5 h-5 text-[#0F4C4C]" strokeWidth={1.8} />
+                          <span className="text-[11px] font-semibold text-[#0F4C4C] mt-1">Tasks</span>
+                        </div>
+                        <div className="flex flex-col items-center cursor-pointer py-1">
+                          <User className="w-5 h-5 text-[#0F4C4C]" strokeWidth={1.8} />
+                          <span className="text-[11px] font-semibold text-[#0F4C4C] mt-1">Profile</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : selectedScreen === 'success' ? (
                 /* SCREEN 8: PASSWORD RESET SUCCESS */
@@ -12729,7 +14338,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
               <div className="flex items-center space-x-2">
                 <FileCode className="w-4 h-4 text-[#10B981]" />
                 <span className="font-mono text-xs text-gray-200 font-semibold">
-                  {selectedScreen === 'dashboard'
+                  {selectedScreen === 'leads-list'
+                    ? 'lib/features/leads/screens/leads_list_screen.dart (screen-leads-list)'
+                    : selectedScreen === 'dashboard'
                     ? 'lib/features/dashboard/screens/dashboard_screen.dart (screen-dashboard)'
                     : selectedScreen === 'notifications'
                     ? 'lib/features/dashboard/screens/notifications_screen.dart (screen-notification)'
