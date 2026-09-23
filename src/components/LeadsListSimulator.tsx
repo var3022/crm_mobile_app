@@ -53,11 +53,13 @@ export type LeadFilter = 'All' | 'New' | 'Contacted' | 'Qualified' | 'Hot' | 'Fo
 interface LeadsListSimulatorProps {
   onNavigateToDashboard?: () => void;
   onNavigateToNotifications?: () => void;
+  onNavigateToNearbyLeads?: () => void;
 }
 
 export const LeadsListSimulator: React.FC<LeadsListSimulatorProps> = ({
   onNavigateToDashboard,
   onNavigateToNotifications,
+  onNavigateToNearbyLeads,
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<LeadFilter>('All');
   const [selectedSort, setSelectedSort] = useState<'AI Score' | 'Distance' | 'Company Name'>('AI Score');
@@ -1004,13 +1006,25 @@ export const LeadsListSimulator: React.FC<LeadsListSimulatorProps> = ({
             <span className="text-[#6B7280]">
               Showing {filteredLeads.length} leads
             </span>
-            <button
-              onClick={() => setShowSortModal(true)}
-              className="font-bold text-[#0F4C4C] flex items-center space-x-1 cursor-pointer hover:underline"
-            >
-              <span>Sorted by {selectedSort}</span>
-              <ChevronDown className="w-3.5 h-3.5 stroke-[2.5]" />
-            </button>
+            <div className="flex items-center space-x-2">
+              {onNavigateToNearbyLeads && (
+                <button
+                  onClick={onNavigateToNearbyLeads}
+                  className="px-2 py-0.5 bg-[#CCFBF1] text-[#0F4C4C] rounded-md font-bold text-[11px] flex items-center space-x-1 cursor-pointer hover:bg-[#99F6E4] transition-colors"
+                  title="Open Nearby Leads (Screen 2) Map"
+                >
+                  <MapPin className="w-3 h-3 text-[#0F4C4C]" />
+                  <span>Map View</span>
+                </button>
+              )}
+              <button
+                onClick={() => setShowSortModal(true)}
+                className="font-bold text-[#0F4C4C] flex items-center space-x-1 cursor-pointer hover:underline"
+              >
+                <span>Sorted by {selectedSort}</span>
+                <ChevronDown className="w-3.5 h-3.5 stroke-[2.5]" />
+              </button>
+            </div>
           </div>
 
           {/* 4. Main Scrollable Leads List Area */}

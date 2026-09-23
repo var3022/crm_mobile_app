@@ -51,10 +51,12 @@ import {
   UserPlus
 } from 'lucide-react';
 import { LeadsListSimulator } from './components/LeadsListSimulator';
+import { NearbyLeadsSimulator } from './components/NearbyLeadsSimulator';
 import { leadsListDartCode } from './data/leadsDartCode';
+import { nearbyLeadsDartCode } from './data/nearbyLeadsDartCode';
 
 export default function App() {
-  const [selectedScreen, setSelectedScreen] = useState<'leads-list' | 'dashboard' | 'notifications' | 'empty-notifications' | 'intro-slide-three' | 'intro-slide-two' | 'app-intro-walkthrough' | 'onboarding-complete' | 'onboarding-offline-setup' | 'onboarding-notifications' | 'onboarding-microphone' | 'onboarding-camera' | 'onboarding-location' | 'onboarding-welcome' | 'biometric' | 'biometric-fail' | 'logout-confirmation' | 'onboarding-skip-confirmation' | 'success' | 'reset' | 'otp' | 'forgot' | 'verification' | 'signup' | 'signin' | 'splash'>('leads-list');
+  const [selectedScreen, setSelectedScreen] = useState<'leads-list' | 'nearby-leads' | 'dashboard' | 'notifications' | 'empty-notifications' | 'intro-slide-three' | 'intro-slide-two' | 'app-intro-walkthrough' | 'onboarding-complete' | 'onboarding-offline-setup' | 'onboarding-notifications' | 'onboarding-microphone' | 'onboarding-camera' | 'onboarding-location' | 'onboarding-welcome' | 'biometric' | 'biometric-fail' | 'logout-confirmation' | 'onboarding-skip-confirmation' | 'success' | 'reset' | 'otp' | 'forgot' | 'verification' | 'signup' | 'signin' | 'splash'>('nearby-leads');
   const [activeTab, setActiveTab] = useState<'preview' | 'code' | 'instructions'>('preview');
   const [copied, setCopied] = useState(false);
 
@@ -9852,6 +9854,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   const currentDartCode =
     selectedScreen === 'leads-list'
       ? leadsListDartCode
+      : selectedScreen === 'nearby-leads'
+      ? nearbyLeadsDartCode
       : selectedScreen === 'dashboard'
       ? dashboardDartCode
       : selectedScreen === 'notifications'
@@ -9946,6 +9950,8 @@ class BiometricFailScreen extends StatelessWidget {
               <span className="bg-[#ECFDF5] text-[#10B981] text-[11px] font-semibold px-2 py-0.5 rounded-md border border-[#A7F3D0]">
                 {selectedScreen === 'leads-list'
                   ? 'Leads (Screen 1)'
+                  : selectedScreen === 'nearby-leads'
+                  ? 'Nearby Leads (Screen 2)'
                   : selectedScreen === 'dashboard'
                   ? 'Dashboard (Screen 1)'
                   : selectedScreen === 'notifications'
@@ -10000,6 +10006,8 @@ class BiometricFailScreen extends StatelessWidget {
             <p className="text-xs text-[#4B5563]">
               {selectedScreen === 'leads-list'
                 ? 'Leads Flow • lib/features/leads/screens/leads_list_screen.dart (screen-leads-list)'
+                : selectedScreen === 'nearby-leads'
+                ? 'Leads Flow • lib/features/leads/screens/nearby_leads_screen.dart (screen-nearby-leads)'
                 : selectedScreen === 'dashboard'
                 ? 'Main Flow • lib/features/dashboard/screens/dashboard_screen.dart (screen-dashboard)'
                 : selectedScreen === 'notifications'
@@ -10069,6 +10077,16 @@ class BiometricFailScreen extends StatelessWidget {
               }`}
             >
               Leads (Screen 1)
+            </button>
+            <button
+              onClick={() => setSelectedScreen('nearby-leads')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                selectedScreen === 'nearby-leads'
+                  ? 'bg-[#0F4C4C] text-white font-bold shadow-xs'
+                  : 'text-[#4B5563] hover:text-[#111827]'
+              }`}
+            >
+              Nearby Leads (Screen 2)
             </button>
             <button
               onClick={() => setSelectedScreen('dashboard')}
@@ -10443,6 +10461,14 @@ class BiometricFailScreen extends StatelessWidget {
               {selectedScreen === 'leads-list' ? (
                 /* LEADS SCREEN 1 (LEADS-LIST) */
                 <LeadsListSimulator
+                  onNavigateToDashboard={() => setSelectedScreen('dashboard')}
+                  onNavigateToNotifications={() => setSelectedScreen('notifications')}
+                  onNavigateToNearbyLeads={() => setSelectedScreen('nearby-leads')}
+                />
+              ) : selectedScreen === 'nearby-leads' ? (
+                /* LEADS SCREEN 2 (NEARBY-LEADS) */
+                <NearbyLeadsSimulator
+                  onBackToLeadsList={() => setSelectedScreen('leads-list')}
                   onNavigateToDashboard={() => setSelectedScreen('dashboard')}
                   onNavigateToNotifications={() => setSelectedScreen('notifications')}
                 />
@@ -14340,6 +14366,8 @@ class BiometricFailScreen extends StatelessWidget {
                 <span className="font-mono text-xs text-gray-200 font-semibold">
                   {selectedScreen === 'leads-list'
                     ? 'lib/features/leads/screens/leads_list_screen.dart (screen-leads-list)'
+                    : selectedScreen === 'nearby-leads'
+                    ? 'lib/features/leads/screens/nearby_leads_screen.dart (screen-nearby-leads)'
                     : selectedScreen === 'dashboard'
                     ? 'lib/features/dashboard/screens/dashboard_screen.dart (screen-dashboard)'
                     : selectedScreen === 'notifications'
