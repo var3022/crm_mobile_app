@@ -1,7 +1,8 @@
+// ignore_for_file: unused_field
+
 import "package:flutter/material.dart";
 import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
-import "../../../core/theme/app_typography.dart";
 import "../../../core/theme/app_dimensions.dart";
 import "../../../core/theme/app_spacing.dart";
 
@@ -72,12 +73,13 @@ class OnboardingWelcomeScreen extends StatefulWidget {
   });
 
   @override
-  State<OnboardingWelcomeScreen> createState() => _OnboardingWelcomeScreenState();
+  State<OnboardingWelcomeScreen> createState() =>
+      _OnboardingWelcomeScreenState();
 }
 
 class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
   final Set<String> _completedStepIds = {};
-  bool _isSyncing = false;
+  final bool _isSyncing = false;
 
   void _toggleStep(String stepId) {
     setState(() {
@@ -122,7 +124,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                     borderRadius: BorderRadius.circular(22),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.18),
+                        color: AppColors.primary.withValues(alpha: 0.18),
                         blurRadius: 16,
                         offset: const Offset(0, 6),
                       ),
@@ -173,9 +175,14 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
               // 4. Company & Territory Info Card
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF3F4F6), // Neutral grey card background
+                  color: const Color(
+                    0xFFF3F4F6,
+                  ), // Neutral grey card background
                   borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
                   border: Border.all(
                     color: const Color(0xFFE5E7EB),
@@ -252,7 +259,8 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                   physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.symmetric(vertical: 6),
                   itemCount: widget.steps.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final item = widget.steps[index];
                     final isCompleted = _completedStepIds.contains(item.id);
@@ -261,7 +269,10 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                       onTap: () => _toggleStep(item.id),
                       borderRadius: BorderRadius.circular(10),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 2.0),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8.0,
+                          horizontal: 2.0,
+                        ),
                         child: Row(
                           children: [
                             // Left item icon
@@ -333,7 +344,9 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusButton,
+                        ),
                       ),
                     ),
                     child: Text(

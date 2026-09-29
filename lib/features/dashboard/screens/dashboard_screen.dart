@@ -3,6 +3,11 @@ import "package:flutter/material.dart";
 import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_spacing.dart";
+import "../../../layout/app_bottom_nav_bar.dart";
+import "../../authentication/repositories/auth_repository.dart";
+import "../../authentication/models/auth_user.dart";
+import "../repositories/dashboard_repository.dart";
+import "../models/dashboard_stats.dart";
 
 /// Dashboard and Notification Screen 1: Screen-Dashboard
 /// Follows the CRM Pro Flutter/Dart master prompt and design system.
@@ -22,6 +27,7 @@ class DashboardScreen extends StatefulWidget {
   final ValueChanged<int>? onNavTap;
   final VoidCallback? onViewBriefTap;
   final ValueChanged<String>? onScheduleItemTap;
+  final bool showBottomNav;
 
   const DashboardScreen({
     super.key,
@@ -31,6 +37,7 @@ class DashboardScreen extends StatefulWidget {
     this.onNavTap,
     this.onViewBriefTap,
     this.onScheduleItemTap,
+    this.showBottomNav = true,
   });
 
   @override
@@ -39,6 +46,48 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentNavIndex = 0;
+  bool _isLoading = true;
+  String? _error;
+  
+  AuthUser? _user;
+  DashboardStats? _stats;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final authRepo = AuthRepository();
+      final dashRepo = DashboardRepository();
+
+      final futures = await Future.wait([
+        authRepo.getCurrentUser(),
+        dashRepo.getStats(),
+      ]);
+
+      if (!mounted) return;
+
+      setState(() {
+        _user = futures[0] as AuthUser?;
+        _stats = futures[1] as DashboardStats?;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,11 +107,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 _buildTopHeader(),
 
                 const SizedBox(height: 10),
-
-                // Main content area with scrollbar strictly hidden
+                
+                if (_isLoading)
+                  const Expanded(child: Center(child: CircularProgressIndicator()))
+                else if (_error != null)
+                  Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.error_outline, color: AppColors.error, size: 48),
+                            const SizedBox(height: 16),
+                            Text(_error!, textAlign: TextAlign.center),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: _loadData,
+                              child: const Text("Retry"),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  // Main content area with scrollbar strictly hidden
                 Expanded(
                   child: ScrollConfiguration(
-                    behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                    behavior: ScrollConfiguration.of(
+                      context,
+                    ).copyWith(scrollbars: false),
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       padding: const EdgeInsets.only(bottom: 110),
@@ -179,7 +254,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // Floating Action Button (placed above bottom navigation) - square with curved edges
             Positioned(
               right: 20,
-              bottom: 84,
+              bottom: widget.showBottomNav ? 84 : 20,
               child: GestureDetector(
                 onTap: widget.onFabTap,
                 child: Container(
@@ -190,30 +265,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF0F4C4C).withOpacity(0.35),
+                        color: const Color(0xFF0F4C4C).withValues(alpha: 0.35),
                         blurRadius: 14,
                         offset: const Offset(0, 5),
                       ),
                     ],
                   ),
                   child: const Center(
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+                    child: Icon(Icons.add, color: Colors.white, size: 28),
                   ),
                 ),
               ),
             ),
 
-            // Bottom Navigation Bar
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: _buildBottomNavigationBar(),
-            ),
+            // Bottom Navigation Bar (if standalone)
+            if (widget.showBottomNav)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: AppBottomNavBar(
+                  currentIndex: _currentNavIndex,
+                  onTap: (index) {
+                    setState(() {
+                      _currentNavIndex = index;
+                    });
+                    if (widget.onNavTap != null) {
+                      widget.onNavTap!(index);
+                    } else {
+                      if (index == 0) {
+                        Navigator.of(context).pushReplacementNamed("/dashboard");
+                      } else if (index == 1) {
+                        Navigator.of(context).pushReplacementNamed("/leads-list");
+                      }
+                    }
+                  },
+                ),
+              ),
           ],
         ),
       ),
@@ -238,7 +326,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             alignment: Alignment.center,
             child: Text(
-              "AM",
+              _user?.firstName.isNotEmpty == true 
+                  ? _user!.firstName[0].toUpperCase() 
+                  : "U",
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -256,7 +346,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Good morning,...",
+                  "Good morning, ${_user?.firstName ?? 'User'}!",
                   style: GoogleFonts.inter(
                     fontSize: 19,
                     fontWeight: FontWeight.w800,
@@ -330,7 +420,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 4,
                         offset: const Offset(0, 1),
                       ),
@@ -385,7 +475,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F4C4C).withOpacity(0.18),
+            color: const Color(0xFF0F4C4C).withValues(alpha: 0.18),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -397,10 +487,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Header: Robot/Brain Icon + "AI DAILY BRIEF"
           Row(
             children: [
-              const Text(
-                "🤖",
-                style: TextStyle(fontSize: 16),
-              ),
+              const Text("🤖", style: TextStyle(fontSize: 16)),
               const SizedBox(width: 8),
               Text(
                 "AI DAILY BRIEF",
@@ -422,7 +509,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: GoogleFonts.inter(
               fontSize: 13.5,
               fontWeight: FontWeight.w400,
-              color: Colors.white.withOpacity(0.92),
+              color: Colors.white.withValues(alpha: 0.92),
               height: 1.45,
               letterSpacing: -0.1,
             ),
@@ -466,27 +553,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   /// 3. Horizontally Scrollable Metric Cards Carousel with scrollbars hidden
   Widget _buildMetricsCarousel() {
+    final visitsCompleted = _stats?.todayVisitsCompleted ?? 0;
+    final visitsTotal = _stats?.todayVisitsTotal ?? 0;
+    final checkIns = _stats?.checkIns ?? 0;
+    final distanceKm = _stats?.distanceKm ?? 0.0;
+    
+    // Format revenue (e.g. ₹4.2L)
+    final revenueRaw = _stats?.revenue ?? 0.0;
+    String revenueStr = "₹0";
+    if (revenueRaw >= 100000) {
+      revenueStr = "₹${(revenueRaw / 100000).toStringAsFixed(1)}L";
+    } else if (revenueRaw >= 1000) {
+      revenueStr = "₹${(revenueRaw / 1000).toStringAsFixed(1)}k";
+    } else {
+      revenueStr = "₹${revenueRaw.toStringAsFixed(0)}";
+    }
+
     final metrics = [
       _MetricItem(
         title: "Today's Visits",
-        value: "2/6",
-        subtitle: "Goal: 6 visits",
+        value: "$visitsCompleted/$visitsTotal",
+        subtitle: "Goal: $visitsTotal visits",
       ),
-      _MetricItem(
-        title: "Check-ins",
-        value: "2",
-        subtitle: "Completed",
-      ),
+      _MetricItem(title: "Check-ins", value: "$checkIns", subtitle: "Completed"),
       _MetricItem(
         title: "Distance",
-        value: "18 km",
+        value: "${distanceKm.toStringAsFixed(1)} km",
         subtitle: "Estimated tra...",
       ),
-      _MetricItem(
-        title: "Revenue",
-        value: "₹4.2L",
-        subtitle: "Active leads",
-      ),
+      _MetricItem(title: "Revenue", value: revenueStr, subtitle: "Active leads"),
     ];
 
     return ScrollConfiguration(
@@ -506,13 +601,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: const Color(0xFFE5E7EB),
-                  width: 1,
-                ),
+                border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -565,19 +657,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   /// 4. Monthly Target Card with circular progress
   Widget _buildMonthlyTargetCard() {
+    final target = _stats?.monthlyTarget ?? 0.0;
+    final achieved = _stats?.monthlyAchieved ?? 0.0;
+    final percentage = target > 0 ? (achieved / target) : 0.0;
+    final displayPercentage = (percentage * 100).toInt();
+    
+    final daysRemaining = _stats?.daysRemaining ?? 0;
+
+    String formatCurrency(double amount) {
+      if (amount >= 100000) {
+        return "₹${(amount / 100000).toStringAsFixed(1)}L";
+      } else if (amount >= 1000) {
+        return "₹${(amount / 1000).toStringAsFixed(0)}k";
+      }
+      return "₹${amount.toStringAsFixed(0)}";
+    }
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFE5E7EB),
-          width: 1,
-        ),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -596,14 +700,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 CustomPaint(
                   size: const Size(68, 68),
                   painter: _CircularProgressPainter(
-                    percentage: 0.68,
+                    percentage: percentage,
                     trackColor: const Color(0xFFF1F5F9),
                     progressColor: const Color(0xFF0F4C4C),
                     strokeWidth: 6.5,
                   ),
                 ),
                 Text(
-                  "68%",
+                  "$displayPercentage%",
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
@@ -634,7 +738,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "₹6,80,000 / ₹10,00,000",
+                  "${formatCurrency(achieved)} / ${formatCurrency(target)}",
                   style: GoogleFonts.inter(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
@@ -644,7 +748,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "22 days remaining",
+                  "$daysRemaining days remaining",
                   style: GoogleFonts.inter(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
@@ -681,13 +785,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: const Color(0xFFE5E7EB),
-            width: 1,
-          ),
+          border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.015),
+              color: Colors.black.withValues(alpha: 0.015),
               blurRadius: 4,
               offset: const Offset(0, 1),
             ),
@@ -790,127 +891,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  /// 6. Bottom Navigation Bar with pill highlight for active tab
-  Widget _buildBottomNavigationBar() {
-    final navItems = [
-      _BottomNavItemData(
-        label: "Home",
-        icon: Icons.home_rounded,
-        outlinedIcon: Icons.home_outlined,
-      ),
-      _BottomNavItemData(
-        label: "Leads",
-        icon: Icons.folder_rounded,
-        outlinedIcon: Icons.folder_outlined,
-      ),
-      _BottomNavItemData(
-        label: "Visits",
-        icon: Icons.share_location_rounded,
-        outlinedIcon: Icons.share_location_outlined,
-      ),
-      _BottomNavItemData(
-        label: "Tasks",
-        icon: Icons.format_list_bulleted_rounded,
-        outlinedIcon: Icons.format_list_bulleted_outlined,
-      ),
-      _BottomNavItemData(
-        label: "Profile",
-        icon: Icons.manage_accounts_rounded,
-        outlinedIcon: Icons.manage_accounts_outlined,
-      ),
-    ];
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: const Border(
-          top: BorderSide(color: Color(0xFFE5E7EB), width: 1),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, -3),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.only(top: 8, bottom: 20, left: 8, right: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(navItems.length, (index) {
-          final item = navItems[index];
-          final isActive = _currentNavIndex == index;
-
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _currentNavIndex = index;
-              });
-              if (widget.onNavTap != null) {
-                widget.onNavTap!(index);
-              }
-            },
-            behavior: HitTestBehavior.opaque,
-            child: isActive
-                ? Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE6F4F2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          item.icon,
-                          size: 22,
-                          color: const Color(0xFF0F4C4C),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          item.label,
-                          style: GoogleFonts.inter(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF0F4C4C),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          item.outlinedIcon,
-                          size: 22,
-                          color: const Color(0xFF9CA3AF),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          item.label,
-                          style: GoogleFonts.inter(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFF6B7280),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-          );
-        }),
-      ),
-    );
-  }
 }
 
 /// Circular progress painter for Monthly Target gauge
@@ -981,14 +961,5 @@ class _MetricItem {
   });
 }
 
-class _BottomNavItemData {
-  final String label;
-  final IconData icon;
-  final IconData outlinedIcon;
 
-  _BottomNavItemData({
-    required this.label,
-    required this.icon,
-    required this.outlinedIcon,
-  });
-}
+typedef ScreenDashboard = DashboardScreen;

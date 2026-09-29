@@ -4,6 +4,7 @@ import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_typography.dart";
 import "../../../core/theme/app_dimensions.dart";
 import "../../../core/theme/app_spacing.dart";
+import "../repositories/auth_repository.dart";
 
 /// Screen 4: Email Verification Screen
 /// Authentic, pixel-accurate reproduction of the CRM Pro Field Sales Email Verification screen.
@@ -34,6 +35,26 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Timer? _countdownTimer;
   bool _isResending = false;
   bool _showSuccessBanner = false;
+  String? _apiError;
+
+  String _maskEmail(String rawEmail) {
+    if (rawEmail.isEmpty) return "j***@company.com";
+    if (rawEmail.contains("***")) return rawEmail;
+    final parts = rawEmail.split("@");
+    if (parts.length != 2) return rawEmail;
+    final name = parts[0];
+    final domain = parts[1];
+    if (name.isEmpty) return rawEmail;
+    return "${name[0]}***@$domain";
+  }
+
+  String get _displayEmail {
+    final routeArg = ModalRoute.of(context)?.settings.arguments;
+    final emailToUse = (routeArg is String && routeArg.isNotEmpty)
+        ? routeArg
+        : widget.email;
+    return _maskEmail(emailToUse);
+  }
 
   @override
   void initState() {
@@ -55,21 +76,30 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     });
   }
 
-  void _handleResend() {
+  void _handleResend() async {
     if (_secondsRemaining > 0 || _isResending) return;
 
     setState(() {
       _isResending = true;
+      _apiError = null;
     });
 
-    // Simulate resending request
-    Future.delayed(const Duration(milliseconds: 600), () {
+    try {
+      final emailToUse = _displayEmail.contains("***") 
+          ? (ModalRoute.of(context)?.settings.arguments as String? ?? widget.email)
+          : _displayEmail;
+
+      final authRepo = AuthRepository();
+      await authRepo.resendVerificationEmail(emailToUse);
+
       if (!mounted) return;
+      
       setState(() {
         _isResending = false;
         _secondsRemaining = widget.initialCountdownSeconds;
         _showSuccessBanner = true;
       });
+      
       _startTimer();
       widget.onResendEmail?.call();
 
@@ -80,7 +110,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           });
         }
       });
-    });
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isResending = false;
+          _apiError = e.toString();
+        });
+      }
+    }
   }
 
   String _formatTime(int totalSeconds) {
@@ -163,11 +200,39 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
-                                    "New verification link sent to ${widget.email}",
+                                    "New verification link sent to $_displayEmail",
                                     style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
                                       color: Color(0xFF065F46),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                        if (_apiError != null)
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.only(top: 8, bottom: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.error_outline, color: AppColors.error, size: 20),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    _apiError!,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.error,
                                     ),
                                   ),
                                 ),
@@ -232,7 +297,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                 children: [
                                   const TextSpan(text: "We've sent a verification link to\n"),
                                   TextSpan(
-                                    text: widget.email,
+                                    text: _displayEmail,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w700,
                                       color: Color(0xFF0F172A),

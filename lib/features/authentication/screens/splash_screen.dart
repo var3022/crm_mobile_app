@@ -1,13 +1,15 @@
 import "package:flutter/material.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_typography.dart";
+import "../repositories/auth_repository.dart";
 
 /// Screen 1: Splash Screen
 /// Authentic, pixel-accurate reproduction of the CRM Pro Field Sales splash screen.
 class SplashScreen extends StatefulWidget {
-  final VoidCallback? onFinished;
+  final VoidCallback? onFinished; // Used for unauthenticated state
+  final VoidCallback? onAuthenticated; // Used for authenticated state
 
-  const SplashScreen({super.key, this.onFinished});
+  const SplashScreen({super.key, this.onFinished, this.onAuthenticated});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -33,21 +35,39 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _scaleAnimation = Tween<double>(begin: 0.92, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutBack,
-      ),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
     );
 
     _animationController.forward();
 
-    // Optional callback trigger after splash duration
-    if (widget.onFinished != null) {
-      Future.delayed(const Duration(milliseconds: 2400), () {
-        if (mounted) {
-          widget.onFinished!();
-        }
-      });
+    _checkAuthStatus();
+  }
+
+  Future<void> _checkAuthStatus() async {
+    final authRepo = AuthRepository();
+    
+    // We want to show the splash screen for at least 2.4 seconds for brand experience
+    final minDurationFuture = Future.delayed(const Duration(milliseconds: 2400));
+    
+    bool isAuthenticated = false;
+    
+    try {
+      await authRepo.getCurrentUser();
+      isAuthenticated = true;
+    } catch (e) {
+      // Not authenticated or network error
+      isAuthenticated = false;
+    }
+
+    // Wait for the minimum duration to complete before navigating
+    await minDurationFuture;
+    
+    if (mounted) {
+      if (isAuthenticated && widget.onAuthenticated != null) {
+        widget.onAuthenticated!();
+      } else if (widget.onFinished != null) {
+        widget.onFinished!();
+      }
     }
   }
 
@@ -65,9 +85,7 @@ class _SplashScreenState extends State<SplashScreen>
         children: [
           // Background: Subtle Field Sales Radar / Geometric rings & crosshair grid
           Positioned.fill(
-            child: CustomPaint(
-              painter: const _SplashRadarPainter(),
-            ),
+            child: CustomPaint(painter: const _SplashRadarPainter()),
           ),
 
           // Main Centered Content
@@ -96,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen>
                               borderRadius: BorderRadius.circular(26),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.12),
+                                  color: Colors.black.withValues(alpha: 0.12),
                                   blurRadius: 24,
                                   offset: const Offset(0, 10),
                                 ),
@@ -187,7 +205,7 @@ class _SplashRadarPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height * 0.44);
 
     final linePaint = Paint()
-      ..color = Colors.white.withOpacity(0.045)
+      ..color = Colors.white.withValues(alpha: 0.045)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
@@ -205,7 +223,7 @@ class _SplashRadarPainter extends CustomPainter {
 
     // Diagonal subtle guide lines
     final diagonalPaint = Paint()
-      ..color = Colors.white.withOpacity(0.025)
+      ..color = Colors.white.withValues(alpha: 0.025)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.75;
 

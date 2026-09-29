@@ -26,8 +26,8 @@ class _OnboardingOfflineSetupScreenState
     extends State<OnboardingOfflineSetupScreen> {
   bool _isDownloading = false;
   bool _isCompleted = false;
-  double _progress = 0.60; // Initial 60% as seen in reference design
-  int _downloadedCount = 72; // 72 of 120 leads
+  double _progress = 0.0; // Initial 60% as seen in reference design
+  int _downloadedCount = 0; // 72 of 120 leads
   final int _totalCount = 120;
   Timer? _timer;
 

@@ -1,8 +1,10 @@
+// ignore_for_file: unused_field
+
 import "package:flutter/material.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_typography.dart";
 import "../../../core/theme/app_dimensions.dart";
-import "../../../core/widgets/app_button.dart";
+import "../repositories/auth_repository.dart";
 
 /// Screen 2: Sign In Screen
 /// Authentic, pixel-accurate reproduction of the CRM Pro Field Sales Sign In screen.
@@ -12,14 +14,18 @@ class SignInScreen extends StatefulWidget {
   final VoidCallback? onCompanySSO;
   final VoidCallback? onBiometricLogin;
   final VoidCallback? onContactSupport;
+  final VoidCallback? onSignUp;
+  final bool isFirstTimeSetup;
 
   const SignInScreen({
     super.key,
     this.onSignInSuccess,
     this.onForgotPassword,
+    this.onSignUp,
     this.onCompanySSO,
     this.onBiometricLogin,
     this.onContactSupport,
+    this.isFirstTimeSetup = true,
   });
 
   @override
@@ -31,8 +37,12 @@ class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  bool _isLoading = false;
+  String? _apiError;
+
   bool _obscurePassword = true;
-  bool _hasAttemptedSubmit = false; // Validation errors are only shown when user attempts submit with empty field
+  bool _hasAttemptedSubmit =
+      false; // Validation errors are only shown when user attempts submit with empty field
   String? _emailError;
   String? _passwordError;
 
@@ -43,11 +53,12 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
-  void _validateAndSubmit() {
+  void _validateAndSubmit() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
     setState(() {
       _hasAttemptedSubmit = true;
-      final email = _emailController.text.trim();
-      final password = _passwordController.text;
 
       if (email.isEmpty) {
         _emailError = "Email address is required";
@@ -67,7 +78,43 @@ class _SignInScreenState extends State<SignInScreen> {
     });
 
     if (_emailError == null && _passwordError == null) {
-      widget.onSignInSuccess?.call();
+      setState(() {
+        _isLoading = true;
+        _apiError = null;
+      });
+
+      try {
+        final authRepo = AuthRepository();
+        await authRepo.login(email, password);
+
+        if (!mounted) return;
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (widget.onSignInSuccess != null) {
+          widget.onSignInSuccess!();
+        } else {
+          final args = ModalRoute.of(context)?.settings.arguments;
+          final isFirstTime = (args is Map && args.containsKey("isFirstTimeSetup"))
+              ? (args["isFirstTimeSetup"] as bool)
+              : widget.isFirstTimeSetup;
+
+          if (isFirstTime) {
+            Navigator.of(context).pushReplacementNamed("/onboarding-welcome");
+          } else {
+            Navigator.of(context).pushReplacementNamed("/dashboard");
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _apiError = e.toString(); // For now, can refine if it's ApiException
+          });
+        }
+      }
     }
   }
 
@@ -79,392 +126,444 @@ class _SignInScreenState extends State<SignInScreen> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+              behavior: ScrollConfiguration.of(
+                context,
+              ).copyWith(scrollbars: false),
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                      // 1. Top Logo Row: [LP Icon] + "CRM Pro"
-                      Row(
-                        children: [
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(14),
+                        // 1. Top Logo Row: [LP Icon] + "CRM Pro"
+                        Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Text(
+                                "LP",
+                                style: TextStyle(
+                                  fontFamily: AppTypography.fontFamily,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
                             ),
-                            alignment: Alignment.center,
-                            child: const Text(
-                              "LP",
+                            const SizedBox(width: 12),
+                            const Text(
+                              "CRM Pro",
                               style: TextStyle(
                                 fontFamily: AppTypography.fontFamily,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: -0.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          const Text(
-                            "CRM Pro",
-                            style: TextStyle(
-                              fontFamily: AppTypography.fontFamily,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.primary,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // 2. Headings: "Welcome Back" & subtitle
-                      const Text(
-                        "Welcome Back",
-                        style: TextStyle(
-                          fontFamily: AppTypography.fontFamily,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
-                          letterSpacing: -0.5,
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "Sign in to continue your field work.",
-                        style: TextStyle(
-                          fontFamily: AppTypography.fontFamily,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textSecondary,
-                          letterSpacing: 0.1,
-                        ),
-                      ),
-
-                      const SizedBox(height: 28),
-
-                      // 3. Email Field
-                      const Text(
-                        "Email Address",
-                        style: TextStyle(
-                          fontFamily: AppTypography.fontFamily,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      _buildInputField(
-                        controller: _emailController,
-                        hintText: "e.g. john@company.com",
-                        prefixIcon: Icons.mail_outline_rounded,
-                        keyboardType: TextInputType.emailAddress,
-                        hasError: _hasAttemptedSubmit && _emailError != null,
-                        onChanged: (val) {
-                          if (_hasAttemptedSubmit) {
-                            setState(() {
-                              _emailError = val.trim().isEmpty
-                                  ? "Email address is required"
-                                  : null;
-                            });
-                          }
-                        },
-                      ),
-                      if (_hasAttemptedSubmit && _emailError != null) ...[
-                        const SizedBox(height: 6),
-                        Text(
-                          _emailError!,
-                          style: const TextStyle(
-                            fontFamily: AppTypography.fontFamily,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.error,
-                          ),
-                        ),
-                      ],
-
-                      const SizedBox(height: 16),
-
-                      // 4. Password Field
-                      const Text(
-                        "Password",
-                        style: TextStyle(
-                          fontFamily: AppTypography.fontFamily,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      _buildInputField(
-                        controller: _passwordController,
-                        hintText: "Enter your password",
-                        prefixIcon: Icons.lock_outline_rounded,
-                        obscureText: _obscurePassword,
-                        hasError: _hasAttemptedSubmit && _passwordError != null,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                            size: 20,
-                            color: AppColors.textSecondary,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
-                        ),
-                        onChanged: (val) {
-                          if (_hasAttemptedSubmit) {
-                            setState(() {
-                              _passwordError = val.isEmpty
-                                  ? "Password is required"
-                                  : null;
-                            });
-                          }
-                        },
-                      ),
-                      if (_hasAttemptedSubmit && _passwordError != null) ...[
-                        const SizedBox(height: 6),
-                        Text(
-                          _passwordError!,
-                          style: const TextStyle(
-                            fontFamily: AppTypography.fontFamily,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.error,
-                          ),
-                        ),
-                      ],
-
-                      const SizedBox(height: 14),
-
-                      // 5. "Forgot Password?" Link
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: InkWell(
-                          onTap: widget.onForgotPassword,
-                          borderRadius: BorderRadius.circular(4),
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 2.0),
-                            child: Text(
-                              "Forgot Password?",
-                              style: TextStyle(
-                                fontFamily: AppTypography.fontFamily,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
                                 color: AppColors.primary,
+                                letterSpacing: -0.3,
                               ),
                             ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // 2. Headings: "Welcome Back" & subtitle
+                        const Text(
+                          "Welcome Back",
+                          style: TextStyle(
+                            fontFamily: AppTypography.fontFamily,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimary,
+                            letterSpacing: -0.5,
+                            height: 1.2,
                           ),
                         ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // 6. Sign In Primary CTA Button (52px height)
-                      SizedBox(
-                        width: double.infinity,
-                        height: AppDimensions.buttonHeight,
-                        child: ElevatedButton(
-                          onPressed: _validateAndSubmit,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: const Text(
-                            "Sign In",
-                            style: TextStyle(
-                              fontFamily: AppTypography.fontFamily,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          "Sign in to continue your field work.",
+                          style: TextStyle(
+                            fontFamily: AppTypography.fontFamily,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSecondary,
+                            letterSpacing: 0.1,
                           ),
                         ),
-                      ),
 
-                      const SizedBox(height: 28),
+                        const SizedBox(height: 28),
 
-                      // 7. Divider: "OR SIGN IN WITH"
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: Divider(
-                              color: AppColors.border,
-                              thickness: 1.0,
-                            ),
+                        // 3. Email Field
+                        const Text(
+                          "Email Address",
+                          style: TextStyle(
+                            fontFamily: AppTypography.fontFamily,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                            child: Text(
-                              "OR SIGN IN WITH",
-                              style: TextStyle(
-                                fontFamily: AppTypography.fontFamily,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textSecondary,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                          const Expanded(
-                            child: Divider(
-                              color: AppColors.border,
-                              thickness: 1.0,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // 8a. Face ID Biometric Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: AppDimensions.buttonHeight,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            if (widget.onBiometricLogin != null) {
-                              widget.onBiometricLogin!();
-                            } else {
-                              Navigator.of(context).pushNamed("/biometric-login");
+                        ),
+                        const SizedBox(height: 8),
+                        _buildInputField(
+                          controller: _emailController,
+                          hintText: "e.g. john@company.com",
+                          prefixIcon: Icons.mail_outline_rounded,
+                          keyboardType: TextInputType.emailAddress,
+                          hasError: _hasAttemptedSubmit && _emailError != null,
+                          onChanged: (val) {
+                            if (_hasAttemptedSubmit) {
+                              setState(() {
+                                _emailError = val.trim().isEmpty
+                                    ? "Email address is required"
+                                    : null;
+                              });
                             }
                           },
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            side: const BorderSide(
-                              color: AppColors.border,
-                              width: 1.0,
+                        ),
+                        if (_hasAttemptedSubmit && _emailError != null) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            _emailError!,
+                            style: const TextStyle(
+                              fontFamily: AppTypography.fontFamily,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.error,
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(
-                                Icons.fingerprint_rounded,
-                                size: 20,
-                                color: AppColors.primary,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "Sign in with Face ID",
-                                style: TextStyle(
-                                  fontFamily: AppTypography.fontFamily,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ],
+                        ],
+
+                        const SizedBox(height: 16),
+
+                        // 4. Password Field
+                        const Text(
+                          "Password",
+                          style: TextStyle(
+                            fontFamily: AppTypography.fontFamily,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
                           ),
                         ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      // 8b. Company SSO Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: AppDimensions.buttonHeight,
-                        child: OutlinedButton(
-                          onPressed: widget.onCompanySSO,
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            side: const BorderSide(
-                              color: AppColors.border,
-                              width: 1.0,
+                        const SizedBox(height: 8),
+                        _buildInputField(
+                          controller: _passwordController,
+                          hintText: "Enter your password",
+                          prefixIcon: Icons.lock_outline_rounded,
+                          obscureText: _obscurePassword,
+                          hasError:
+                              _hasAttemptedSubmit && _passwordError != null,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                              size: 20,
+                              color: AppColors.textSecondary,
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(
-                                Icons.apartment_rounded,
-                                size: 20,
-                                color: AppColors.primary,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "Company SSO",
-                                style: TextStyle(
-                                  fontFamily: AppTypography.fontFamily,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
+                          onChanged: (val) {
+                            if (_hasAttemptedSubmit) {
+                              setState(() {
+                                _passwordError = val.isEmpty
+                                    ? "Password is required"
+                                    : null;
+                              });
+                            }
+                          },
                         ),
-                      ),
+                        if (_hasAttemptedSubmit && _passwordError != null) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            _passwordError!,
+                            style: const TextStyle(
+                              fontFamily: AppTypography.fontFamily,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.error,
+                            ),
+                          ),
+                        ],
 
-                      const Spacer(),
+                        const SizedBox(height: 14),
 
-                      // 9. Bottom Support Footer: "Having trouble? Contact IT Support"
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 24.0, bottom: 20.0),
+                        // 5. "Forgot Password?" Link
+                        Align(
+                          alignment: Alignment.centerRight,
                           child: InkWell(
-                            onTap: widget.onContactSupport,
+                            onTap: widget.onForgotPassword,
                             borderRadius: BorderRadius.circular(4),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 6.0),
-                              child: RichText(
-                                text: const TextSpan(
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 4.0,
+                                horizontal: 2.0,
+                              ),
+                              child: Text(
+                                "Forgot Password?",
+                                style: TextStyle(
+                                  fontFamily: AppTypography.fontFamily,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        if (_apiError != null) ...[
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppColors.error.withValues(alpha: 0.5)),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.error_outline, color: AppColors.error, size: 20),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    _apiError!,
+                                    style: const TextStyle(
+                                      fontFamily: AppTypography.fontFamily,
+                                      fontSize: 13,
+                                      color: AppColors.error,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        // 6. Sign In Primary CTA Button (52px height)
+                        SizedBox(
+                          width: double.infinity,
+                          height: AppDimensions.buttonHeight,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _validateAndSubmit,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
+                              disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
+                                : const Text(
+                                    "Sign In",
+                                    style: TextStyle(
+                                      fontFamily: AppTypography.fontFamily,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 28),
+
+                        // 7. Divider: "OR SIGN IN WITH"
+                        Row(
+                          children: [
+                            const Expanded(
+                              child: Divider(
+                                color: AppColors.border,
+                                thickness: 1.0,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14.0,
+                              ),
+                              child: Text(
+                                "OR SIGN IN WITH",
+                                style: TextStyle(
+                                  fontFamily: AppTypography.fontFamily,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textSecondary,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                            const Expanded(
+                              child: Divider(
+                                color: AppColors.border,
+                                thickness: 1.0,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // 8a. Face ID Biometric Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: AppDimensions.buttonHeight,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              if (widget.onBiometricLogin != null) {
+                                widget.onBiometricLogin!();
+                              } else {
+                                Navigator.of(
+                                  context,
+                                ).pushNamed("/biometric-login");
+                              }
+                            },
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              side: const BorderSide(
+                                color: AppColors.border,
+                                width: 1.0,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(
+                                  Icons.fingerprint_rounded,
+                                  size: 20,
+                                  color: AppColors.primary,
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  "Sign in with Face ID",
                                   style: TextStyle(
                                     fontFamily: AppTypography.fontFamily,
-                                    fontSize: 13.5,
-                                    color: AppColors.textSecondary,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
                                   ),
-                                  children: [
-                                    TextSpan(text: "Having trouble? "),
-                                    TextSpan(
-                                      text: "Contact IT Support",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.primary,
-                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // 8b. Company SSO Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: AppDimensions.buttonHeight,
+                          child: OutlinedButton(
+                            onPressed: widget.onCompanySSO,
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              side: const BorderSide(
+                                color: AppColors.border,
+                                width: 1.0,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(
+                                  Icons.apartment_rounded,
+                                  size: 20,
+                                  color: AppColors.primary,
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  "Company SSO",
+                                  style: TextStyle(
+                                    fontFamily: AppTypography.fontFamily,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        // 9. Bottom Support Footer: "Having trouble? Contact IT Support"
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              top: 24.0,
+                              bottom: 20.0,
+                            ),
+                            child: InkWell(
+                              onTap: widget.onSignUp,
+                              borderRadius: BorderRadius.circular(4),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4.0,
+                                  horizontal: 6.0,
+                                ),
+                                child: RichText(
+                                  text: const TextSpan(
+                                    style: TextStyle(
+                                      fontFamily: AppTypography.fontFamily,
+                                      fontSize: 13.5,
+                                      color: AppColors.textSecondary,
                                     ),
-                                  ],
+                                    children: [
+                                      TextSpan(text: "Don't have an account? "),
+                                      TextSpan(
+                                        text: "Create one now",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
               ),
             );
           },
@@ -506,7 +605,10 @@ class _SignInScreenState extends State<SignInScreen> {
         ),
         decoration: InputDecoration(
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 15,
+          ),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,

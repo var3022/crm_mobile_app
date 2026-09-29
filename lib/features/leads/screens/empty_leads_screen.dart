@@ -10,6 +10,7 @@ class EmptyLeadsScreen extends StatelessWidget {
   final VoidCallback? onScanCardTap;
   final ValueChanged<LeadModel>? onLeadSelected;
   final ValueChanged<int>? onBottomNavTap;
+  final bool showBottomNav;
 
   const EmptyLeadsScreen({
     super.key,
@@ -18,6 +19,7 @@ class EmptyLeadsScreen extends StatelessWidget {
     this.onScanCardTap,
     this.onLeadSelected,
     this.onBottomNavTap,
+    this.showBottomNav = true,
   });
 
   @override
@@ -29,6 +31,9 @@ class EmptyLeadsScreen extends StatelessWidget {
       onScanCardTap: onScanCardTap,
       onLeadSelected: onLeadSelected,
       onBottomNavTap: onBottomNavTap,
+      showBottomNav: showBottomNav,
     );
   }
 }
+
+typedef ScreenEmptyLeads = EmptyLeadsScreen;

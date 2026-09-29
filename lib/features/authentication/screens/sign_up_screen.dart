@@ -2,11 +2,12 @@ import "package:flutter/material.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_typography.dart";
 import "../../../core/theme/app_dimensions.dart";
+import "../repositories/auth_repository.dart";
 
 /// Screen 3: Sign Up Screen (Create Account)
 /// Authentic, pixel-accurate reproduction of the CRM Pro Field Sales Sign Up screen.
 class SignUpScreen extends StatefulWidget {
-  final VoidCallback? onSignUpSuccess;
+  final ValueChanged<String>? onSignUpSuccess;
   final VoidCallback? onSignInTap;
   final VoidCallback? onCompanySSO;
 
@@ -26,6 +27,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _companyController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  bool _isLoading = false;
+  String? _apiError;
+  bool _obscurePassword = true;
 
   String _selectedCountryCode = "+91";
   String? _selectedDesignation;
@@ -54,6 +60,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String? _phoneError;
   String? _companyError;
   String? _designationError;
+  String? _passwordError;
 
   @override
   void dispose() {
@@ -61,10 +68,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _emailController.dispose();
     _phoneController.dispose();
     _companyController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
-  void _validateAndSubmit() {
+  Future<void> _validateAndSubmit() async {
     setState(() {
       _hasAttemptedSubmit = true;
       final name = _fullNameController.text.trim();
@@ -110,14 +118,69 @@ class _SignUpScreenState extends State<SignUpScreen> {
       } else {
         _designationError = null;
       }
+
+      // Password Validation
+      final password = _passwordController.text;
+      if (password.isEmpty) {
+        _passwordError = "Password is required";
+      } else if (password.length < 6) {
+        _passwordError = "Password must be at least 6 characters";
+      } else {
+        _passwordError = null;
+      }
     });
 
     if (_fullNameError == null &&
         _emailError == null &&
         _phoneError == null &&
         _companyError == null &&
-        _designationError == null) {
-      widget.onSignUpSuccess?.call();
+        _designationError == null &&
+        _passwordError == null) {
+      
+      setState(() {
+        _isLoading = true;
+        _apiError = null;
+      });
+
+      try {
+        final authRepo = AuthRepository();
+        
+        final nameParts = _fullNameController.text.trim().split(' ');
+        final firstName = nameParts.first;
+        final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+        
+        final companyName = _companyController.text.trim();
+        final subdomain = companyName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '-');
+
+        await authRepo.register(
+          tenantName: companyName,
+          subdomain: subdomain,
+          adminEmail: _emailController.text.trim(),
+          adminPassword: _passwordController.text,
+          adminFirstName: firstName,
+          adminLastName: lastName,
+        );
+
+        if (!mounted) return;
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        final email = _emailController.text.trim();
+        if (widget.onSignUpSuccess != null) {
+          widget.onSignUpSuccess!(email);
+        } else {
+          Navigator.of(context).pushNamed("/email-verification", arguments: email);
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _apiError = e.toString();
+          });
+        }
+      }
     }
   }
 
@@ -515,31 +578,121 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ],
 
+              const SizedBox(height: 16),
+
+              // 7.5 Password Field
+              const Text(
+                "Password",
+                style: TextStyle(
+                  fontFamily: AppTypography.fontFamily,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildInputField(
+                controller: _passwordController,
+                hintText: "Enter your password",
+                prefixIcon: Icons.lock_outline_rounded,
+                obscureText: _obscurePassword,
+                hasError: _hasAttemptedSubmit && _passwordError != null,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                    size: 20,
+                    color: AppColors.textSecondary,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                ),
+                onChanged: (val) {
+                  if (_hasAttemptedSubmit) {
+                    setState(() {
+                      _passwordError = val.isEmpty ? "Password is required" : null;
+                    });
+                  }
+                },
+              ),
+              if (_hasAttemptedSubmit && _passwordError != null) ...[
+                const SizedBox(height: 5),
+                Text(
+                  _passwordError!,
+                  style: const TextStyle(
+                    fontFamily: AppTypography.fontFamily,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.error,
+                  ),
+                ),
+              ],
+
               const SizedBox(height: 24),
+
+              if (_apiError != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.error.withValues(alpha: 0.5)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline, color: AppColors.error, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _apiError!,
+                          style: const TextStyle(
+                            fontFamily: AppTypography.fontFamily,
+                            fontSize: 13,
+                            color: AppColors.error,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
 
               // 8. Create Account Primary CTA Button (52px height)
               SizedBox(
                 width: double.infinity,
                 height: AppDimensions.buttonHeight,
                 child: ElevatedButton(
-                  onPressed: _validateAndSubmit,
+                  onPressed: _isLoading ? null : _validateAndSubmit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
+                    disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    "Create Account",
-                    style: TextStyle(
-                      fontFamily: AppTypography.fontFamily,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : const Text(
+                          "Create Account",
+                          style: TextStyle(
+                            fontFamily: AppTypography.fontFamily,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
 

@@ -2,6 +2,8 @@ import "package:flutter/material.dart";
 import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_spacing.dart";
+import "../repositories/notification_repository.dart";
+import "../models/notification_model.dart";
 
 /// Notification Item Data Model
 class NotificationItem {
@@ -83,7 +85,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   String _selectedFilter = "All";
   int _selectedBottomNavIndex = 0;
 
+  bool _isLoading = false;
   late List<NotificationItem> _notifications;
+  final NotificationRepository _repository = NotificationRepository();
 
   List<NotificationItem> _getDefaultNotifications() {
     return [
@@ -150,15 +154,94 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     } else if (widget.initialNotifications != null) {
       _notifications = List.from(widget.initialNotifications!);
     } else {
-      _notifications = _getDefaultNotifications();
+      _notifications = [];
+      _loadNotifications();
     }
+  }
+
+  Future<void> _loadNotifications() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final models = await _repository.getNotifications();
+      if (!mounted) return;
+      setState(() {
+        _notifications = models.map((m) => _mapModelToItem(m)).toList();
+        // Fallback to default if API returns empty for demo purposes (as backend might not be fully seeded)
+        if (_notifications.isEmpty) {
+          _notifications = _getDefaultNotifications();
+        }
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        // Fallback to demo data on error for demo purposes
+        _notifications = _getDefaultNotifications();
+        _isLoading = false;
+      });
+    }
+  }
+
+  NotificationItem _mapModelToItem(NotificationModel model) {
+    IconData icon = Icons.notifications_outlined;
+    Color iconColor = const Color(0xFF0F4C4C);
+    Color iconBgColor = const Color(0xFFE0F2F1);
+    String? actionText;
+    
+    switch (model.category) {
+      case 'leads':
+        icon = Icons.person_outline_rounded;
+        iconColor = const Color(0xFF0F4C4C);
+        iconBgColor = const Color(0xFFE0F2F1);
+        actionText = "View Lead";
+        break;
+      case 'visits':
+        icon = Icons.calendar_today_outlined;
+        iconColor = const Color(0xFFD97706);
+        iconBgColor = const Color(0xFFFEF3C7);
+        break;
+      case 'tasks':
+        icon = Icons.error_outline_rounded;
+        iconColor = const Color(0xFFD97706);
+        iconBgColor = const Color(0xFFFEF3C7);
+        break;
+      case 'deals':
+        icon = Icons.handshake_outlined;
+        iconColor = const Color(0xFF7C3AED);
+        iconBgColor = const Color(0xFFEDE9FE);
+        break;
+    }
+
+    return NotificationItem(
+      id: model.id,
+      title: model.title,
+      time: model.time,
+      category: model.category,
+      isUnread: model.isUnread,
+      icon: icon,
+      iconColor: iconColor,
+      iconBgColor: iconBgColor,
+      actionText: actionText,
+    );
   }
 
   int get _unreadCount => _notifications.where((item) => item.isUnread).length;
 
-  void _markAllAsRead() {
+  void _markAllAsRead() async {
+    try {
+      await _repository.markAllAsRead();
+    } catch (e) {
+      // Handle error implicitly or show snackbar
+    }
+    
+    if (!mounted) return;
     setState(() {
-      _notifications = _notifications.map((n) => n.copyWith(isUnread: false)).toList();
+      _notifications = _notifications
+          .map((n) => n.copyWith(isUnread: false))
+          .toList();
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -312,7 +395,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ),
                         backgroundColor: const Color(0xFF0F4C4C),
                         behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         duration: const Duration(seconds: 2),
                       ),
                     );
@@ -328,7 +413,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ),
                   child: Text(
                     "Save Preferences",
-                    style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
@@ -355,7 +443,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
           Switch(
             value: initialVal,
-            activeColor: const Color(0xFF0F4C4C),
+            activeThumbColor: const Color(0xFF0F4C4C),
             onChanged: (val) {},
           ),
         ],
@@ -377,7 +465,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               width: 140,
               height: 140,
               decoration: const BoxDecoration(
-                color: Color(0xFFE8F6F4), // Pale soft mint / seafoam matching screenshot
+                color: Color(
+                  0xFFE8F6F4,
+                ), // Pale soft mint / seafoam matching screenshot
                 shape: BoxShape.circle,
               ),
               child: const Center(
@@ -425,7 +515,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               onTap: _showNotificationSettings,
               behavior: HitTestBehavior.opaque,
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 16,
+                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -471,7 +564,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
                 // 1. Static Top Header (Title with Badge + Actions)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.screenHorizontal,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -491,7 +586,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           if (unreadCount > 0) ...[
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7.5, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7.5,
+                                vertical: 2,
+                              ),
                               decoration: const BoxDecoration(
                                 color: Color(0xFFEF4444),
                                 shape: BoxShape.circle,
@@ -515,7 +613,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               onTap: _markAllAsRead,
                               behavior: HitTestBehavior.opaque,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                  horizontal: 2,
+                                ),
                                 child: Text(
                                   "Mark All Read",
                                   style: GoogleFonts.inter(
@@ -532,7 +633,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               onTap: _clearAllNotifications,
                               behavior: HitTestBehavior.opaque,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                  horizontal: 4,
+                                ),
                                 child: Text(
                                   "Clear",
                                   style: GoogleFonts.inter(
@@ -550,7 +654,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           onTap: _restoreDemoNotifications,
                           behavior: HitTestBehavior.opaque,
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 4,
+                              horizontal: 2,
+                            ),
                             child: Text(
                               "Load Demo",
                               style: GoogleFonts.inter(
@@ -572,13 +679,20 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   SizedBox(
                     height: 38,
                     child: ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                      behavior: ScrollConfiguration.of(
+                        context,
+                      ).copyWith(scrollbars: false),
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.screenHorizontal,
+                        ),
                         children: [
-                          _buildFilterChip("All", isSelected: _selectedFilter == "All"),
+                          _buildFilterChip(
+                            "All",
+                            isSelected: _selectedFilter == "All",
+                          ),
                           const SizedBox(width: 8),
                           _buildFilterChip(
                             "Unread",
@@ -586,9 +700,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             isSelected: _selectedFilter == "Unread",
                           ),
                           const SizedBox(width: 8),
-                          _buildFilterChip("Leads", isSelected: _selectedFilter == "Leads"),
+                          _buildFilterChip(
+                            "Leads",
+                            isSelected: _selectedFilter == "Leads",
+                          ),
                           const SizedBox(width: 8),
-                          _buildFilterChip("Visits", isSelected: _selectedFilter == "Visits"),
+                          _buildFilterChip(
+                            "Visits",
+                            isSelected: _selectedFilter == "Visits",
+                          ),
                         ],
                       ),
                     ),
@@ -598,34 +718,38 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
                 // 3. Notification List Items OR Empty State
                 Expanded(
-                  child: ScrollConfiguration(
-                    behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-                    child: _notifications.isEmpty
-                        ? _buildEmptyNotificationState()
+                  child: _isLoading 
+                      ? const Center(child: CircularProgressIndicator())
+                      : ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(
+                            context,
+                          ).copyWith(scrollbars: false),
+                          child: _notifications.isEmpty
+                              ? _buildEmptyNotificationState()
                         : _filteredNotifications.isEmpty
-                            ? _buildEmptyNotificationState(
-                                message: _selectedFilter == "Unread"
-                                    ? "You have read all your notifications."
-                                    : "No notifications found in the $_selectedFilter category.",
-                              )
-                            : ListView.separated(
-                                physics: const BouncingScrollPhysics(),
-                                padding: const EdgeInsets.only(
-                                  left: AppSpacing.screenHorizontal,
-                                  right: AppSpacing.screenHorizontal,
-                                  bottom: 110,
-                                ),
-                                itemCount: _filteredNotifications.length,
-                                separatorBuilder: (context, index) => const Divider(
-                                  color: Color(0xFFF3F4F6),
-                                  thickness: 1,
-                                  height: 24,
-                                ),
-                                itemBuilder: (context, index) {
-                                  final item = _filteredNotifications[index];
-                                  return _buildNotificationRow(item);
-                                },
-                              ),
+                        ? _buildEmptyNotificationState(
+                            message: _selectedFilter == "Unread"
+                                ? "You have read all your notifications."
+                                : "No notifications found in the $_selectedFilter category.",
+                          )
+                        : ListView.separated(
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.only(
+                              left: AppSpacing.screenHorizontal,
+                              right: AppSpacing.screenHorizontal,
+                              bottom: 110,
+                            ),
+                            itemCount: _filteredNotifications.length,
+                            separatorBuilder: (context, index) => const Divider(
+                              color: Color(0xFFF3F4F6),
+                              thickness: 1,
+                              height: 24,
+                            ),
+                            itemBuilder: (context, index) {
+                              final item = _filteredNotifications[index];
+                              return _buildNotificationRow(item);
+                            },
+                          ),
                   ),
                 ),
               ],
@@ -644,7 +768,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _buildFilterChip(String label, {int? badgeCount, required bool isSelected}) {
+  Widget _buildFilterChip(
+    String label, {
+    int? badgeCount,
+    required bool isSelected,
+  }) {
     final bool isAllSelected = isSelected;
 
     return GestureDetector(
@@ -673,7 +801,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               style: GoogleFonts.inter(
                 fontSize: 13.5,
                 fontWeight: isAllSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isAllSelected ? const Color(0xFF0F4C4C) : const Color(0xFF4B5563),
+                color: isAllSelected
+                    ? const Color(0xFF0F4C4C)
+                    : const Color(0xFF4B5563),
               ),
             ),
             if (badgeCount != null && badgeCount > 0) ...[
@@ -736,11 +866,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 color: item.iconBgColor,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                item.icon,
-                color: item.iconColor,
-                size: 22,
-              ),
+              child: Icon(item.icon, color: item.iconColor, size: 22),
             ),
 
             const SizedBox(width: 14),
@@ -778,13 +904,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               GestureDetector(
                 onTap: item.onAction,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 7,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF0F4C4C),
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF0F4C4C).withOpacity(0.18),
+                        color: const Color(0xFF0F4C4C).withValues(alpha: 0.18),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -816,7 +945,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -825,17 +954,47 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(0, Icons.home_outlined, "Home", onTap: widget.onHomeTap),
-          _buildNavItem(1, Icons.folder_outlined, "Leads", onTap: widget.onLeadsTap),
-          _buildNavItem(2, Icons.alt_route_rounded, "Visits", onTap: widget.onVisitsTap),
-          _buildNavItem(3, Icons.format_list_bulleted_rounded, "Tasks", onTap: widget.onTasksTap),
-          _buildNavItem(4, Icons.person_outline_rounded, "Profile", onTap: widget.onProfileTap),
+          _buildNavItem(
+            0,
+            Icons.home_outlined,
+            "Home",
+            onTap: widget.onHomeTap,
+          ),
+          _buildNavItem(
+            1,
+            Icons.folder_outlined,
+            "Leads",
+            onTap: widget.onLeadsTap,
+          ),
+          _buildNavItem(
+            2,
+            Icons.alt_route_rounded,
+            "Visits",
+            onTap: widget.onVisitsTap,
+          ),
+          _buildNavItem(
+            3,
+            Icons.format_list_bulleted_rounded,
+            "Tasks",
+            onTap: widget.onTasksTap,
+          ),
+          _buildNavItem(
+            4,
+            Icons.person_outline_rounded,
+            "Profile",
+            onTap: widget.onProfileTap,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label, {VoidCallback? onTap}) {
+  Widget _buildNavItem(
+    int index,
+    IconData icon,
+    String label, {
+    VoidCallback? onTap,
+  }) {
     final isSelected = _selectedBottomNavIndex == index;
 
     return GestureDetector(
@@ -845,6 +1004,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         });
         if (onTap != null) {
           onTap();
+        } else {
+          if (index == 0) {
+            Navigator.of(context).pushReplacementNamed("/dashboard");
+          } else if (index == 1) {
+            Navigator.of(context).pushReplacementNamed("/leads-list");
+          }
         }
       },
       behavior: HitTestBehavior.opaque,
@@ -856,7 +1021,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             Icon(
               icon,
               size: 22,
-              color: isSelected ? const Color(0xFF0F4C4C) : const Color(0xFF6B7280),
+              color: isSelected
+                  ? const Color(0xFF0F4C4C)
+                  : const Color(0xFF6B7280),
             ),
             const SizedBox(height: 4),
             Text(
@@ -864,7 +1031,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? const Color(0xFF0F4C4C) : const Color(0xFF6B7280),
+                color: isSelected
+                    ? const Color(0xFF0F4C4C)
+                    : const Color(0xFF6B7280),
               ),
             ),
           ],
@@ -873,3 +1042,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 }
+
+typedef EmptyNotificationScreen = NotificationsScreen;
+typedef ScreenNotification = NotificationsScreen;
+typedef ScreenEmptyNotification = NotificationsScreen;

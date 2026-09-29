@@ -1,38 +1,17 @@
-# CRM Pro Field Sales (Flutter + Dart)
+# crm_mobile_test
 
-Comprehensive mobile CRM application for field sales teams, built with Flutter and Dart.
+A new Flutter project.
 
-## Project Structure
+## Getting Started
 
-```text
-crm_pro/
-├── lib/
-│   ├── main.dart                       # Application entry point
-│   ├── core/
-│   │   ├── theme/
-│   │   │   ├── app_colors.dart         # Centralized brand & semantic tokens
-│   │   │   ├── app_typography.dart     # Inter typography scale
-│   │   │   ├── app_spacing.dart        # 8-point spacing system
-│   │   │   ├── app_dimensions.dart     # Radii and component sizing
-│   │   │   └── app_theme.dart          # Master ThemeData
-│   │   └── widgets/
-│   │       ├── app_button.dart         # Standard 52px primary CTA
-│   │       ├── app_text_field.dart     # Standard input fields
-│   │       ├── app_card.dart           # Standard surface cards
-│   │       ├── app_badge.dart          # Semantic status tags
-│   │       ├── app_filter_pill.dart    # Filter pills with active teal fill
-│   │       ├── app_back_button.dart    # 40x40 circular chevron-left
-│   │       ├── app_scaffold.dart       # Responsive mobile scaffold
-│   │       └── app_bottom_navigation.dart # 5-tab navigation bar
-│   └── features/                       # Modular feature domains
-├── pubspec.yaml                        # Flutter package configuration
-└── analysis_options.yaml               # Flutter linting rules
-```
+This project is a starting point for a Flutter application.
 
-## Running in Android Studio
+A few resources to get you started if this is your first Flutter project:
 
-1. Open Android Studio.
-2. Select **Open** and choose this project directory.
-3. Run `flutter pub get` in the terminal or click "Pub get" in Android Studio.
-4. Select an Android emulator or connected device.
-5. Click **Run** (or press `Shift + F10`).
+- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
+- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

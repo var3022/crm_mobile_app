@@ -40,7 +40,7 @@ class LeadCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.025),
+            color: Colors.black.withValues(alpha: 0.025),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -159,10 +159,7 @@ class LeadCard extends StatelessWidget {
               decoration: const BoxDecoration(
                 color: Color(0xFFE8F7F7),
                 border: Border(
-                  top: BorderSide(
-                    color: Color(0xFFD2EEEE),
-                    width: 1,
-                  ),
+                  top: BorderSide(color: Color(0xFFD2EEEE), width: 1),
                 ),
               ),
               child: Row(
@@ -269,17 +266,17 @@ class LeadCard extends StatelessWidget {
     if (score >= 80) {
       // Hot / High Tier (e.g. 94)
       borderColor = const Color(0xFF10B981);
-      bgColor = const Color(0xFFD1FADF).withOpacity(0.65);
+      bgColor = const Color(0xFFD1FADF).withValues(alpha: 0.65);
       textColor = const Color(0xFF10B981);
     } else if (score >= 60) {
       // Warm / Medium Tier (e.g. 76)
       borderColor = const Color(0xFFF59E0B);
-      bgColor = const Color(0xFFFEF3C7).withOpacity(0.65);
+      bgColor = const Color(0xFFFEF3C7).withValues(alpha: 0.65);
       textColor = const Color(0xFFD97706);
     } else {
       // Cold / Low Tier (e.g. 45)
       borderColor = const Color(0xFFEF4444);
-      bgColor = const Color(0xFFFEE2E2).withOpacity(0.65);
+      bgColor = const Color(0xFFFEE2E2).withValues(alpha: 0.65);
       textColor = const Color(0xFFDC2626);
     }
 
@@ -315,7 +312,9 @@ class LeadCard extends StatelessWidget {
       label = "Hot 🔥";
       bgColor = const Color(0xFFD1FADF);
       textColor = const Color(0xFF059669);
-    } else if (lead.temperature == LeadTemperature.cold || lead.notes.contains("Follow-up") || lead.companyName == "DataFlow Systems") {
+    } else if (lead.temperature == LeadTemperature.cold ||
+        lead.notes!.contains("Follow-up") ||
+        lead.companyName == "DataFlow Systems") {
       label = "Follow-up Due";
       bgColor = const Color(0xFFFEF3C7);
       textColor = const Color(0xFFD97706);

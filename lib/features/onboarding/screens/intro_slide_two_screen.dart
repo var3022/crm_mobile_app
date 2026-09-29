@@ -10,11 +10,7 @@ class IntroSlideTwoScreen extends StatelessWidget {
   final VoidCallback? onNext;
   final VoidCallback? onSkip;
 
-  const IntroSlideTwoScreen({
-    super.key,
-    this.onNext,
-    this.onSkip,
-  });
+  const IntroSlideTwoScreen({super.key, this.onNext, this.onSkip});
 
   void _handleNext(BuildContext context) {
     if (onNext != null) {
@@ -88,7 +84,7 @@ class IntroSlideTwoScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(32),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.12),
+                              color: Colors.black.withValues(alpha: 0.12),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -123,7 +119,7 @@ class IntroSlideTwoScreen extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 15.5,
                         fontWeight: FontWeight.w400,
-                        color: const Color(0xFFD1FAE5).withOpacity(0.85),
+                        color: const Color(0xFFD1FAE5).withValues(alpha: 0.85),
                         height: 1.45,
                         letterSpacing: -0.2,
                       ),
@@ -153,7 +149,7 @@ class IntroSlideTwoScreen extends StatelessWidget {
                         height: 7,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.35),
+                          color: Colors.white.withValues(alpha: 0.35),
                         ),
                       ),
                       // Dot 2 (active)
@@ -172,7 +168,7 @@ class IntroSlideTwoScreen extends StatelessWidget {
                         height: 7,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.35),
+                          color: Colors.white.withValues(alpha: 0.35),
                         ),
                       ),
                     ],
@@ -189,7 +185,7 @@ class IntroSlideTwoScreen extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.18),
+                            color: Colors.black.withValues(alpha: 0.18),
                             blurRadius: 14,
                             offset: const Offset(0, 4),
                           ),
@@ -230,7 +226,7 @@ class TrackVisitsGraphicPainter extends CustomPainter {
 
     // 1. Subtle 4x4 coordinate grid lines
     final gridPaint = Paint()
-      ..color = Colors.white.withOpacity(0.08)
+      ..color = Colors.white.withValues(alpha: 0.08)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
@@ -248,7 +244,7 @@ class TrackVisitsGraphicPainter extends CustomPainter {
 
     // 2. Dashed Trajectory Lines
     final dashPaint = Paint()
-      ..color = const Color(0xFF6EE7B7).withOpacity(0.6)
+      ..color = const Color(0xFF6EE7B7).withValues(alpha: 0.6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.2
       ..strokeCap = StrokeCap.round;
@@ -256,12 +252,26 @@ class TrackVisitsGraphicPainter extends CustomPainter {
     // Diagonal dashed line: Building -> Pin
     final pDiagStart = Offset(buildingCenter.dx + 4, buildingCenter.dy - 16);
     final pDiagEnd = Offset(pinCenter.dx - 1, pinCenter.dy + 23);
-    _drawDashedLine(canvas, pDiagStart, pDiagEnd, dashPaint, dashLength: 6, dashSpace: 5);
+    _drawDashedLine(
+      canvas,
+      pDiagStart,
+      pDiagEnd,
+      dashPaint,
+      dashLength: 6,
+      dashSpace: 5,
+    );
 
     // Horizontal dashed line: Building -> Checkmark
     final pHorizStart = Offset(buildingCenter.dx + 16, buildingCenter.dy);
     final pHorizEnd = Offset(checkmarkCenter.dx - 22, checkmarkCenter.dy);
-    _drawDashedLine(canvas, pHorizStart, pHorizEnd, dashPaint, dashLength: 6, dashSpace: 5);
+    _drawDashedLine(
+      canvas,
+      pHorizStart,
+      pHorizEnd,
+      dashPaint,
+      dashLength: 6,
+      dashSpace: 5,
+    );
 
     // 3. Draw Building Icon at bottom left
     _drawBuildingIcon(canvas, buildingCenter);

@@ -11,17 +11,13 @@ class IntroSlideThreeScreen extends StatelessWidget {
   final VoidCallback? onGetStarted;
   final VoidCallback? onSkip;
 
-  const IntroSlideThreeScreen({
-    super.key,
-    this.onGetStarted,
-    this.onSkip,
-  });
+  const IntroSlideThreeScreen({super.key, this.onGetStarted, this.onSkip});
 
   void _handleGetStarted(BuildContext context) {
     if (onGetStarted != null) {
       onGetStarted!();
     } else {
-      Navigator.of(context).pushReplacementNamed("/biometric-login");
+      Navigator.of(context).pushReplacementNamed("/dashboard");
     }
   }
 
@@ -29,7 +25,7 @@ class IntroSlideThreeScreen extends StatelessWidget {
     if (onSkip != null) {
       onSkip!();
     } else {
-      Navigator.of(context).pushReplacementNamed("/biometric-login");
+      Navigator.of(context).pushReplacementNamed("/dashboard");
     }
   }
 
@@ -89,7 +85,7 @@ class IntroSlideThreeScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(32),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.12),
+                              color: Colors.black.withValues(alpha: 0.12),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -124,7 +120,7 @@ class IntroSlideThreeScreen extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 15.5,
                         fontWeight: FontWeight.w400,
-                        color: const Color(0xFFD1FAE5).withOpacity(0.85),
+                        color: const Color(0xFFD1FAE5).withValues(alpha: 0.85),
                         height: 1.45,
                         letterSpacing: -0.2,
                       ),
@@ -154,7 +150,7 @@ class IntroSlideThreeScreen extends StatelessWidget {
                         height: 7,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.35),
+                          color: Colors.white.withValues(alpha: 0.35),
                         ),
                       ),
                       // Dot 2 (inactive)
@@ -164,7 +160,7 @@ class IntroSlideThreeScreen extends StatelessWidget {
                         height: 7,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.35),
+                          color: Colors.white.withValues(alpha: 0.35),
                         ),
                       ),
                       // Dot 3 (active)
@@ -192,7 +188,7 @@ class IntroSlideThreeScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(28),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.18),
+                            color: Colors.black.withValues(alpha: 0.18),
                             blurRadius: 14,
                             offset: const Offset(0, 4),
                           ),
@@ -233,7 +229,7 @@ class AiInsightsGraphicPainter extends CustomPainter {
 
     // 1. Subtle 4x4 coordinate grid lines
     final gridPaint = Paint()
-      ..color = Colors.white.withOpacity(0.08)
+      ..color = Colors.white.withValues(alpha: 0.08)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
@@ -252,7 +248,7 @@ class AiInsightsGraphicPainter extends CustomPainter {
     final bar1Left = w * 0.245;
     final bar1Height = h * 0.26;
     final bar1Rect = RRect.fromRectAndCorners(
-      Rect.fromLTWH(bar1Left, yBase - bar1Height, bar1Width, bar1Height),
+      Rect.fromLTWH(bar1Left, yBase - bar1Height, barWidth, bar1Height),
       topLeft: const Radius.circular(5.5),
       topRight: const Radius.circular(5.5),
     );
@@ -265,7 +261,7 @@ class AiInsightsGraphicPainter extends CustomPainter {
     final bar2Left = w * 0.368;
     final bar2Height = h * 0.46;
     final bar2Rect = RRect.fromRectAndCorners(
-      Rect.fromLTWH(bar2Left, yBase - bar2Height, bar1Width, bar2Height),
+      Rect.fromLTWH(bar2Left, yBase - bar2Height, barWidth, bar2Height),
       topLeft: const Radius.circular(5.5),
       topRight: const Radius.circular(5.5),
     );
@@ -278,7 +274,7 @@ class AiInsightsGraphicPainter extends CustomPainter {
     final bar3Left = w * 0.493;
     final bar3Height = h * 0.62;
     final bar3Rect = RRect.fromRectAndCorners(
-      Rect.fromLTWH(bar3Left, yBase - bar3Height, bar1Width, bar3Height),
+      Rect.fromLTWH(bar3Left, yBase - bar3Height, barWidth, bar3Height),
       topLeft: const Radius.circular(5.5),
       topRight: const Radius.circular(5.5),
     );
@@ -303,7 +299,7 @@ class AiInsightsGraphicPainter extends CustomPainter {
       smallStarPath,
       starPaint
         ..strokeWidth = 1.7
-        ..color = Colors.white.withOpacity(0.9),
+        ..color = Colors.white.withValues(alpha: 0.9),
     );
 
     // Large outline star (further right)
