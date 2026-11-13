@@ -11,11 +11,7 @@ class IntroSlideThreeScreen extends StatelessWidget {
   final VoidCallback? onGetStarted;
   final VoidCallback? onSkip;
 
-  const IntroSlideThreeScreen({
-    super.key,
-    this.onGetStarted,
-    this.onSkip,
-  });
+  const IntroSlideThreeScreen({super.key, this.onGetStarted, this.onSkip});
 
   void _handleGetStarted(BuildContext context) {
     if (onGetStarted != null) {
@@ -252,7 +248,7 @@ class AiInsightsGraphicPainter extends CustomPainter {
     final bar1Left = w * 0.245;
     final bar1Height = h * 0.26;
     final bar1Rect = RRect.fromRectAndCorners(
-      Rect.fromLTWH(bar1Left, yBase - bar1Height, bar1Width, bar1Height),
+      Rect.fromLTWH(bar1Left, yBase - bar1Height, barWidth, bar1Height),
       topLeft: const Radius.circular(5.5),
       topRight: const Radius.circular(5.5),
     );
@@ -265,7 +261,7 @@ class AiInsightsGraphicPainter extends CustomPainter {
     final bar2Left = w * 0.368;
     final bar2Height = h * 0.46;
     final bar2Rect = RRect.fromRectAndCorners(
-      Rect.fromLTWH(bar2Left, yBase - bar2Height, bar1Width, bar2Height),
+      Rect.fromLTWH(bar2Left, yBase - bar2Height, barWidth, bar2Height),
       topLeft: const Radius.circular(5.5),
       topRight: const Radius.circular(5.5),
     );
@@ -278,7 +274,7 @@ class AiInsightsGraphicPainter extends CustomPainter {
     final bar3Left = w * 0.493;
     final bar3Height = h * 0.62;
     final bar3Rect = RRect.fromRectAndCorners(
-      Rect.fromLTWH(bar3Left, yBase - bar3Height, bar1Width, bar3Height),
+      Rect.fromLTWH(bar3Left, yBase - bar3Height, barWidth, bar3Height),
       topLeft: const Radius.circular(5.5),
       topRight: const Radius.circular(5.5),
     );

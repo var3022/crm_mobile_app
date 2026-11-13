@@ -2,7 +2,9 @@ import "dart:async";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "../../../core/theme/app_colors.dart";
+// ignore: unused_import
 import "../../../core/theme/app_typography.dart";
+// ignore: unused_import
 import "../../../core/theme/app_dimensions.dart";
 import "../../../core/theme/app_spacing.dart";
 
@@ -105,7 +107,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       for (int i = 0; i < _otpLength && i < clean.length; i++) {
         _controllers[i].text = clean[i];
       }
-      final nextIndex = (clean.length < _otpLength) ? clean.length : _otpLength - 1;
+      final nextIndex = (clean.length < _otpLength)
+          ? clean.length
+          : _otpLength - 1;
       _focusNodes[nextIndex].requestFocus();
       return;
     }
@@ -204,12 +208,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           builder: (context, constraints) {
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPaddingH,
+                horizontal: AppSpacing.screenHorizontal,
               ),
               child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: IntrinsicHeight(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -220,7 +222,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: InkWell(
-                            onTap: widget.onBack ??
+                            onTap:
+                                widget.onBack ??
                                 () => Navigator.of(context).maybePop(),
                             borderRadius: BorderRadius.circular(20),
                             child: const Padding(
@@ -246,9 +249,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           decoration: BoxDecoration(
                             color: AppColors.successLight,
                             borderRadius: BorderRadius.circular(12.0),
-                            border: Border.parseBorder(
-                              Border.all(color: const Color(0xFFA7F3D0)),
-                            ),
+                            border: Border.all(color: const Color(0xFFA7F3D0)),
                           ),
                           child: Row(
                             children: [
@@ -325,7 +326,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               height: 1.45,
                             ),
                             children: [
-                              const TextSpan(text: "We sent a 6-digit code to "),
+                              const TextSpan(
+                                text: "We sent a 6-digit code to ",
+                              ),
                               TextSpan(
                                 text: widget.email,
                                 style: const TextStyle(
@@ -346,7 +349,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: List.generate(_otpLength, (index) {
                             final isFocused = _focusNodes[index].hasFocus;
-                            final hasValue = _controllers[index].text.isNotEmpty;
+                            // ignore: unused_local_variable
+                            final hasValue =
+                                _controllers[index].text.isNotEmpty;
                             final hasError = _errorMessage != null;
 
                             return Container(
@@ -359,15 +364,16 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                   color: hasError
                                       ? AppColors.error
                                       : isFocused
-                                          ? AppColors.primary
-                                          : const Color(0xFFE2E8F0),
+                                      ? AppColors.primary
+                                      : const Color(0xFFE2E8F0),
                                   width: isFocused || hasError ? 2.0 : 1.2,
                                 ),
                                 boxShadow: isFocused
                                     ? [
                                         BoxShadow(
-                                          color: AppColors.primary
-                                              .withValues(alpha: 0.12),
+                                          color: AppColors.primary.withValues(
+                                            alpha: 0.12,
+                                          ),
                                           blurRadius: 6,
                                           offset: const Offset(0, 2),
                                         ),
@@ -495,11 +501,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               : _handleVerify,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            disabledBackgroundColor:
-                                AppColors.primary.withValues(alpha: 0.38),
+                            disabledBackgroundColor: AppColors.primary
+                                .withValues(alpha: 0.38),
                             foregroundColor: Colors.white,
-                            disabledForegroundColor:
-                                Colors.white.withValues(alpha: 0.7),
+                            disabledForegroundColor: Colors.white.withValues(
+                              alpha: 0.7,
+                            ),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
@@ -540,8 +547,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               if (widget.onSignInTap != null) {
                                 widget.onSignInTap!();
                               } else {
-                                Navigator.of(context)
-                                    .pushReplacementNamed("/sign-in");
+                                Navigator.of(
+                                  context,
+                                ).pushReplacementNamed("/sign-in");
                               }
                             },
                             child: RichText(
@@ -584,10 +592,7 @@ class _ShieldCheckPainter extends CustomPainter {
   final Color color;
   final double strokeWidth;
 
-  _ShieldCheckPainter({
-    required this.color,
-    required this.strokeWidth,
-  });
+  _ShieldCheckPainter({required this.color, required this.strokeWidth});
 
   @override
   void paint(Canvas canvas, Size size) {

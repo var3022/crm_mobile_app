@@ -1,3 +1,4 @@
+import "dart:math" as math;
 import "package:flutter/material.dart";
 import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
@@ -10,11 +11,7 @@ class AppIntroWalkthroughScreen extends StatefulWidget {
   final VoidCallback? onFinished;
   final VoidCallback? onSkip;
 
-  const AppIntroWalkthroughScreen({
-    super.key,
-    this.onFinished,
-    this.onSkip,
-  });
+  const AppIntroWalkthroughScreen({super.key, this.onFinished, this.onSkip});
 
   @override
   State<AppIntroWalkthroughScreen> createState() =>
@@ -148,7 +145,9 @@ class _AppIntroWalkthroughScreenState extends State<AppIntroWalkthroughScreen>
                             width: 280,
                             height: 280,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF135858), // Subtle lighter teal card
+                              color: const Color(
+                                0xFF135858,
+                              ), // Subtle lighter teal card
                               borderRadius: BorderRadius.circular(32),
                               boxShadow: [
                                 BoxShadow(
@@ -308,12 +307,7 @@ class _AppIntroWalkthroughScreenState extends State<AppIntroWalkthroughScreen>
   }
 }
 
-enum _SlideGraphicType {
-  mapRoute,
-  trackVisits,
-  aiInsights,
-  offlineShield,
-}
+enum _SlideGraphicType { mapRoute, trackVisits, aiInsights, offlineShield }
 
 class _WalkthroughSlideData {
   final String title;
@@ -362,7 +356,8 @@ class _MapRoutePainter extends CustomPainter {
 
     // 3. Draw Dashed Route Lines connecting Node 1 -> Node 2 -> Node 3
     final dashPaint = Paint()
-      ..color = const Color(0xFF6EE7B7).withOpacity(0.6) // Minty light dashed line
+      ..color = const Color(0xFF6EE7B7)
+          .withOpacity(0.6) // Minty light dashed line
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.2
       ..strokeCap = StrokeCap.round;
@@ -472,12 +467,26 @@ class _TrackVisitsPainter extends CustomPainter {
     // Diagonal dashed line: Building -> Pin
     final pDiagStart = Offset(buildingCenter.dx + 4, buildingCenter.dy - 16);
     final pDiagEnd = Offset(pinCenter.dx - 1, pinCenter.dy + 23);
-    _drawDashedLine(canvas, pDiagStart, pDiagEnd, dashPaint, dashLength: 6, dashSpace: 5);
+    _drawDashedLine(
+      canvas,
+      pDiagStart,
+      pDiagEnd,
+      dashPaint,
+      dashLength: 6,
+      dashSpace: 5,
+    );
 
     // Horizontal dashed line: Building -> Checkmark
     final pHorizStart = Offset(buildingCenter.dx + 16, buildingCenter.dy);
     final pHorizEnd = Offset(checkmarkCenter.dx - 22, checkmarkCenter.dy);
-    _drawDashedLine(canvas, pHorizStart, pHorizEnd, dashPaint, dashLength: 6, dashSpace: 5);
+    _drawDashedLine(
+      canvas,
+      pHorizStart,
+      pHorizEnd,
+      dashPaint,
+      dashLength: 6,
+      dashSpace: 5,
+    );
 
     // 3. Draw Building Icon at bottom left
     _drawBuildingIcon(canvas, buildingCenter);
@@ -661,7 +670,7 @@ class _AiInsightsPainter extends CustomPainter {
     final bar1Left = w * 0.245;
     final bar1Height = h * 0.26;
     final bar1Rect = RRect.fromRectAndCorners(
-      Rect.fromLTWH(bar1Left, yBase - bar1Height, bar1Width, bar1Height),
+      Rect.fromLTWH(bar1Left, yBase - bar1Height, barWidth, bar1Height),
       topLeft: const Radius.circular(5.5),
       topRight: const Radius.circular(5.5),
     );
@@ -674,7 +683,7 @@ class _AiInsightsPainter extends CustomPainter {
     final bar2Left = w * 0.368;
     final bar2Height = h * 0.46;
     final bar2Rect = RRect.fromRectAndCorners(
-      Rect.fromLTWH(bar2Left, yBase - bar2Height, bar1Width, bar2Height),
+      Rect.fromLTWH(bar2Left, yBase - bar2Height, barWidth, bar2Height),
       topLeft: const Radius.circular(5.5),
       topRight: const Radius.circular(5.5),
     );
@@ -687,7 +696,7 @@ class _AiInsightsPainter extends CustomPainter {
     final bar3Left = w * 0.493;
     final bar3Height = h * 0.62;
     final bar3Rect = RRect.fromRectAndCorners(
-      Rect.fromLTWH(bar3Left, yBase - bar3Height, bar1Width, bar3Height),
+      Rect.fromLTWH(bar3Left, yBase - bar3Height, barWidth, bar3Height),
       topLeft: const Radius.circular(5.5),
       topRight: const Radius.circular(5.5),
     );

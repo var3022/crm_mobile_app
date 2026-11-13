@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import "package:flutter/material.dart";
 import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
@@ -59,6 +61,7 @@ class _OnboardingSkipConfirmationScreenState
   late AnimationController _animController;
   late Animation<double> _slideAnimation;
   late Animation<double> _fadeAnimation;
+  // ignore: unused_field
   int _currentNavIndex = 0;
 
   @override

@@ -97,12 +97,16 @@ class LeadCard extends StatelessWidget {
                             color: Color(0xFF9CA3AF),
                           ),
                           const SizedBox(width: 3),
-                          Text(
-                            "${lead.distanceKm} km · ${lead.locationArea}",
-                            style: const TextStyle(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFF6B7280),
+                          Expanded(
+                            child: Text(
+                              "${lead.distanceKm} km · ${lead.locationArea}",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF6B7280),
+                              ),
                             ),
                           ),
                         ],
@@ -159,10 +163,7 @@ class LeadCard extends StatelessWidget {
               decoration: const BoxDecoration(
                 color: Color(0xFFE8F7F7),
                 border: Border(
-                  top: BorderSide(
-                    color: Color(0xFFD2EEEE),
-                    width: 1,
-                  ),
+                  top: BorderSide(color: Color(0xFFD2EEEE), width: 1),
                 ),
               ),
               child: Row(
@@ -315,7 +316,9 @@ class LeadCard extends StatelessWidget {
       label = "Hot 🔥";
       bgColor = const Color(0xFFD1FADF);
       textColor = const Color(0xFF059669);
-    } else if (lead.temperature == LeadTemperature.cold || lead.notes.contains("Follow-up") || lead.companyName == "DataFlow Systems") {
+    } else if (lead.temperature == LeadTemperature.cold ||
+        (lead.notes?.contains("Follow-up") ?? false) ||
+        lead.companyName == "DataFlow Systems") {
       label = "Follow-up Due";
       bgColor = const Color(0xFFFEF3C7);
       textColor = const Color(0xFFD97706);

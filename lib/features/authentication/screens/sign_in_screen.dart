@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_typography.dart";
 import "../../../core/theme/app_dimensions.dart";
+// ignore: unused_import
 import "../../../core/widgets/app_button.dart";
 
 /// Screen 2: Sign In Screen
@@ -27,6 +28,7 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  // ignore: unused_field
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();

@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_typography.dart";
+// ignore: unused_import
 import "../../../core/theme/app_dimensions.dart";
 import "../../../core/theme/app_spacing.dart";
 
@@ -42,8 +43,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   void initState() {
     super.initState();
-    _newPasswordController = TextEditingController(text: widget.initialPassword ?? "");
-    _confirmPasswordController = TextEditingController(text: widget.initialConfirmPassword ?? "");
+    _newPasswordController = TextEditingController(
+      text: widget.initialPassword ?? "",
+    );
+    _confirmPasswordController = TextEditingController(
+      text: widget.initialConfirmPassword ?? "",
+    );
 
     _newPasswordController.addListener(_onPasswordChanged);
     _confirmPasswordController.addListener(_onConfirmPasswordChanged);
@@ -76,8 +81,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final text = _newPasswordController.text;
     return RegExp(r"(?=.*[a-z])(?=.*[A-Z])").hasMatch(text);
   }
+
   bool get _hasNumber => RegExp(r"[0-9]").hasMatch(_newPasswordController.text);
-  bool get _hasSpecialChar => RegExp(r'[!@#$%^&*(),.?":{}|<>_\-]').hasMatch(_newPasswordController.text);
+  bool get _hasSpecialChar => RegExp(
+    r'[!@#$%^&*(),.?":{}|<>_\-]',
+  ).hasMatch(_newPasswordController.text);
 
   int get _strengthScore {
     int score = 0;
@@ -138,7 +146,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     if (_hasAttemptedSubmit && confirmPass.isEmpty) {
       return "Passwords do not match";
     }
-    if ((_hasAttemptedSubmit || _confirmPasswordTouched) && confirmPass.isNotEmpty && newPass != confirmPass) {
+    if ((_hasAttemptedSubmit || _confirmPasswordTouched) &&
+        confirmPass.isNotEmpty &&
+        newPass != confirmPass) {
       return "Passwords do not match";
     }
     return null;
@@ -175,7 +185,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       setState(() {
         _isLoading = false;
         _showSuccessToast = true;
-        _successToastMessage = "Password reset successfully! Redirecting to Sign In...";
+        _successToastMessage =
+            "Password reset successfully! Redirecting to Sign In...";
       });
 
       widget.onResetSuccess?.call(_newPasswordController.text);
@@ -202,8 +213,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     Expanded(
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.spacing24,
-                          vertical: AppSpacing.spacing16,
+                          horizontal: AppSpacing.xxl24,
+                          vertical: AppSpacing.lg16,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,7 +226,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                 button: true,
                                 label: "Back to previous screen",
                                 child: InkWell(
-                                  onTap: widget.onBack ?? () => Navigator.of(context).maybePop(),
+                                  onTap:
+                                      widget.onBack ??
+                                      () => Navigator.of(context).maybePop(),
                                   borderRadius: BorderRadius.circular(20),
                                   child: Container(
                                     width: 40,
@@ -243,7 +256,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                 decoration: BoxDecoration(
                                   color: AppColors.successLight,
                                   border: Border.all(
-                                    color: AppColors.success.withValues(alpha: 0.3),
+                                    color: AppColors.success.withValues(
+                                      alpha: 0.3,
+                                    ),
                                   ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -335,7 +350,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             // Password Strength Row & Meter
                             if (_newPasswordController.text.isNotEmpty) ...[
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Password Strength",
@@ -363,7 +379,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                   child: LinearProgressIndicator(
                                     value: _strengthProgress,
                                     backgroundColor: const Color(0xFFE2E8F0),
-                                    valueColor: AlwaysStoppedAnimation<Color>(_strengthColor),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      _strengthColor,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -378,7 +396,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               isObscured: _obscureConfirmPassword,
                               onToggleObscure: () {
                                 setState(() {
-                                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                                  _obscureConfirmPassword =
+                                      !_obscureConfirmPassword;
                                 });
                               },
                               hasError: _confirmPasswordError != null,
@@ -437,12 +456,18 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               width: double.infinity,
                               height: 52,
                               child: ElevatedButton(
-                                onPressed: (_isLoading || !_isFormValid) ? null : _handleResetPassword,
+                                onPressed: (_isLoading || !_isFormValid)
+                                    ? null
+                                    : _handleResetPassword,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: _isFormValid ? AppColors.primary : AppColors.primary.withOpacity(0.4),
+                                  backgroundColor: _isFormValid
+                                      ? AppColors.primary
+                                      : AppColors.primary.withOpacity(0.4),
                                   foregroundColor: Colors.white,
-                                  disabledBackgroundColor: AppColors.primary.withOpacity(0.4),
-                                  disabledForegroundColor: Colors.white.withOpacity(0.7),
+                                  disabledBackgroundColor: AppColors.primary
+                                      .withOpacity(0.4),
+                                  disabledForegroundColor: Colors.white
+                                      .withOpacity(0.7),
                                   elevation: 0,
                                   shadowColor: Colors.transparent,
                                   shape: RoundedRectangleBorder(
@@ -455,16 +480,20 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                         height: 22,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2.4,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
                                         ),
                                       )
                                     : Text(
                                         "Reset Password",
-                                        style: AppTypography.buttonLarge.copyWith(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 16,
-                                        ),
+                                        style: AppTypography.buttonPrimary
+                                            .copyWith(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 16,
+                                            ),
                                       ),
                               ),
                             ),
@@ -534,7 +563,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           border: InputBorder.none,
           suffixIcon: IconButton(
             icon: Icon(
-              isObscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+              isObscured
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
               color: const Color(0xFF64748B),
               size: 20,
             ),
@@ -546,18 +577,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  Widget _buildRuleItem({
-    required bool isMet,
-    required String text,
-  }) {
+  Widget _buildRuleItem({required bool isMet, required String text}) {
     return Row(
       children: [
         if (isMet)
-          const Icon(
-            Icons.check_rounded,
-            color: Color(0xFF10B981),
-            size: 18,
-          )
+          const Icon(Icons.check_rounded, color: Color(0xFF10B981), size: 18)
         else
           Container(
             width: 16,
@@ -565,10 +589,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             margin: const EdgeInsets.only(left: 1, right: 1),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(
-                color: const Color(0xFF94A3B8),
-                width: 1.5,
-              ),
+              border: Border.all(color: const Color(0xFF94A3B8), width: 1.5),
             ),
           ),
         const SizedBox(width: 10),

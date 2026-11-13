@@ -2,6 +2,20 @@
 
 Comprehensive mobile CRM application for field sales teams, built with Flutter and Dart.
 
+The Flutter app now includes local account, customer, deal, visit, task, profile,
+settings and reporting flows. See [IMPLEMENTATION.md](IMPLEMENTATION.md) for
+screen coverage, integration boundaries, validation status and run commands.
+
+For a browser preview with Flutter 3.38+:
+
+```powershell
+flutter pub get
+flutter run -d chrome --dart-define=APP_ROUTE=/screen-index
+```
+
+The React/Vite project under `src/` remains the original preview/code viewer.
+The new application screens are implemented in Flutter under `lib/`.
+
 ## Project Structure
 
 ```text
