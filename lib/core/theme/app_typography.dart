@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "app_colors.dart";
 
 /// Typography scale for CRM Pro Field Sales using Inter font
@@ -14,7 +13,8 @@ class AppTypography {
     required double height,
     Color color = AppColors.textPrimary,
   }) {
-    return GoogleFonts.inter(
+    return TextStyle(
+      fontFamily: fontFamily,
       fontSize: fontSize,
       fontWeight: fontWeight,
       height: height / fontSize,

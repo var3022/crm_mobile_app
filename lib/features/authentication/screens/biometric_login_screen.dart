@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import "package:flutter/material.dart";
 import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
@@ -47,6 +49,7 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
   late bool _isFailedState;
   bool _isAuthenticating = false;
   bool _authSuccess = false;
+  // ignore: unused_field
   String? _errorMessage;
 
   @override

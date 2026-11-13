@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "../models/lead_model.dart";
 import "../widgets/lead_card.dart";
+// ignore: unused_import
 import "../../../core/theme/app_colors.dart";
 
 /// Leads Screen 1: Leads List Screen (screen-leads-list)
@@ -52,109 +53,109 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
       _leads = [];
     } else {
       _leads = [
-      const LeadModel(
-        id: 'lead-1',
-        companyName: 'Acme Corp',
-        contactName: 'John Doe',
-        contactRole: 'CTO',
-        distanceKm: 0.8,
-        locationArea: 'South Mumbai',
-        lastActive: '2 hours ago',
-        aiScore: 94,
-        stage: LeadStage.qualified,
-        temperature: LeadTemperature.hot,
-        isFlagged: true,
-        phoneNumber: '+91 98201 12345',
-        email: 'john.doe@acmecorp.com',
-        hasSwipeActionTip: true,
-        notes: 'Interested in enterprise fleet tracking integration.',
-      ),
-      const LeadModel(
-        id: 'lead-2',
-        companyName: 'TechVista Ltd',
-        contactName: 'Priya Sharma',
-        contactRole: 'HR',
-        distanceKm: 1.2,
-        locationArea: 'Lower Parel',
-        lastActive: 'Yesterday',
-        aiScore: 76,
-        stage: LeadStage.contacted,
-        temperature: LeadTemperature.warm,
-        isFlagged: false,
-        phoneNumber: '+91 98192 98765',
-        email: 'priya.sharma@techvista.io',
-        hasSwipeActionTip: false,
-        notes: 'Follow up regarding cloud licenses next week.',
-      ),
-      const LeadModel(
-        id: 'lead-3',
-        companyName: 'DataFlow Systems',
-        contactName: 'Karan Malhotra',
-        contactRole: 'MD',
-        distanceKm: 2.5,
-        locationArea: 'Andheri East',
-        lastActive: '3 days ago',
-        aiScore: 45,
-        stage: LeadStage.newLead,
-        temperature: LeadTemperature.cold,
-        isFlagged: false,
-        phoneNumber: '+91 98205 55678',
-        email: 'karan@dataflow.co.in',
-        hasSwipeActionTip: false,
-        notes: 'Cold inbound inquiry; schedule intro deck presentation.',
-      ),
-      const LeadModel(
-        id: 'lead-4',
-        companyName: 'Apex Logistics',
-        contactName: 'Vikram Mehta',
-        contactRole: 'VP Sales',
-        distanceKm: 1.8,
-        locationArea: 'BKC',
-        lastActive: '5 hours ago',
-        aiScore: 88,
-        stage: LeadStage.qualified,
-        temperature: LeadTemperature.hot,
-        isFlagged: false,
-        phoneNumber: '+91 98334 23456',
-        email: 'vikram.m@apexlogistics.com',
-        hasSwipeActionTip: false,
-        notes: 'Ready for commercial proposal review.',
-      ),
-      const LeadModel(
-        id: 'lead-5',
-        companyName: 'Nova Pharmaceuticals',
-        contactName: 'Dr. Rajesh Iyer',
-        contactRole: 'Director',
-        distanceKm: 0.6,
-        locationArea: 'Worli',
-        lastActive: 'Just now',
-        aiScore: 92,
-        stage: LeadStage.newLead,
-        temperature: LeadTemperature.hot,
-        isFlagged: true,
-        phoneNumber: '+91 98401 88990',
-        email: 'rajesh.iyer@novapharma.org',
-        hasSwipeActionTip: false,
-        notes: 'High priority doctor network dispatch trial.',
-      ),
-      const LeadModel(
-        id: 'lead-6',
-        companyName: 'Zenith Retail',
-        contactName: 'Ananya Deshmukh',
-        contactRole: 'Procurement Head',
-        distanceKm: 3.1,
-        locationArea: 'Dadar',
-        lastActive: '1 day ago',
-        aiScore: 64,
-        stage: LeadStage.contacted,
-        temperature: LeadTemperature.warm,
-        isFlagged: false,
-        phoneNumber: '+91 98210 77123',
-        email: 'ananya@zenithretail.in',
-        hasSwipeActionTip: false,
-        notes: 'Requested sample barcode terminals.',
-      ),
-    ];
+        const LeadModel(
+          id: 'lead-1',
+          companyName: 'Acme Corp',
+          contactName: 'John Doe',
+          contactRole: 'CTO',
+          distanceKm: 0.8,
+          locationArea: 'South Mumbai',
+          lastActive: '2 hours ago',
+          aiScore: 94,
+          stage: LeadStage.qualified,
+          temperature: LeadTemperature.hot,
+          isFlagged: true,
+          phoneNumber: '+91 98201 12345',
+          email: 'john.doe@acmecorp.com',
+          hasSwipeActionTip: true,
+          notes: 'Interested in enterprise fleet tracking integration.',
+        ),
+        const LeadModel(
+          id: 'lead-2',
+          companyName: 'TechVista Ltd',
+          contactName: 'Priya Sharma',
+          contactRole: 'HR',
+          distanceKm: 1.2,
+          locationArea: 'Lower Parel',
+          lastActive: 'Yesterday',
+          aiScore: 76,
+          stage: LeadStage.contacted,
+          temperature: LeadTemperature.warm,
+          isFlagged: false,
+          phoneNumber: '+91 98192 98765',
+          email: 'priya.sharma@techvista.io',
+          hasSwipeActionTip: false,
+          notes: 'Follow up regarding cloud licenses next week.',
+        ),
+        const LeadModel(
+          id: 'lead-3',
+          companyName: 'DataFlow Systems',
+          contactName: 'Karan Malhotra',
+          contactRole: 'MD',
+          distanceKm: 2.5,
+          locationArea: 'Andheri East',
+          lastActive: '3 days ago',
+          aiScore: 45,
+          stage: LeadStage.newLead,
+          temperature: LeadTemperature.cold,
+          isFlagged: false,
+          phoneNumber: '+91 98205 55678',
+          email: 'karan@dataflow.co.in',
+          hasSwipeActionTip: false,
+          notes: 'Cold inbound inquiry; schedule intro deck presentation.',
+        ),
+        const LeadModel(
+          id: 'lead-4',
+          companyName: 'Apex Logistics',
+          contactName: 'Vikram Mehta',
+          contactRole: 'VP Sales',
+          distanceKm: 1.8,
+          locationArea: 'BKC',
+          lastActive: '5 hours ago',
+          aiScore: 88,
+          stage: LeadStage.qualified,
+          temperature: LeadTemperature.hot,
+          isFlagged: false,
+          phoneNumber: '+91 98334 23456',
+          email: 'vikram.m@apexlogistics.com',
+          hasSwipeActionTip: false,
+          notes: 'Ready for commercial proposal review.',
+        ),
+        const LeadModel(
+          id: 'lead-5',
+          companyName: 'Nova Pharmaceuticals',
+          contactName: 'Dr. Rajesh Iyer',
+          contactRole: 'Director',
+          distanceKm: 0.6,
+          locationArea: 'Worli',
+          lastActive: 'Just now',
+          aiScore: 92,
+          stage: LeadStage.newLead,
+          temperature: LeadTemperature.hot,
+          isFlagged: true,
+          phoneNumber: '+91 98401 88990',
+          email: 'rajesh.iyer@novapharma.org',
+          hasSwipeActionTip: false,
+          notes: 'High priority doctor network dispatch trial.',
+        ),
+        const LeadModel(
+          id: 'lead-6',
+          companyName: 'Zenith Retail',
+          contactName: 'Ananya Deshmukh',
+          contactRole: 'Procurement Head',
+          distanceKm: 3.1,
+          locationArea: 'Dadar',
+          lastActive: '1 day ago',
+          aiScore: 64,
+          stage: LeadStage.contacted,
+          temperature: LeadTemperature.warm,
+          isFlagged: false,
+          phoneNumber: '+91 98210 77123',
+          email: 'ananya@zenithretail.in',
+          hasSwipeActionTip: false,
+          notes: 'Requested sample barcode terminals.',
+        ),
+      ];
     }
   }
 
@@ -178,7 +179,14 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
     } else if (_selectedFilter == 'Hot') {
       list = list.where((l) => l.temperature == LeadTemperature.hot).toList();
     } else if (_selectedFilter == 'Follow-up Due') {
-      list = list.where((l) => l.notes.contains('Follow-up') || l.temperature == LeadTemperature.cold || l.companyName == 'DataFlow Systems').toList();
+      list = list
+          .where(
+            (l) =>
+                (l.notes?.contains('Follow-up') ?? false) ||
+                l.temperature == LeadTemperature.cold ||
+                l.companyName == 'DataFlow Systems',
+          )
+          .toList();
     } else if (_selectedFilter == 'Nearby') {
       list = list.where((l) => l.distanceKm <= 1.0).toList();
     }
@@ -259,12 +267,20 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                     sortOption,
                     style: TextStyle(
                       fontSize: 15,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? const Color(0xFF0F4C4C) : const Color(0xFF374151),
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: isSelected
+                          ? const Color(0xFF0F4C4C)
+                          : const Color(0xFF374151),
                     ),
                   ),
                   trailing: isSelected
-                      ? const Icon(Icons.check_circle_rounded, color: Color(0xFF0F4C4C), size: 20)
+                      ? const Icon(
+                          Icons.check_circle_rounded,
+                          color: Color(0xFF0F4C4C),
+                          size: 20,
+                        )
                       : null,
                   onTap: () {
                     setState(() {
@@ -331,7 +347,10 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                   controller: companyCtrl,
                   decoration: InputDecoration(
                     labelText: "Company Name",
-                    labelStyle: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                    labelStyle: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF6B7280),
+                    ),
                     filled: true,
                     fillColor: const Color(0xFFF9FAFB),
                     border: OutlineInputBorder(
@@ -348,12 +367,17 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                         controller: contactCtrl,
                         decoration: InputDecoration(
                           labelText: "Contact Name",
-                          labelStyle: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                          labelStyle: const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF6B7280),
+                          ),
                           filled: true,
                           fillColor: const Color(0xFFF9FAFB),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE5E7EB),
+                            ),
                           ),
                         ),
                       ),
@@ -364,12 +388,17 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                         controller: roleCtrl,
                         decoration: InputDecoration(
                           labelText: "Role / Designation",
-                          labelStyle: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                          labelStyle: const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF6B7280),
+                          ),
                           filled: true,
                           fillColor: const Color(0xFFF9FAFB),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE5E7EB),
+                            ),
                           ),
                         ),
                       ),
@@ -381,7 +410,10 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                   controller: areaCtrl,
                   decoration: InputDecoration(
                     labelText: "Location / Territory Area",
-                    labelStyle: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                    labelStyle: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF6B7280),
+                    ),
                     filled: true,
                     fillColor: const Color(0xFFF9FAFB),
                     border: OutlineInputBorder(
@@ -403,10 +435,16 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                             LeadModel(
                               id: 'lead-${DateTime.now().millisecondsSinceEpoch}',
                               companyName: companyCtrl.text.trim(),
-                              contactName: contactCtrl.text.trim().isEmpty ? 'Contact' : contactCtrl.text.trim(),
-                              contactRole: roleCtrl.text.trim().isEmpty ? 'Lead' : roleCtrl.text.trim(),
+                              contactName: contactCtrl.text.trim().isEmpty
+                                  ? 'Contact'
+                                  : contactCtrl.text.trim(),
+                              contactRole: roleCtrl.text.trim().isEmpty
+                                  ? 'Lead'
+                                  : roleCtrl.text.trim(),
                               distanceKm: 1.5,
-                              locationArea: areaCtrl.text.trim().isEmpty ? 'Mumbai' : areaCtrl.text.trim(),
+                              locationArea: areaCtrl.text.trim().isEmpty
+                                  ? 'Mumbai'
+                                  : areaCtrl.text.trim(),
                               lastActive: 'Just now',
                               aiScore: 82,
                               stage: LeadStage.newLead,
@@ -419,7 +457,9 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                         Navigator.of(ctx).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text("Added ${companyCtrl.text.trim()} to leads"),
+                            content: Text(
+                              "Added ${companyCtrl.text.trim()} to leads",
+                            ),
                             backgroundColor: const Color(0xFF10B981),
                           ),
                         );
@@ -427,7 +467,9 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0F4C4C),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       elevation: 0,
                     ),
                     child: const Text(
@@ -453,7 +495,11 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.phone_in_talk_rounded, color: Colors.white, size: 18),
+            const Icon(
+              Icons.phone_in_talk_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
             const SizedBox(width: 8),
             Text("Calling ${lead.contactName} (${lead.phoneNumber})..."),
           ],
@@ -469,7 +515,11 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_outline_rounded, color: Colors.white, size: 18),
+            const Icon(
+              Icons.check_circle_outline_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
             const SizedBox(width: 8),
             Text("Logged in-person visit for ${lead.companyName}!"),
           ],
@@ -492,7 +542,12 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
           children: [
             // 1. Top Header: Title "Leads" + Search & Add Icons
             Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20, top: 12, bottom: 8),
+              padding: const EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 12,
+                bottom: 8,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -521,9 +576,13 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                           height: 40,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: _isSearchOpen ? const Color(0xFFE8F7F7) : Colors.white,
+                            color: _isSearchOpen
+                                ? const Color(0xFFE8F7F7)
+                                : Colors.white,
                             border: Border.all(
-                              color: _isSearchOpen ? const Color(0xFF0F4C4C) : const Color(0xFFE5E7EB),
+                              color: _isSearchOpen
+                                  ? const Color(0xFF0F4C4C)
+                                  : const Color(0xFFE5E7EB),
                               width: 1.0,
                             ),
                           ),
@@ -531,7 +590,9 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                           child: Icon(
                             Icons.search_rounded,
                             size: 20,
-                            color: _isSearchOpen ? const Color(0xFF0F4C4C) : const Color(0xFF111827),
+                            color: _isSearchOpen
+                                ? const Color(0xFF0F4C4C)
+                                : const Color(0xFF111827),
                           ),
                         ),
                       ),
@@ -565,35 +626,55 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
             // Optional Search Input field (if toggled)
             if (_isSearchOpen)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 6,
+                ),
                 child: TextField(
                   controller: _searchController,
                   autofocus: true,
                   onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
                     hintText: "Search company, contact, or area...",
-                    hintStyle: const TextStyle(fontSize: 13.5, color: Color(0xFF9CA3AF)),
-                    prefixIcon: const Icon(Icons.search, size: 18, color: Color(0xFF0F4C4C)),
+                    hintStyle: const TextStyle(
+                      fontSize: 13.5,
+                      color: Color(0xFF9CA3AF),
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      size: 18,
+                      color: Color(0xFF0F4C4C),
+                    ),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? GestureDetector(
                             onTap: () {
                               _searchController.clear();
                               setState(() {});
                             },
-                            child: const Icon(Icons.close, size: 18, color: Color(0xFF6B7280)),
+                            child: const Icon(
+                              Icons.close,
+                              size: 18,
+                              color: Color(0xFF6B7280),
+                            ),
                           )
                         : null,
                     isDense: true,
                     filled: true,
                     fillColor: const Color(0xFFF9FAFB),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF0F4C4C), width: 1.5),
+                      borderSide: const BorderSide(
+                        color: Color(0xFF0F4C4C),
+                        width: 1.5,
+                      ),
                     ),
                   ),
                 ),
@@ -605,42 +686,63 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
             SizedBox(
               height: 38,
               child: ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                behavior: ScrollConfiguration.of(
+                  context,
+                ).copyWith(scrollbars: false),
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: [
-                    _buildFilterChip('All', count: _leads.length, isSelected: _selectedFilter == 'All'),
+                    _buildFilterChip(
+                      'All',
+                      count: _leads.length,
+                      isSelected: _selectedFilter == 'All',
+                    ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
                       'New',
-                      count: _leads.where((l) => l.stage == LeadStage.newLead).length,
+                      count: _leads
+                          .where((l) => l.stage == LeadStage.newLead)
+                          .length,
                       isSelected: _selectedFilter == 'New',
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
                       'Contacted',
-                      count: _leads.where((l) => l.stage == LeadStage.contacted).length,
+                      count: _leads
+                          .where((l) => l.stage == LeadStage.contacted)
+                          .length,
                       isSelected: _selectedFilter == 'Contacted',
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
                       'Qualified',
-                      count: _leads.where((l) => l.stage == LeadStage.qualified).length,
+                      count: _leads
+                          .where((l) => l.stage == LeadStage.qualified)
+                          .length,
                       isSelected: _selectedFilter == 'Qualified',
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
                       'Hot 🔥',
                       filterKey: 'Hot',
-                      count: _leads.where((l) => l.temperature == LeadTemperature.hot).length,
+                      count: _leads
+                          .where((l) => l.temperature == LeadTemperature.hot)
+                          .length,
                       isSelected: _selectedFilter == 'Hot',
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
                       'Follow-up Due',
-                      count: _leads.where((l) => l.notes.contains('Follow-up') || l.temperature == LeadTemperature.cold || l.companyName == 'DataFlow Systems').length,
+                      count: _leads
+                          .where(
+                            (l) =>
+                                (l.notes?.contains('Follow-up') ?? false) ||
+                                l.temperature == LeadTemperature.cold ||
+                                l.companyName == 'DataFlow Systems',
+                          )
+                          .length,
                       isSelected: _selectedFilter == 'Follow-up Due',
                     ),
                     const SizedBox(width: 8),
@@ -707,10 +809,17 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
               // Scrollable Leads List with hidden scrollbars
               Expanded(
                 child: ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                  behavior: ScrollConfiguration.of(
+                    context,
+                  ).copyWith(scrollbars: false),
                   child: ListView.builder(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 12),
+                    padding: const EdgeInsets.only(
+                      left: 20,
+                      right: 20,
+                      top: 4,
+                      bottom: 12,
+                    ),
                     itemCount: leads.length,
                     itemBuilder: (context, index) {
                       final lead = leads[index];
@@ -846,7 +955,10 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                   },
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF0F4C4C),
-                    side: const BorderSide(color: Color(0xFF0F4C4C), width: 1.5),
+                    side: const BorderSide(
+                      color: Color(0xFF0F4C4C),
+                      width: 1.5,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -854,7 +966,11 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.camera_alt_outlined, size: 20, color: Color(0xFF0F4C4C)),
+                      Icon(
+                        Icons.camera_alt_outlined,
+                        size: 20,
+                        color: Color(0xFF0F4C4C),
+                      ),
                       SizedBox(width: 8),
                       Text(
                         "Scan Visiting Card",
@@ -907,7 +1023,11 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
               const SizedBox(height: 16),
               const Row(
                 children: [
-                  Icon(Icons.camera_alt_rounded, color: Color(0xFF0F4C4C), size: 24),
+                  Icon(
+                    Icons.camera_alt_rounded,
+                    color: Color(0xFF0F4C4C),
+                    size: 24,
+                  ),
                   SizedBox(width: 10),
                   Text(
                     "Scan Visiting Card",
@@ -942,15 +1062,39 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.auto_awesome, color: Color(0xFF10B981), size: 14),
+                          Icon(
+                            Icons.auto_awesome,
+                            color: Color(0xFF10B981),
+                            size: 14,
+                          ),
                           SizedBox(width: 6),
-                          Text("AI OCR Detected", style: TextStyle(color: Color(0xFF34D399), fontSize: 11, fontWeight: FontWeight.bold)),
+                          Text(
+                            "AI OCR Detected",
+                            style: TextStyle(
+                              color: Color(0xFF34D399),
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
                       SizedBox(height: 6),
-                      Text("Apex Solutions Ltd.", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-                      Text("Rajesh Sharma • VP Procurement", style: TextStyle(color: Colors.white70, fontSize: 12)),
-                      Text("+91 98211 44556 • Bandra Kurla Complex", style: TextStyle(color: Colors.white60, fontSize: 11)),
+                      Text(
+                        "Apex Solutions Ltd.",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Rajesh Sharma • VP Procurement",
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
+                      Text(
+                        "+91 98211 44556 • Bandra Kurla Complex",
+                        style: TextStyle(color: Colors.white60, fontSize: 11),
+                      ),
                     ],
                   ),
                 ),
@@ -991,9 +1135,17 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0F4C4C),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  child: const Text("Confirm & Add Scanned Lead", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    "Confirm & Add Scanned Lead",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -1004,7 +1156,12 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
   }
 
   /// Individual filter chip pill matching image.png
-  Widget _buildFilterChip(String label, {String? filterKey, int? count, required bool isSelected}) {
+  Widget _buildFilterChip(
+    String label, {
+    String? filterKey,
+    int? count,
+    required bool isSelected,
+  }) {
     final key = filterKey ?? label;
     return GestureDetector(
       onTap: () {
@@ -1034,7 +1191,10 @@ class _LeadsListScreenState extends State<LeadsListScreen> {
             if (count != null) ...[
               const SizedBox(width: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 1.5,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? const Color(0x33000000) : Colors.white,
                   borderRadius: BorderRadius.circular(10),
