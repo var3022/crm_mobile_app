@@ -1,7 +1,15 @@
 /// Lead model representing a prospective client in CRM Pro Field Sales
 enum LeadTemperature { hot, warm, cold }
 
-enum LeadStage { newLead, contacted, qualified, proposal, negotiation, won, lost }
+enum LeadStage {
+  newLead,
+  contacted,
+  qualified,
+  proposal,
+  negotiation,
+  won,
+  lost,
+}
 
 class LeadModel {
   final String id;

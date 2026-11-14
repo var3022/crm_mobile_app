@@ -20,9 +20,7 @@ class AppBottomNavigation extends StatelessWidget {
       height: AppDimensions.bottomNavHeight,
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        border: Border(
-          top: BorderSide(color: AppColors.border, width: 1.0),
-        ),
+        border: Border(top: BorderSide(color: AppColors.border, width: 1.0)),
       ),
       child: SafeArea(
         top: false,
@@ -30,10 +28,30 @@ class AppBottomNavigation extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildNavItem(0, "Home", Icons.home_outlined, Icons.home_rounded),
-            _buildNavItem(1, "Leads", Icons.people_outline_rounded, Icons.people_rounded),
-            _buildNavItem(2, "Visits", Icons.location_on_outlined, Icons.location_on_rounded),
-            _buildNavItem(3, "Tasks", Icons.check_circle_outline_rounded, Icons.check_circle_rounded),
-            _buildNavItem(4, "Profile", Icons.person_outline_rounded, Icons.person_rounded),
+            _buildNavItem(
+              1,
+              "Leads",
+              Icons.people_outline_rounded,
+              Icons.people_rounded,
+            ),
+            _buildNavItem(
+              2,
+              "Visits",
+              Icons.location_on_outlined,
+              Icons.location_on_rounded,
+            ),
+            _buildNavItem(
+              3,
+              "Tasks",
+              Icons.check_circle_outline_rounded,
+              Icons.check_circle_rounded,
+            ),
+            _buildNavItem(
+              4,
+              "Profile",
+              Icons.person_outline_rounded,
+              Icons.person_rounded,
+            ),
           ],
         ),
       ),

@@ -54,7 +54,8 @@ class LogoutConfirmationScreen extends StatefulWidget {
   }
 
   @override
-  State<LogoutConfirmationScreen> createState() => _LogoutConfirmationScreenState();
+  State<LogoutConfirmationScreen> createState() =>
+      _LogoutConfirmationScreenState();
 }
 
 class _LogoutConfirmationScreenState extends State<LogoutConfirmationScreen>
@@ -74,9 +75,10 @@ class _LogoutConfirmationScreenState extends State<LogoutConfirmationScreen>
     _slideAnimation = Tween<double>(begin: 40.0, end: 0.0).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeOut),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
     _animController.forward();
   }
 
@@ -223,10 +225,7 @@ class _LogoutConfirmationScreenState extends State<LogoutConfirmationScreen>
               builder: (context, child) {
                 return Transform.translate(
                   offset: Offset(0, _slideAnimation.value),
-                  child: Opacity(
-                    opacity: _fadeAnimation.value,
-                    child: child,
-                  ),
+                  child: Opacity(opacity: _fadeAnimation.value, child: child),
                 );
               },
               child: Column(
@@ -306,9 +305,7 @@ class _LogoutConfirmationScreenState extends State<LogoutConfirmationScreen>
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Color(0xFFE5E7EB), width: 1.0),
-        ),
+        border: Border(top: BorderSide(color: Color(0xFFE5E7EB), width: 1.0)),
       ),
       child: SafeArea(
         top: false,
@@ -321,10 +318,25 @@ class _LogoutConfirmationScreenState extends State<LogoutConfirmationScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildNavItem(0, "Home", Icons.home_outlined, false),
-                  _buildNavItem(1, "Leads", Icons.person_add_alt_outlined, false),
+                  _buildNavItem(
+                    1,
+                    "Leads",
+                    Icons.person_add_alt_outlined,
+                    false,
+                  ),
                   _buildNavItem(2, "Visits", Icons.location_on_outlined, false),
-                  _buildNavItem(3, "Tasks", Icons.assignment_turned_in_outlined, false),
-                  _buildNavItem(4, "Profile", Icons.person_outline_rounded, true),
+                  _buildNavItem(
+                    3,
+                    "Tasks",
+                    Icons.assignment_turned_in_outlined,
+                    false,
+                  ),
+                  _buildNavItem(
+                    4,
+                    "Profile",
+                    Icons.person_outline_rounded,
+                    true,
+                  ),
                 ],
               ),
             ),
@@ -346,11 +358,7 @@ class _LogoutConfirmationScreenState extends State<LogoutConfirmationScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 22,
-              color: isActive ? activeColor : inactiveColor,
-            ),
+            Icon(icon, size: 22, color: isActive ? activeColor : inactiveColor),
             const SizedBox(height: 3),
             Text(
               label,
@@ -395,12 +403,7 @@ class LogoutConfirmationSheet extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.only(
-        top: 10,
-        left: 20,
-        right: 20,
-        bottom: 24,
-      ),
+      padding: const EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -548,10 +551,7 @@ class LogoutConfirmationSheet extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: const Color(0xFF374151),
-                side: const BorderSide(
-                  color: Color(0xFFE5E7EB),
-                  width: 1.2,
-                ),
+                side: const BorderSide(color: Color(0xFFE5E7EB), width: 1.2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

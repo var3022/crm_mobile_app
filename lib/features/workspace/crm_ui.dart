@@ -281,12 +281,16 @@ Future<bool> confirm(
 class FormFieldSpec {
   const FormFieldSpec(
     this.label, {
-    this.value = '',
+    String value = '',
+    String? initial,
     this.required = false,
     this.options,
     this.lines = 1,
-    this.kind = 'text',
-  });
+    String kind = 'text',
+    String? type,
+  }) : value = initial ?? value,
+       kind = type ?? kind;
+
   final String label, value, kind;
   final bool required;
   final List<String>? options;
@@ -331,6 +335,15 @@ class _CrmFormState extends State<CrmForm> {
         context,
         controllers.map((k, v) => MapEntry(k, v.text.trim())),
       );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => saving = false);
     }
@@ -363,6 +376,7 @@ class _CrmFormState extends State<CrmForm> {
                 isExpanded: true,
                 hint: Text('Select ${f.label.toLowerCase()}'),
                 items: f.options!
+                    .toSet()
                     .map(
                       (s) => DropdownMenuItem(
                         value: s,

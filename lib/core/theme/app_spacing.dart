@@ -21,7 +21,9 @@ class AppSpacing {
   static const double contentArea = 24.0;
   static const double cardPadding = 16.0;
 
-  static const EdgeInsets screenPadding = EdgeInsets.symmetric(horizontal: screenHorizontal);
+  static const EdgeInsets screenPadding = EdgeInsets.symmetric(
+    horizontal: screenHorizontal,
+  );
   static const EdgeInsets contentPadding = EdgeInsets.all(contentArea);
   static const EdgeInsets cardInsets = EdgeInsets.all(cardPadding);
 }

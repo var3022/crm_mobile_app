@@ -45,7 +45,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   bool _isValidEmail(String email) {
-    final emailRegex = RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$");
+    final emailRegex = RegExp(
+      r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$",
+    );
     return emailRegex.hasMatch(email.trim());
   }
 
@@ -109,11 +111,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             builder: (context, constraints) {
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.screenHorizontal,
+                ),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -131,7 +133,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 Navigator.of(context).maybePop();
                               }
                             },
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusBackButton),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusBackButton,
+                            ),
                             child: Container(
                               width: 44,
                               height: 44,
@@ -153,7 +157,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             width: 120,
                             height: 120,
                             decoration: const BoxDecoration(
-                              color: Color(0xFFE8F5F3), // Soft mint / brand teal tint
+                              color: Color(
+                                0xFFE8F5F3,
+                              ), // Soft mint / brand teal tint
                               shape: BoxShape.circle,
                             ),
                             child: Center(
@@ -309,10 +315,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
                               foregroundColor: Colors.white,
-                              disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.7),
+                              disabledBackgroundColor: AppColors.primary
+                                  .withValues(alpha: 0.7),
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusButton,
+                                ),
                               ),
                             ),
                             child: _isLoading
@@ -340,14 +349,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                         // 7. Footer: Remember your password? Sign In
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 24.0, top: 20.0),
+                          padding: const EdgeInsets.only(
+                            bottom: 24.0,
+                            top: 20.0,
+                          ),
                           child: Center(
                             child: GestureDetector(
                               onTap: () {
                                 if (widget.onSignInTap != null) {
                                   widget.onSignInTap!();
                                 } else {
-                                  Navigator.of(context).pushReplacementNamed("/sign-in");
+                                  Navigator.of(
+                                    context,
+                                  ).pushReplacementNamed("/sign-in");
                                 }
                               },
                               child: RichText(
@@ -391,10 +405,7 @@ class _LockIconPainter extends CustomPainter {
   final Color color;
   final double strokeWidth;
 
-  _LockIconPainter({
-    required this.color,
-    required this.strokeWidth,
-  });
+  _LockIconPainter({required this.color, required this.strokeWidth});
 
   @override
   void paint(Canvas canvas, Size size) {

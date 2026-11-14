@@ -19,8 +19,10 @@ class AppDimensions {
   static const double radiusBackButton = 20.0;
 
   static BorderRadius get cardBorderRadius => BorderRadius.circular(radiusCard);
-  static BorderRadius get buttonBorderRadius => BorderRadius.circular(radiusButton);
-  static BorderRadius get inputBorderRadius => BorderRadius.circular(radiusInput);
+  static BorderRadius get buttonBorderRadius =>
+      BorderRadius.circular(radiusButton);
+  static BorderRadius get inputBorderRadius =>
+      BorderRadius.circular(radiusInput);
   static BorderRadius get pillBorderRadius => BorderRadius.circular(radiusPill);
   static BorderRadius get tagBorderRadius => BorderRadius.circular(radiusTag);
 

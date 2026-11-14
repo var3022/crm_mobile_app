@@ -45,7 +45,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
-          minimumSize: const Size.fromHeight(AppDimensions.buttonHeight),
+          minimumSize: const Size(64, AppDimensions.buttonHeight),
           shape: RoundedRectangleBorder(
             borderRadius: AppDimensions.buttonBorderRadius,
           ),
@@ -56,8 +56,13 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        hintStyle: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        hintStyle: AppTypography.bodySmall.copyWith(
+          color: AppColors.textTertiary,
+        ),
         border: OutlineInputBorder(
           borderRadius: AppDimensions.inputBorderRadius,
           borderSide: const BorderSide(color: AppColors.border, width: 1.0),

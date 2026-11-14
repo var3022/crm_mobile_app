@@ -74,9 +74,10 @@ class _OnboardingSkipConfirmationScreenState
     _slideAnimation = Tween<double>(begin: 40.0, end: 0.0).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeOut),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
     _animController.forward();
   }
 
@@ -187,10 +188,7 @@ class _OnboardingSkipConfirmationScreenState
               builder: (context, child) {
                 return Transform.translate(
                   offset: Offset(0, _slideAnimation.value),
-                  child: Opacity(
-                    opacity: _fadeAnimation.value,
-                    child: child,
-                  ),
+                  child: Opacity(opacity: _fadeAnimation.value, child: child),
                 );
               },
               child: Column(
@@ -221,9 +219,7 @@ class _OnboardingSkipConfirmationScreenState
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Color(0xFFE5E7EB), width: 1.0),
-        ),
+        border: Border(top: BorderSide(color: Color(0xFFE5E7EB), width: 1.0)),
       ),
       child: SafeArea(
         top: false,
@@ -260,11 +256,7 @@ class _OnboardingSkipConfirmationScreenState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 22,
-              color: navColor,
-            ),
+            Icon(icon, size: 22, color: navColor),
             const SizedBox(height: 3),
             Text(
               label,
@@ -307,12 +299,7 @@ class OnboardingSkipConfirmationSheet extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.only(
-        top: 10,
-        left: 20,
-        right: 20,
-        bottom: 24,
-      ),
+      padding: const EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -363,10 +350,7 @@ class OnboardingSkipConfirmationSheet extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFFF9FAFB),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: const Color(0xFFF1F5F9),
-                width: 1.0,
-              ),
+              border: Border.all(color: const Color(0xFFF1F5F9), width: 1.0),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -430,10 +414,7 @@ class OnboardingSkipConfirmationSheet extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: const Color(0xFF374151),
-                side: const BorderSide(
-                  color: Color(0xFFE5E7EB),
-                  width: 1.2,
-                ),
+                side: const BorderSide(color: Color(0xFFE5E7EB), width: 1.2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

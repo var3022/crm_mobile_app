@@ -31,7 +31,8 @@ class BiometricLoginScreen extends StatefulWidget {
     this.alternativeOptionText = "Use password instead",
     this.isFailed = false,
     this.failedTitle = "Face ID Failed",
-    this.failedSubtitle = "We couldn't verify your identity. Please try again or use your password.",
+    this.failedSubtitle =
+        "We couldn't verify your identity. Please try again or use your password.",
     this.errorBannerText = "TOO MANY ATTEMPTS. PLEASE USE PASSWORD.",
   });
 
@@ -230,14 +231,20 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: _isFailedState
-                                ? const Color(0xFF133B3B) // Tinted dark teal inner disc
-                                : const Color(0xFF1E6060), // Translucent soft teal disc
+                                ? const Color(
+                                    0xFF133B3B,
+                                  ) // Tinted dark teal inner disc
+                                : const Color(
+                                    0xFF1E6060,
+                                  ), // Translucent soft teal disc
                             border: Border.all(
                               color: _isFailedState
-                                  ? const Color(0xFFEF4444) // Coral red border for failure
+                                  ? const Color(
+                                      0xFFEF4444,
+                                    ) // Coral red border for failure
                                   : _authSuccess
-                                      ? const Color(0xFF10B981)
-                                      : Colors.white.withOpacity(0.15),
+                                  ? const Color(0xFF10B981)
+                                  : Colors.white.withOpacity(0.15),
                               width: _isFailedState ? 2.0 : 1.5,
                             ),
                             boxShadow: [
@@ -245,8 +252,8 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                                 color: _isFailedState
                                     ? const Color(0x38EF4444)
                                     : _authSuccess
-                                        ? const Color(0x3310B981)
-                                        : Colors.black.withOpacity(0.1),
+                                    ? const Color(0x3310B981)
+                                    : Colors.black.withOpacity(0.1),
                                 blurRadius: 18,
                                 offset: const Offset(0, 6),
                               ),
@@ -260,23 +267,27 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                                   size: 52,
                                 )
                               : _isAuthenticating
-                                  ? const SizedBox(
-                                      width: 48,
-                                      height: 48,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.8,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                      ),
-                                    )
-                                  : CustomPaint(
-                                      size: const Size(58, 58),
-                                      painter: _FaceIdIconPainter(
-                                        color: _isFailedState
-                                            ? const Color(0xFFEF4444) // Coral red Face ID
-                                            : Colors.white,
-                                        strokeWidth: 2.8,
-                                      ),
+                              ? const SizedBox(
+                                  width: 48,
+                                  height: 48,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.8,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
                                     ),
+                                  ),
+                                )
+                              : CustomPaint(
+                                  size: const Size(58, 58),
+                                  painter: _FaceIdIconPainter(
+                                    color: _isFailedState
+                                        ? const Color(
+                                            0xFFEF4444,
+                                          ) // Coral red Face ID
+                                        : Colors.white,
+                                    strokeWidth: 2.8,
+                                  ),
+                                ),
                         ),
                       );
                     },
@@ -320,8 +331,8 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                       _isAuthenticating
                           ? "Verifying Face ID..."
                           : _authSuccess
-                              ? "Verified!"
-                              : widget.promptText,
+                          ? "Verified!"
+                          : widget.promptText,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
                         fontSize: 16,
@@ -407,7 +418,10 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                       onPressed: _handleUsePassword,
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.white.withOpacity(0.85),
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
                       ),
                       child: Text(
                         widget.alternativeOptionText,
@@ -439,10 +453,7 @@ class _FaceIdIconPainter extends CustomPainter {
   final Color color;
   final double strokeWidth;
 
-  const _FaceIdIconPainter({
-    required this.color,
-    required this.strokeWidth,
-  });
+  const _FaceIdIconPainter({required this.color, required this.strokeWidth});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -498,34 +509,18 @@ class _FaceIdIconPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    canvas.drawLine(
-      Offset(sx(19), sy(20)),
-      Offset(sx(19), sy(23)),
-      eyePaint,
-    );
+    canvas.drawLine(Offset(sx(19), sy(20)), Offset(sx(19), sy(23)), eyePaint);
 
     // 6. Right Eye Slit: M35 20V23 (strokeWidth: 3.0)
-    canvas.drawLine(
-      Offset(sx(35), sy(20)),
-      Offset(sx(35), sy(23)),
-      eyePaint,
-    );
+    canvas.drawLine(Offset(sx(35), sy(20)), Offset(sx(35), sy(23)), eyePaint);
 
     // 7. Nose: M27 24V30 (strokeWidth: 2.6)
-    canvas.drawLine(
-      Offset(sx(27), sy(24)),
-      Offset(sx(27), sy(30)),
-      paint,
-    );
+    canvas.drawLine(Offset(sx(27), sy(24)), Offset(sx(27), sy(30)), paint);
 
     // 8. Smile: M19 36C21.5 39 32.5 39 35 36 (strokeWidth: 2.6)
     final smilePath = Path();
     smilePath.moveTo(sx(19), sy(36));
-    smilePath.cubicTo(
-      sx(21.5), sy(39),
-      sx(32.5), sy(39),
-      sx(35), sy(36),
-    );
+    smilePath.cubicTo(sx(21.5), sy(39), sx(32.5), sy(39), sx(35), sy(36));
     canvas.drawPath(smilePath, paint);
   }
 

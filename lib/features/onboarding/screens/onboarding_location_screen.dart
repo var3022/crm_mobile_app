@@ -258,10 +258,7 @@ class _BenefitItem extends StatelessWidget {
   final String title;
   final String description;
 
-  const _BenefitItem({
-    required this.title,
-    required this.description,
-  });
+  const _BenefitItem({required this.title, required this.description});
 
   @override
   Widget build(BuildContext context) {
@@ -351,8 +348,14 @@ class _RouteIllustrationPainter extends CustomPainter {
 
     // 2. Define node positions (3 connected route waypoints)
     final nodeA = Offset(size.width * 0.52, size.height * 0.28); // Upper node
-    final nodeB = Offset(size.width * 0.68, size.height * 0.48); // Middle-right node
-    final nodeC = Offset(size.width * 0.42, size.height * 0.70); // Lower-left node
+    final nodeB = Offset(
+      size.width * 0.68,
+      size.height * 0.48,
+    ); // Middle-right node
+    final nodeC = Offset(
+      size.width * 0.42,
+      size.height * 0.70,
+    ); // Lower-left node
 
     // Connecting line from upper-right edge into Node A
     final leadInEnd = Offset(size.width * 0.80, size.height * 0.22);

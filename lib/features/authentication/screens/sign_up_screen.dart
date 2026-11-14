@@ -39,14 +39,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     "Sales Director",
   ];
 
-  final List<String> _countryCodes = [
-    "+91",
-    "+1",
-    "+44",
-    "+65",
-    "+971",
-    "+61",
-  ];
+  final List<String> _countryCodes = ["+91", "+1", "+44", "+65", "+971", "+61"];
 
   bool _hasAttemptedSubmit = false;
   String? _fullNameError;
@@ -130,531 +123,537 @@ class _SignUpScreenState extends State<SignUpScreen> {
           behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 16.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 1. Top Logo Row: [LP Icon] + "CRM Pro"
                 Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(14),
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        "LP",
+                        style: TextStyle(
+                          fontFamily: AppTypography.fontFamily,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
                     ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      "LP",
+                    const SizedBox(width: 12),
+                    const Text(
+                      "CRM Pro",
                       style: TextStyle(
                         fontFamily: AppTypography.fontFamily,
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
+                        color: AppColors.primary,
+                        letterSpacing: -0.3,
                       ),
                     ),
+                  ],
+                ),
+
+                const SizedBox(height: 28),
+
+                // 2. Headings: "Create Account" & subtitle
+                const Text(
+                  "Create Account",
+                  style: TextStyle(
+                    fontFamily: AppTypography.fontFamily,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.5,
+                    height: 1.2,
                   ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    "CRM Pro",
-                    style: TextStyle(
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Register to join the field sales network.",
+                  style: TextStyle(
+                    fontFamily: AppTypography.fontFamily,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textSecondary,
+                    letterSpacing: 0.1,
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 3. Full Name
+                const Text(
+                  "Full Name",
+                  style: TextStyle(
+                    fontFamily: AppTypography.fontFamily,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildInputField(
+                  controller: _fullNameController,
+                  hintText: "e.g. John Doe",
+                  prefixIcon: Icons.person_outline_rounded,
+                  hasError: _hasAttemptedSubmit && _fullNameError != null,
+                  onChanged: (val) {
+                    if (_hasAttemptedSubmit) {
+                      setState(() {
+                        _fullNameError = val.trim().isEmpty
+                            ? "Full name is required"
+                            : null;
+                      });
+                    }
+                  },
+                ),
+                if (_hasAttemptedSubmit && _fullNameError != null) ...[
+                  const SizedBox(height: 5),
+                  Text(
+                    _fullNameError!,
+                    style: const TextStyle(
                       fontFamily: AppTypography.fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primary,
-                      letterSpacing: -0.3,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.error,
                     ),
                   ),
                 ],
-              ),
 
-              const SizedBox(height: 28),
+                const SizedBox(height: 16),
 
-              // 2. Headings: "Create Account" & subtitle
-              const Text(
-                "Create Account",
-                style: TextStyle(
-                  fontFamily: AppTypography.fontFamily,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.5,
-                  height: 1.2,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Register to join the field sales network.",
-                style: TextStyle(
-                  fontFamily: AppTypography.fontFamily,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
-                  letterSpacing: 0.1,
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // 3. Full Name
-              const Text(
-                "Full Name",
-                style: TextStyle(
-                  fontFamily: AppTypography.fontFamily,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              _buildInputField(
-                controller: _fullNameController,
-                hintText: "e.g. John Doe",
-                prefixIcon: Icons.person_outline_rounded,
-                hasError: _hasAttemptedSubmit && _fullNameError != null,
-                onChanged: (val) {
-                  if (_hasAttemptedSubmit) {
-                    setState(() {
-                      _fullNameError = val.trim().isEmpty ? "Full name is required" : null;
-                    });
-                  }
-                },
-              ),
-              if (_hasAttemptedSubmit && _fullNameError != null) ...[
-                const SizedBox(height: 5),
-                Text(
-                  _fullNameError!,
-                  style: const TextStyle(
+                // 4. Email Address
+                const Text(
+                  "Email Address",
+                  style: TextStyle(
                     fontFamily: AppTypography.fontFamily,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.error,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
                 ),
-              ],
-
-              const SizedBox(height: 16),
-
-              // 4. Email Address
-              const Text(
-                "Email Address",
-                style: TextStyle(
-                  fontFamily: AppTypography.fontFamily,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                const SizedBox(height: 8),
+                _buildInputField(
+                  controller: _emailController,
+                  hintText: "e.g. john@company.com",
+                  prefixIcon: Icons.mail_outline_rounded,
+                  keyboardType: TextInputType.emailAddress,
+                  hasError: _hasAttemptedSubmit && _emailError != null,
+                  onChanged: (val) {
+                    if (_hasAttemptedSubmit) {
+                      setState(() {
+                        if (val.trim().isEmpty) {
+                          _emailError = "Email address is required";
+                        } else if (!val.contains("@") || !val.contains(".")) {
+                          _emailError = "Invalid email format";
+                        } else {
+                          _emailError = null;
+                        }
+                      });
+                    }
+                  },
                 ),
-              ),
-              const SizedBox(height: 8),
-              _buildInputField(
-                controller: _emailController,
-                hintText: "e.g. john@company.com",
-                prefixIcon: Icons.mail_outline_rounded,
-                keyboardType: TextInputType.emailAddress,
-                hasError: _hasAttemptedSubmit && _emailError != null,
-                onChanged: (val) {
-                  if (_hasAttemptedSubmit) {
-                    setState(() {
-                      if (val.trim().isEmpty) {
-                        _emailError = "Email address is required";
-                      } else if (!val.contains("@") || !val.contains(".")) {
-                        _emailError = "Invalid email format";
-                      } else {
-                        _emailError = null;
-                      }
-                    });
-                  }
-                },
-              ),
-              if (_hasAttemptedSubmit && _emailError != null) ...[
-                const SizedBox(height: 5),
-                Text(
-                  _emailError!,
-                  style: const TextStyle(
+                if (_hasAttemptedSubmit && _emailError != null) ...[
+                  const SizedBox(height: 5),
+                  Text(
+                    _emailError!,
+                    style: const TextStyle(
+                      fontFamily: AppTypography.fontFamily,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.error,
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 16),
+
+                // 5. Phone Number (Country Code Dropdown + Phone Input)
+                const Text(
+                  "Phone Number",
+                  style: TextStyle(
                     fontFamily: AppTypography.fontFamily,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.error,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
                 ),
-              ],
-
-              const SizedBox(height: 16),
-
-              // 5. Phone Number (Country Code Dropdown + Phone Input)
-              const Text(
-                "Phone Number",
-                style: TextStyle(
-                  fontFamily: AppTypography.fontFamily,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Country Code Dropdown Container
-                  Container(
-                    height: 52,
-                    width: 88,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: _hasAttemptedSubmit && _phoneError != null
-                            ? const Color(0xFFEF4444)
-                            : AppColors.border,
-                        width: 1.2,
+                const SizedBox(height: 8),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Country Code Dropdown Container
+                    Container(
+                      height: 52,
+                      width: 88,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _hasAttemptedSubmit && _phoneError != null
+                              ? const Color(0xFFEF4444)
+                              : AppColors.border,
+                          width: 1.2,
+                        ),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _selectedCountryCode,
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: AppColors.textPrimary,
+                            size: 20,
+                          ),
+                          style: const TextStyle(
+                            fontFamily: AppTypography.fontFamily,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                          items: _countryCodes.map((code) {
+                            return DropdownMenuItem<String>(
+                              value: code,
+                              child: Text(code),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() => _selectedCountryCode = val);
+                            }
+                          },
+                        ),
                       ),
                     ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedCountryCode,
-                        icon: const Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: AppColors.textPrimary,
-                          size: 20,
-                        ),
-                        style: const TextStyle(
-                          fontFamily: AppTypography.fontFamily,
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                        ),
-                        items: _countryCodes.map((code) {
-                          return DropdownMenuItem<String>(
-                            value: code,
-                            child: Text(code),
-                          );
-                        }).toList(),
+                    const SizedBox(width: 10),
+                    // Phone Number Input
+                    Expanded(
+                      child: _buildInputField(
+                        controller: _phoneController,
+                        hintText: "98765 43210",
+                        keyboardType: TextInputType.phone,
+                        hasError: _hasAttemptedSubmit && _phoneError != null,
                         onChanged: (val) {
-                          if (val != null) {
-                            setState(() => _selectedCountryCode = val);
+                          if (_hasAttemptedSubmit) {
+                            setState(() {
+                              _phoneError = val.trim().isEmpty
+                                  ? "Phone number is required"
+                                  : null;
+                            });
                           }
                         },
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  // Phone Number Input
-                  Expanded(
-                    child: _buildInputField(
-                      controller: _phoneController,
-                      hintText: "98765 43210",
-                      keyboardType: TextInputType.phone,
-                      hasError: _hasAttemptedSubmit && _phoneError != null,
-                      onChanged: (val) {
-                        if (_hasAttemptedSubmit) {
-                          setState(() {
-                            _phoneError = val.trim().isEmpty ? "Phone number is required" : null;
-                          });
-                        }
-                      },
+                  ],
+                ),
+                if (_hasAttemptedSubmit && _phoneError != null) ...[
+                  const SizedBox(height: 5),
+                  Text(
+                    _phoneError!,
+                    style: const TextStyle(
+                      fontFamily: AppTypography.fontFamily,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.error,
                     ),
                   ),
                 ],
-              ),
-              if (_hasAttemptedSubmit && _phoneError != null) ...[
-                const SizedBox(height: 5),
-                Text(
-                  _phoneError!,
-                  style: const TextStyle(
+
+                const SizedBox(height: 16),
+
+                // 6. Company Name
+                const Text(
+                  "Company Name",
+                  style: TextStyle(
                     fontFamily: AppTypography.fontFamily,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.error,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
                 ),
-              ],
-
-              const SizedBox(height: 16),
-
-              // 6. Company Name
-              const Text(
-                "Company Name",
-                style: TextStyle(
-                  fontFamily: AppTypography.fontFamily,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                const SizedBox(height: 8),
+                _buildInputField(
+                  controller: _companyController,
+                  hintText: "e.g. Acme Corp",
+                  prefixIcon: Icons.business_center_outlined,
+                  hasError: _hasAttemptedSubmit && _companyError != null,
+                  onChanged: (val) {
+                    if (_hasAttemptedSubmit) {
+                      setState(() {
+                        _companyError = val.trim().isEmpty
+                            ? "Company name is required"
+                            : null;
+                      });
+                    }
+                  },
                 ),
-              ),
-              const SizedBox(height: 8),
-              _buildInputField(
-                controller: _companyController,
-                hintText: "e.g. Acme Corp",
-                prefixIcon: Icons.business_center_outlined,
-                hasError: _hasAttemptedSubmit && _companyError != null,
-                onChanged: (val) {
-                  if (_hasAttemptedSubmit) {
-                    setState(() {
-                      _companyError = val.trim().isEmpty ? "Company name is required" : null;
-                    });
-                  }
-                },
-              ),
-              if (_hasAttemptedSubmit && _companyError != null) ...[
-                const SizedBox(height: 5),
-                Text(
-                  _companyError!,
-                  style: const TextStyle(
+                if (_hasAttemptedSubmit && _companyError != null) ...[
+                  const SizedBox(height: 5),
+                  Text(
+                    _companyError!,
+                    style: const TextStyle(
+                      fontFamily: AppTypography.fontFamily,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.error,
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 16),
+
+                // 7. Designation Dropdown Selector
+                const Text(
+                  "Designation",
+                  style: TextStyle(
                     fontFamily: AppTypography.fontFamily,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.error,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
                 ),
-              ],
-
-              const SizedBox(height: 16),
-
-              // 7. Designation Dropdown Selector
-              const Text(
-                "Designation",
-                style: TextStyle(
-                  fontFamily: AppTypography.fontFamily,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                height: 52,
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: _hasAttemptedSubmit && _designationError != null
-                        ? const Color(0xFFEF4444)
-                        : AppColors.border,
-                    width: 1.2,
+                const SizedBox(height: 8),
+                Container(
+                  height: 52,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _hasAttemptedSubmit && _designationError != null
+                          ? const Color(0xFFEF4444)
+                          : AppColors.border,
+                      width: 1.2,
+                    ),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedDesignation,
+                      isExpanded: true,
+                      hint: Row(
+                        children: const [
+                          Icon(
+                            Icons.military_tech_outlined,
+                            size: 20,
+                            color: Color(0xFF9CA3AF),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            "Select Designation",
+                            style: TextStyle(
+                              fontFamily: AppTypography.fontFamily,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF9CA3AF),
+                            ),
+                          ),
+                        ],
+                      ),
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: Color(0xFF6B7280),
+                        size: 20,
+                      ),
+                      items: _designationOptions.map((desig) {
+                        return DropdownMenuItem<String>(
+                          value: desig,
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.military_tech_outlined,
+                                size: 20,
+                                color: AppColors.primary,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  desig,
+                                  style: const TextStyle(
+                                    fontFamily: AppTypography.fontFamily,
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        setState(() {
+                          _selectedDesignation = val;
+                          if (_hasAttemptedSubmit) {
+                            _designationError = null;
+                          }
+                        });
+                      },
+                    ),
                   ),
                 ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _selectedDesignation,
-                    isExpanded: true,
-                    hint: Row(
+                if (_hasAttemptedSubmit && _designationError != null) ...[
+                  const SizedBox(height: 5),
+                  Text(
+                    _designationError!,
+                    style: const TextStyle(
+                      fontFamily: AppTypography.fontFamily,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.error,
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 24),
+
+                // 8. Create Account Primary CTA Button (52px height)
+                SizedBox(
+                  width: double.infinity,
+                  height: AppDimensions.buttonHeight,
+                  child: ElevatedButton(
+                    onPressed: _validateAndSubmit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Create Account",
+                      style: TextStyle(
+                        fontFamily: AppTypography.fontFamily,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 26),
+
+                // 9. Divider: "OR SIGN UP WITH"
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Divider(color: AppColors.border, thickness: 1.0),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                      child: Text(
+                        "OR SIGN UP WITH",
+                        style: TextStyle(
+                          fontFamily: AppTypography.fontFamily,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    const Expanded(
+                      child: Divider(color: AppColors.border, thickness: 1.0),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // 10. Company SSO Button
+                SizedBox(
+                  width: double.infinity,
+                  height: AppDimensions.buttonHeight,
+                  child: OutlinedButton(
+                    onPressed: widget.onCompanySSO,
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      side: const BorderSide(
+                        color: AppColors.border,
+                        width: 1.0,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Icon(
-                          Icons.military_tech_outlined,
+                          Icons.apartment_rounded,
                           size: 20,
-                          color: Color(0xFF9CA3AF),
+                          color: AppColors.primary,
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "Select Designation",
+                          "Company SSO",
                           style: TextStyle(
                             fontFamily: AppTypography.fontFamily,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF9CA3AF),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ],
                     ),
-                    icon: const Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: Color(0xFF6B7280),
-                      size: 20,
-                    ),
-                    items: _designationOptions.map((desig) {
-                      return DropdownMenuItem<String>(
-                        value: desig,
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.military_tech_outlined,
-                              size: 20,
-                              color: AppColors.primary,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                desig,
-                                style: const TextStyle(
-                                  fontFamily: AppTypography.fontFamily,
-                                  fontSize: 14.5,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (val) {
-                      setState(() {
-                        _selectedDesignation = val;
-                        if (_hasAttemptedSubmit) {
-                          _designationError = null;
-                        }
-                      });
-                    },
                   ),
                 ),
-              ),
-              if (_hasAttemptedSubmit && _designationError != null) ...[
-                const SizedBox(height: 5),
-                Text(
-                  _designationError!,
-                  style: const TextStyle(
-                    fontFamily: AppTypography.fontFamily,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.error,
+
+                const SizedBox(height: 28),
+
+                // 11. Bottom Footer: "Already have an account? Sign In"
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: InkWell(
+                      onTap: widget.onSignInTap,
+                      borderRadius: BorderRadius.circular(4),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 4.0,
+                          horizontal: 6.0,
+                        ),
+                        child: RichText(
+                          text: const TextSpan(
+                            style: TextStyle(
+                              fontFamily: AppTypography.fontFamily,
+                              fontSize: 13.5,
+                              color: AppColors.textSecondary,
+                            ),
+                            children: [
+                              TextSpan(text: "Already have an account? "),
+                              TextSpan(
+                                text: "Sign In",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
-
-              const SizedBox(height: 24),
-
-              // 8. Create Account Primary CTA Button (52px height)
-              SizedBox(
-                width: double.infinity,
-                height: AppDimensions.buttonHeight,
-                child: ElevatedButton(
-                  onPressed: _validateAndSubmit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    "Create Account",
-                    style: TextStyle(
-                      fontFamily: AppTypography.fontFamily,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 26),
-
-              // 9. Divider: "OR SIGN UP WITH"
-              Row(
-                children: [
-                  const Expanded(
-                    child: Divider(
-                      color: AppColors.border,
-                      thickness: 1.0,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                    child: Text(
-                      "OR SIGN UP WITH",
-                      style: TextStyle(
-                        fontFamily: AppTypography.fontFamily,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                  const Expanded(
-                    child: Divider(
-                      color: AppColors.border,
-                      thickness: 1.0,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // 10. Company SSO Button
-              SizedBox(
-                width: double.infinity,
-                height: AppDimensions.buttonHeight,
-                child: OutlinedButton(
-                  onPressed: widget.onCompanySSO,
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    side: const BorderSide(
-                      color: AppColors.border,
-                      width: 1.0,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(
-                        Icons.apartment_rounded,
-                        size: 20,
-                        color: AppColors.primary,
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        "Company SSO",
-                        style: TextStyle(
-                          fontFamily: AppTypography.fontFamily,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 28),
-
-              // 11. Bottom Footer: "Already have an account? Sign In"
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: InkWell(
-                    onTap: widget.onSignInTap,
-                    borderRadius: BorderRadius.circular(4),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 6.0),
-                      child: RichText(
-                        text: const TextSpan(
-                          style: TextStyle(
-                            fontFamily: AppTypography.fontFamily,
-                            fontSize: 13.5,
-                            color: AppColors.textSecondary,
-                          ),
-                          children: [
-                            TextSpan(text: "Already have an account? "),
-                            TextSpan(
-                              text: "Sign In",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
         ),
       ),
     );
@@ -693,7 +692,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
         decoration: InputDecoration(
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 15,
+          ),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
@@ -705,11 +707,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             color: Color(0xFF9CA3AF),
           ),
           prefixIcon: prefixIcon != null
-              ? Icon(
-                  prefixIcon,
-                  size: 20,
-                  color: const Color(0xFF9CA3AF),
-                )
+              ? Icon(prefixIcon, size: 20, color: const Color(0xFF9CA3AF))
               : null,
           suffixIcon: suffixIcon,
         ),

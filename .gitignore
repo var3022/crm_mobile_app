@@ -10,3 +10,11 @@ coverage/
 .dart_tool/
 .flutter-plugins*
 .packages
+
+# Local IDE state and machine-specific Android configuration
+.idea/
+*.iml
+android/local.properties
+android/key.properties
+*.jks
+*.keystore

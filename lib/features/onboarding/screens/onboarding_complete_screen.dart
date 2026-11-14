@@ -9,13 +9,11 @@ import "../../../core/theme/app_spacing.dart";
 class OnboardingCompleteScreen extends StatefulWidget {
   final VoidCallback? onContinue;
 
-  const OnboardingCompleteScreen({
-    super.key,
-    this.onContinue,
-  });
+  const OnboardingCompleteScreen({super.key, this.onContinue});
 
   @override
-  State<OnboardingCompleteScreen> createState() => _OnboardingCompleteScreenState();
+  State<OnboardingCompleteScreen> createState() =>
+      _OnboardingCompleteScreenState();
 }
 
 class _OnboardingCompleteScreenState extends State<OnboardingCompleteScreen>
@@ -83,7 +81,9 @@ class _OnboardingCompleteScreenState extends State<OnboardingCompleteScreen>
                       width: 196,
                       height: 196,
                       decoration: const BoxDecoration(
-                        color: Color(0xFFD1FADF), // Soft mint outer glow circle (same as reset success)
+                        color: Color(
+                          0xFFD1FADF,
+                        ), // Soft mint outer glow circle (same as reset success)
                         shape: BoxShape.circle,
                       ),
                       alignment: Alignment.center,
@@ -91,7 +91,9 @@ class _OnboardingCompleteScreenState extends State<OnboardingCompleteScreen>
                         width: 128,
                         height: 128,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF10B981), // Emerald green inner circle
+                          color: Color(
+                            0xFF10B981,
+                          ), // Emerald green inner circle
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
@@ -244,9 +246,7 @@ class _OnboardingCompleteScreenState extends State<OnboardingCompleteScreen>
                                 ),
                                 TextSpan(
                                   text: "(✓ Active)",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  style: TextStyle(fontWeight: FontWeight.w600),
                                 ),
                               ],
                             ),
@@ -304,10 +304,7 @@ class _DoubleCheckPainter extends CustomPainter {
   final Color color;
   final double strokeWidth;
 
-  const _DoubleCheckPainter({
-    required this.color,
-    required this.strokeWidth,
-  });
+  const _DoubleCheckPainter({required this.color, required this.strokeWidth});
 
   @override
   void paint(Canvas canvas, Size size) {
