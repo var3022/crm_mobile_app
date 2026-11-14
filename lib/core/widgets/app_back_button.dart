@@ -22,7 +22,7 @@ class AppBackButton extends StatelessWidget {
       height: AppDimensions.backButtonSize,
       child: Material(
         color: backgroundColor ?? AppColors.surfaceReference,
-        shape: const CircleBorder(),
+        shape: const CircleBorder(side: BorderSide(color: AppColors.border)),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onPressed ?? () => Navigator.of(context).maybePop(),

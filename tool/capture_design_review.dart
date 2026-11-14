@@ -17,25 +17,81 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     final boundaryKey = GlobalKey();
-    await tester.pumpWidget(RepaintBoundary(key: boundaryKey, child: const CrmProApp()));
+    await tester.pumpWidget(
+      RepaintBoundary(key: boundaryKey, child: const CrmProApp()),
+    );
     await tester.pump(const Duration(seconds: 1));
-    final navigator = tester.state<NavigatorState>(find.byType(Navigator).first);
-    const routes = ['dashboard','leads','customers','lead-details','customer-details','pipeline','visits','active-visit','tasks','reports','profile','settings','targets','offline-data'];
+    final navigator = tester.state<NavigatorState>(
+      find.byType(Navigator).first,
+    );
+    const routes = [
+      'dashboard',
+      'leads',
+      'customers',
+      'lead-details',
+      'customer-details',
+      'pipeline',
+      'visits',
+      'active-visit',
+      'tasks',
+      'reports',
+      'profile',
+      'settings',
+      'targets',
+      'offline-data',
+      'new-lead',
+      'edit-lead',
+      'filter-leads',
+      'add-note',
+      'new-deal',
+      'update-deal',
+      'new-task',
+      'edit-task',
+      'visit-history',
+    ];
     final output = Directory('../tmp/pdfs/app-review');
-    output.createSync(recursive:true);
+    output.createSync(recursive: true);
     for (final route in routes) {
       navigator.pushNamedAndRemoveUntil('/$route', (_) => false);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 800));
       await tester.pump();
       await tester.runAsync(() async {
-        final boundary = boundaryKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+        final boundary =
+            boundaryKey.currentContext!.findRenderObject()!
+                as RenderRepaintBoundary;
         final frame = await boundary.toImage(pixelRatio: 2);
         final bytes = await frame.toByteData(format: ui.ImageByteFormat.png);
-        await File('${output.path}/$route.png').writeAsBytes(bytes!.buffer.asUint8List());
+        await File(
+          '${output.path}/$route.png',
+        ).writeAsBytes(bytes!.buffer.asUint8List());
         frame.dispose();
       });
       await tester.pump(const Duration(milliseconds: 100));
+      expect(tester.takeException(), isNull, reason: route);
+    }
+    navigator.pushNamedAndRemoveUntil('/reports', (_) => false);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 800));
+    for (final sheet in ['Select Date Range', 'Export Report']) {
+      await tester.tap(find.byTooltip(sheet));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 800));
+      await tester.runAsync(() async {
+        final boundary =
+            boundaryKey.currentContext!.findRenderObject()!
+                as RenderRepaintBoundary;
+        final frame = await boundary.toImage(pixelRatio: 2);
+        final bytes = await frame.toByteData(format: ui.ImageByteFormat.png);
+        await File(
+          '${output.path}/${sheet == 'Export Report' ? 'export-report' : 'report-range'}.png',
+        ).writeAsBytes(bytes!.buffer.asUint8List());
+        frame.dispose();
+      });
+      expect(tester.takeException(), isNull, reason: sheet);
+      navigator.pop();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 800));
     }
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();

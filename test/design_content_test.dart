@@ -34,7 +34,13 @@ void main() {
     ]) {
       expect(find.text(label), findsOneWidget);
     }
-    await tester.ensureVisible(find.text('Deal Pipeline Stage'));
+    await tester.scrollUntilVisible(
+      find.text('Deal Pipeline Stage'),
+      180,
+      scrollable: find.byWidgetPredicate(
+        (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+      ),
+    );
     expect(find.text('Deal Pipeline Stage'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -46,7 +52,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       await tester.pumpWidget(const CrmProApp());
-    await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(seconds: 1));
       tester
           .state<NavigatorState>(find.byType(Navigator).first)
           .pushNamedAndRemoveUntil('/settings', (_) => false);

@@ -1,3 +1,5 @@
+import 'report_export.dart';
+import 'reporting_ui.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,19 +12,13 @@ import 'tasks_deals_screens.dart' show dateText;
 /// Page 81: Profile Screen with data-derived stats and avatar
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
-
   @override
   Widget build(BuildContext c) => ListenableBuilder(
     listenable: CrmStore.instance,
     builder: (c, _) {
       final store = CrmStore.instance;
-      final completedVisits = store.visits
-          .where((v) => v.status == 'Completed')
-          .length;
-      final wonDealsValue = store.deals
-          .where((d) => d.stage == 'Won')
-          .fold<double>(0, (sum, d) => sum + d.value);
-
+      final p = MonthlyPerformance(store, DateTime.now());
+      final storage = store.calculateStorageBreakdown();
       return CrmPage(
         title: 'Profile',
         nav: 4,
@@ -33,114 +29,95 @@ class ProfileScreen extends StatelessWidget {
           ),
         ],
         children: [
-          gap(10),
+          gap(16),
           Center(
-            child: Stack(
-              children: [
-                avatar(store.userProfile.avatarInitials, radius: 46),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: InkWell(
-                    onTap: () => open(c, '/edit-profile'),
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        size: 14,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            child: Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: AppColors.primaryLight,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              alignment: Alignment.center,
+              child: strong(store.userProfile.avatarInitials, 25),
             ),
           ),
-          gap(14),
-          Center(child: strong(store.name, 21)),
+          gap(12),
+          Center(child: strong(store.name, 22)),
           gap(4),
-          Center(child: badge(store.userProfile.designation)),
+          Center(child: muted(store.userProfile.designation)),
           gap(4),
-          Center(child: muted(store.userProfile.territory)),
-          gap(18),
-          const Divider(),
-
-          // Dynamic Performance Metrics
+          Center(
+            child: muted('Acme Industries · ${store.userProfile.territory}'),
+          ),
+          gap(22),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _stat('$completedVisits', 'visits this month'),
-              _stat(
-                wonDealsValue > 0
-                    ? '₹${(wonDealsValue / 100000).toStringAsFixed(1)}L'
-                    : '₹6.8L',
-                'revenue generated',
+              Expanded(child: _stat('${p.visits.length}', 'visits this month')),
+              Expanded(child: _stat(rupees(p.revenue), 'revenue generated')),
+              Expanded(
+                child: _stat('${p.conversion.round()}%', 'conversion rate'),
               ),
-              _stat('32%', 'conversion rate'),
             ],
           ),
-          gap(14),
-          const Divider(),
-
-          // Navigation Links
-          linkRow('My Reports', Icons.bar_chart, () => open(c, '/reports')),
-          linkRow('My Targets', Icons.flag_outlined, () => open(c, '/targets')),
-          linkRow(
-            'Visit History',
-            Icons.history,
-            () => open(c, '/visit-history'),
-          ),
-          linkRow(
-            'Offline Data',
-            Icons.cloud_download_outlined,
-            () => open(c, '/offline-data'),
-          ),
-          linkRow(
-            'Security & Two-Factor (2FA)',
-            Icons.security_outlined,
-            () => open(c, '/security'),
-          ),
-          linkRow(
-            'Settings',
-            Icons.settings_outlined,
-            () => open(c, '/settings'),
-          ),
-          linkRow('Help & Support', Icons.help_outline, () => open(c, '/help')),
-          linkRow('About', Icons.info_outline, () => open(c, '/about')),
-          const SizedBox(height: 10),
-          Center(
-            child: TextButton.icon(
-              onPressed: () => showModalBottomSheet(
-                context: c,
-                backgroundColor: Colors.transparent,
-                builder: (_) => const LogoutConfirmationModal(),
-              ),
-              icon: const Icon(Icons.logout, color: AppColors.error, size: 18),
-              label: const Text(
-                'Sign Out',
-                style: TextStyle(
-                  color: AppColors.error,
-                  fontWeight: FontWeight.bold,
+          gap(24),
+          Panel(
+            child: Column(
+              children: [
+                linkRow(
+                  'My Reports',
+                  Icons.bar_chart_outlined,
+                  () => open(c, '/reports'),
                 ),
-              ),
+                linkRow(
+                  'My Targets',
+                  Icons.flag_outlined,
+                  () => open(c, '/targets'),
+                ),
+                linkRow(
+                  'Visit History',
+                  Icons.history,
+                  () => open(c, '/visit-history'),
+                ),
+                linkRow(
+                  'Offline Data',
+                  Icons.cloud_download_outlined,
+                  () => open(c, '/offline-data'),
+                  trailing: muted(
+                    '${(storage['totalMb'] as num).toStringAsFixed(2)} MB',
+                  ),
+                ),
+                linkRow(
+                  'Settings',
+                  Icons.settings_outlined,
+                  () => open(c, '/settings'),
+                ),
+                linkRow(
+                  'Help & Support',
+                  Icons.help_outline,
+                  () => open(c, '/help'),
+                ),
+                linkRow(
+                  'About',
+                  Icons.info_outline,
+                  () => open(c, '/about'),
+                  trailing: muted('v1.0.0'),
+                ),
+              ],
             ),
           ),
         ],
       );
     },
   );
-
-  Widget _stat(String n, String label) => Column(
+  Widget _stat(String value, String label) => Column(
     children: [
-      strong(n, 20),
-      gap(4),
+      strong(value, 21),
+      gap(5),
       Text(
         label,
-        style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+        style: const TextStyle(fontSize: 9, color: AppColors.textSecondary),
+        textAlign: TextAlign.center,
       ),
     ],
   );
@@ -330,11 +307,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
       return CrmPage(
         title: 'Settings',
         nav: 4,
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (route) => open(c, route),
+            itemBuilder: (_) => const [
+              PopupMenuItem(
+                value: '/security',
+                child: Text('Two-Factor Authentication (2FA)'),
+              ),
+              PopupMenuItem(
+                value: '/notification-settings',
+                child: Text('Notification Categories & Quiet Hours'),
+              ),
+            ],
+          ),
+        ],
         children: [
           Panel(
             child: Row(
               children: [
-                avatar(CrmStore.instance.userProfile.avatarInitials),
+                Container(
+                  width: 64,
+                  height: 64,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: strong(
+                    CrmStore.instance.userProfile.avatarInitials,
+                    24,
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -352,95 +356,126 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           gap(20),
           heading('Account Settings'),
-          linkRow(
-            'Edit Profile',
-            Icons.person_outline,
-            () => open(c, '/edit-profile'),
-          ),
-          linkRow(
-            'Change Password',
-            Icons.lock_outline,
-            () => open(c, '/change-password'),
-          ),
-          _setting(
-            c,
-            'Biometric Login',
-            s.biometricLogin,
-            (v) => s.biometricLogin = v,
-          ),
-          linkRow(
-            'Two-Factor Authentication (2FA)',
-            Icons.shield_outlined,
-            () => open(c, '/security'),
+          Panel(
+            child: Column(
+              children: [
+                linkRow(
+                  'Edit Profile',
+                  Icons.person_outline,
+                  () => open(c, '/edit-profile'),
+                ),
+                linkRow(
+                  'Change Password',
+                  Icons.lock_outline,
+                  () => open(c, '/change-password'),
+                ),
+                _setting(
+                  c,
+                  'Biometric Login',
+                  s.biometricLogin,
+                  (v) => s.biometricLogin = v,
+                ),
+              ],
+            ),
           ),
           gap(14),
           heading('Notifications'),
-          _setting(
-            c,
-            'Push Notifications',
-            s.pushNotifications,
-            (v) => s.pushNotifications = v,
-          ),
-          _setting(
-            c,
-            'Visit Reminders',
-            s.visitReminders,
-            (v) => s.visitReminders = v,
-          ),
-          _setting(
-            c,
-            'Nearby Leads Alert',
-            s.nearbyLeadsAlert,
-            (v) => s.nearbyLeadsAlert = v,
-          ),
-          linkRow(
-            'Notification Categories & Quiet Hours',
-            Icons.schedule,
-            () => open(c, '/notification-settings'),
+          Panel(
+            child: Column(
+              children: [
+                _setting(
+                  c,
+                  'Push Notifications',
+                  s.pushNotifications,
+                  (v) => s.pushNotifications = v,
+                ),
+                _setting(
+                  c,
+                  'Visit Reminders',
+                  s.visitReminders,
+                  (v) => s.visitReminders = v,
+                ),
+                _setting(
+                  c,
+                  'Nearby Leads Alert',
+                  s.nearbyLeadsAlert,
+                  (v) => s.nearbyLeadsAlert = v,
+                ),
+              ],
+            ),
           ),
           gap(14),
           heading('Location & Tracking'),
-          _setting(
-            c,
-            'Location Tracking',
-            s.locationTracking,
-            (v) => s.locationTracking = v,
-          ),
-          linkRow(
-            'Tracking Hours',
-            Icons.schedule,
-            () async {
-              final start = await showTimePicker(context: c, initialTime: const TimeOfDay(hour: 8, minute: 0));
-              if (start == null || !c.mounted) return;
-              final end = await showTimePicker(context: c, initialTime: const TimeOfDay(hour: 20, minute: 0));
-              if (end == null || !c.mounted) return;
-              final hours = '${start.format(c)} - ${end.format(c)}';
-              try { await CrmStore.instance.update(() => s.trackingHours = hours); }
-              catch (_) { if (c.mounted) message(c, 'Failed to save tracking hours'); }
-            },
-            trailing: muted(s.trackingHours),
+          Panel(
+            child: Column(
+              children: [
+                _setting(
+                  c,
+                  'Location Tracking',
+                  s.locationTracking,
+                  (v) => s.locationTracking = v,
+                ),
+                linkRow('Tracking Hours', Icons.schedule, () async {
+                  final start = await showTimePicker(
+                    context: c,
+                    initialTime: const TimeOfDay(hour: 8, minute: 0),
+                  );
+                  if (start == null || !c.mounted) return;
+                  final end = await showTimePicker(
+                    context: c,
+                    initialTime: const TimeOfDay(hour: 20, minute: 0),
+                  );
+                  if (end == null || !c.mounted) return;
+                  final hours = '${start.format(c)} - ${end.format(c)}';
+                  try {
+                    await CrmStore.instance.update(
+                      () => s.trackingHours = hours,
+                    );
+                  } catch (_) {
+                    if (c.mounted) message(c, 'Failed to save tracking hours');
+                  }
+                }, trailing: muted(s.trackingHours)),
+              ],
+            ),
           ),
           gap(14),
           heading('Offline & Data'),
-          linkRow(
-            'Offline Data',
-            Icons.cloud_download_outlined,
-            () => open(c, '/offline-data'),
-          ),
-          _setting(
-            c,
-            'Wi-Fi only Sync',
-            s.wifiOnlySync,
-            (v) => s.wifiOnlySync = v,
+          Panel(
+            child: Column(
+              children: [
+                linkRow(
+                  'Offline Data',
+                  Icons.cloud_download_outlined,
+                  () => open(c, '/offline-data'),
+                ),
+                _setting(
+                  c,
+                  'Wi-Fi only Sync',
+                  s.wifiOnlySync,
+                  (v) => s.wifiOnlySync = v,
+                ),
+              ],
+            ),
           ),
           gap(14),
           heading('AI Settings'),
-          _setting(c, 'AI Assistant', s.aiAssistant, (v) => s.aiAssistant = v),
-          _setting(
-            c,
-            'Daily Briefing',
-            s.dailyBriefing,
-            (v) => s.dailyBriefing = v,
+          Panel(
+            child: Column(
+              children: [
+                _setting(
+                  c,
+                  'AI Assistant',
+                  s.aiAssistant,
+                  (v) => s.aiAssistant = v,
+                ),
+                _setting(
+                  c,
+                  'Daily Briefing',
+                  s.dailyBriefing,
+                  (v) => s.dailyBriefing = v,
+                ),
+              ],
+            ),
           ),
           gap(20),
           button('Sign Out', () {
@@ -450,6 +485,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               builder: (_) => const LogoutConfirmationModal(),
             );
           }, secondary: true),
+          gap(16),
+          Center(
+            child: muted('You will be asked to confirm before signing out'),
+          ),
         ],
       );
     },
@@ -943,391 +982,303 @@ class ReportsScreen extends StatefulWidget {
 }
 
 class _ReportsScreenState extends State<ReportsScreen> {
-  String period = 'This Month';
-  DateTime? customStartDate;
-  DateTime? customEndDate;
-
-  void _showExportModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (ctx) => _ExportReportModal(
-        initialPeriod: period,
-        initialStartDate: customStartDate,
-        initialEndDate: customEndDate,
-      ),
-    );
+  ReportRange range = reportPreset('This Month');
+  Future<void> chooseRange() async {
+    final selected = await selectReportRange(context, range);
+    if (selected != null && mounted) setState(() => range = selected);
   }
 
-  Future<void> _pickCustomDateRange() async {
-    final now = DateTime.now();
-    final picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2035),
-      initialDateRange: DateTimeRange(
-        start: customStartDate ?? now.subtract(const Duration(days: 7)),
-        end: customEndDate ?? now,
-      ),
-    );
-    if (picked != null) {
-      setState(() {
-        customStartDate = picked.start;
-        customEndDate = picked.end;
-        period = 'Custom Range';
-      });
-    }
-  }
-
+  void export(BuildContext c) => showModalBottomSheet(
+    context: c,
+    isScrollControlled: true,
+    useSafeArea: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => _ExportReportModal(
+      initialPeriod: 'Custom Range',
+      initialStartDate: range.start,
+      initialEndDate: range.end,
+    ),
+  );
   @override
-  Widget build(BuildContext c) {
-    return ListenableBuilder(
-      listenable: CrmStore.instance,
-      builder: (c, _) {
-        final store = CrmStore.instance;
-        final inRangeVisits = store.visits
-            .where(
-              (v) => CrmStorage.isDateInRange(
-                v.date,
-                period,
-                null,
-                customStartDate,
-                customEndDate,
-              ),
-            )
-            .toList();
-        final inRangeDeals = store.deals
-            .where(
-              (d) => CrmStorage.isDateInRange(
-                d.createdAt,
-                period,
-                null,
-                customStartDate,
-                customEndDate,
-              ),
-            )
-            .toList();
-        final wonDeals = inRangeDeals.where((d) => d.stage == 'Won').toList();
-        final totalWon = wonDeals.fold<double>(0, (sum, d) => sum + d.value);
-
-        // Derive real calculated metrics
-        final totalDurationMinutes = inRangeVisits.fold<int>(
-          0,
-          (sum, v) => sum + CrmStorage.parseDurationMinutes(v),
-        );
-        final activeProposalsCount = inRangeDeals
-            .where((d) => d.stage.toLowerCase() == 'proposal')
-            .length;
-
-        // Dynamic weekday counts for VISITS BY DAY
-        int countForWeekday(int weekday) =>
-            inRangeVisits.where((v) => v.date.weekday == weekday).length;
-        final monCount = countForWeekday(DateTime.monday);
-        final tueCount = countForWeekday(DateTime.tuesday);
-        final wedCount = countForWeekday(DateTime.wednesday);
-        final thuCount = countForWeekday(DateTime.thursday);
-        final friCount = countForWeekday(DateTime.friday);
-        final satCount = countForWeekday(DateTime.saturday);
-        final maxDayCount = [
-          monCount,
-          tueCount,
-          wedCount,
-          thuCount,
-          friCount,
-          satCount,
-        ].fold<int>(1, (m, val) => val > m ? val : m);
-
-        return CrmPage(
-          title: 'My Reports',
-          nav: 0,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.file_download_outlined),
-              tooltip: 'Export Report',
-              onPressed: () => _showExportModal(c),
-            ),
-          ],
-          children: [
-            chips(
-              const [
-                'This Week',
-                'This Month',
-                'Last Month',
-                'Quarter 3',
-                'Custom Range',
-              ],
-              period,
-              (v) {
-                if (v == 'Custom Range' &&
-                    (customStartDate == null || customEndDate == null)) {
-                  final now = DateTime.now();
-                  customStartDate = now.subtract(const Duration(days: 7));
-                  customEndDate = now;
-                }
-                setState(() => period = v);
-              },
-            ),
-            if (period == 'Custom Range') ...[
-              const SizedBox(height: 8),
-              InkWell(
-                onTap: _pickCustomDateRange,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
+  Widget build(BuildContext c) => ListenableBuilder(
+    listenable: CrmStore.instance,
+    builder: (c, _) {
+      final store = CrmStore.instance;
+      bool selected(DateTime date) =>
+          !date.isBefore(range.start) &&
+          date.isBefore(range.end.add(const Duration(days: 1)));
+      final visits = store.visits.where((v) => selected(v.date)).toList();
+      final completed = visits.where((v) => v.status == 'Completed').toList();
+      final deals = store.deals
+          .where((d) => selected(d.closeDate ?? d.createdAt))
+          .toList();
+      final won = deals.where((d) => d.stage == 'Won').toList();
+      final closed = deals
+          .where((d) => d.stage == 'Won' || d.stage == 'Lost')
+          .length;
+      final revenue = won.fold<double>(0, (s, d) => s + d.value);
+      final conversion = closed == 0 ? 0.0 : won.length / closed * 100;
+      final minutes = completed.fold<int>(
+        0,
+        (s, v) => s + CrmStorage.parseDurationMinutes(v),
+      );
+      final average = completed.isEmpty
+          ? 0
+          : (minutes / completed.length).round();
+      final lastWeek = reportPreset('Last Week');
+      final activity = store.visits
+          .where(
+            (v) =>
+                !v.date.isBefore(lastWeek.start) &&
+                v.date.isBefore(lastWeek.end.add(const Duration(days: 1))),
+          )
+          .toList();
+      final counts = [
+        for (var i = 1; i <= 7; i++)
+          activity.where((v) => v.date.weekday == i).length,
+      ];
+      final maximum = counts.fold<int>(1, (a, b) => a > b ? a : b);
+      final previousStart = range.start.subtract(
+        Duration(days: range.end.difference(range.start).inDays + 1),
+      );
+      final previousVisits = store.visits
+          .where(
+            (v) =>
+                v.status == 'Completed' &&
+                !v.date.isBefore(previousStart) &&
+                v.date.isBefore(range.start),
+          )
+          .length;
+      return CrmPage(
+        title: 'My Reports',
+        nav: 0,
+        actions: [
+          IconButton(
+            tooltip: 'Select Date Range',
+            onPressed: chooseRange,
+            icon: const Icon(Icons.calendar_today_outlined),
+          ),
+          IconButton(
+            tooltip: 'Export Report',
+            onPressed: () => export(c),
+            icon: const Icon(Icons.file_download_outlined),
+          ),
+        ],
+        children: [
+          chips(
+            const ['This Week', 'This Month', 'Last Month', 'Quarter'],
+            range.label,
+            (v) => setState(() => range = reportPreset(v)),
+          ),
+          gap(14),
+          Panel(
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 44,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade300),
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  child: strong(completed.length >= 40 ? 'A' : '—', 24),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.date_range,
-                        size: 16,
-                        color: AppColors.primary,
+                      strong(
+                        completed.length >= 40
+                            ? 'Great performance this month!'
+                            : 'Your performance this month',
+                        15,
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        customStartDate != null && customEndDate != null
-                            ? '${customStartDate!.day}/${customStartDate!.month}/${customStartDate!.year} - ${customEndDate!.day}/${customEndDate!.month}/${customEndDate!.year}'
-                            : 'Pick Custom Date Range',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      gap(4),
+                      muted(
+                        'Team average unavailable until team data is connected.',
                       ),
-                      const SizedBox(width: 6),
-                      const Icon(Icons.edit, size: 14, color: Colors.grey),
                     ],
                   ),
                 ),
+              ],
+            ),
+          ),
+          gap(16),
+          if (range.compare) ...[
+            Panel(
+              child: Text(
+                '${completed.length} completed visits vs $previousVisits in the previous ${range.end.difference(range.start).inDays + 1} days',
+              ),
+            ),
+            gap(12),
+          ],
+          Row(
+            children: [
+              Expanded(
+                child: metric(
+                  'VISITS GOAL',
+                  '${completed.length} / 50',
+                  '${(completed.length / 50 * 100).round()}% complete',
+                  completed.length / 50,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: metric(
+                  'REVENUE',
+                  '${rupees(revenue)} / ₹10L',
+                  '${(revenue / 1000000 * 100).round()}% target met',
+                  revenue / 1000000,
+                ),
               ),
             ],
-            gap(14),
-
-            Panel(
+          ),
+          gap(12),
+          Row(
+            children: [
+              Expanded(
+                child: metric(
+                  'CONVERSION',
+                  closed == 0 ? 'N/A' : '${conversion.round()}%',
+                  '$closed closed deals',
+                  null,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: metric(
+                  'AVG DURATION',
+                  '$average min',
+                  completed.isEmpty
+                      ? 'No completed visits'
+                      : 'Completed visits only',
+                  null,
+                ),
+              ),
+            ],
+          ),
+          gap(24),
+          heading('Visit Activity (Last Week)'),
+          Panel(
+            color: Colors.white,
+            child: SizedBox(
+              height: 130,
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Icon(
-                    Icons.insights,
-                    color: AppColors.primary,
-                    size: 30,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  for (var i = 0; i < 7; i++)
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        strong('Your performance this month', 16),
-                        muted(
-                          '${inRangeVisits.where((v) => v.status == "Completed").length} visits completed • ${wonDeals.length} deals won',
+                        Text(
+                          '${counts[i]}',
+                          style: const TextStyle(fontSize: 10),
+                        ),
+                        gap(5),
+                        Container(
+                          width: 18,
+                          height: 75 * counts[i] / maximum,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                        gap(6),
+                        Text(
+                          ['M', 'T', 'W', 'T', 'F', 'S', 'S'][i],
+                          style: const TextStyle(fontSize: 10),
                         ),
                       ],
                     ),
-                  ),
                 ],
               ),
             ),
-            gap(16),
-            // Metrics 2x2 Grid with Calculated Values and Clear Sample Labels
-            Row(
-              children: [
-                Expanded(
-                  child: _metricCard(
-                    'VISITS GOAL',
-                    '${inRangeVisits.where((v) => v.status == "Completed").length}',
-                    'vs target (Sample benchmark)',
-                    Colors.green,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _metricCard(
-                    'REVENUE',
-                    '₹${(totalWon / 100000).toStringAsFixed(1)}L',
-                    'vs last month (Sample benchmark)',
-                    AppColors.primary,
-                  ),
-                ),
-              ],
-            ),
-            gap(10),
-            Row(
-              children: [
-                Expanded(
-                  child: _metricCard(
-                    'CONVERSION',
-                    '${inRangeDeals.isEmpty ? 0 : (wonDeals.length * 100 / inRangeDeals.length).round()}%',
-                    '$activeProposalsCount proposals active',
-                    Colors.blue,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _metricCard(
-                    'AVG DURATION',
-                    '${inRangeVisits.isEmpty ? 0 : (totalDurationMinutes / inRangeVisits.length).round()} min',
-                    '${inRangeVisits.length} visits logged',
-                    Colors.amber.shade900,
-                  ),
-                ),
-              ],
-            ),
-            gap(18),
-
-            heading('Visit Activity (Last Week)'),
-            Container(
-              height: 140,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
+          ),
+          gap(24),
+          heading('Deal Pipeline Stage'),
+          ...['Qualified', 'Discovery', 'Proposal', 'Negotiation', 'Won'].map((
+            stage,
+          ) {
+            final count = deals.where((d) => d.stage == stage).length;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  _barCol(
-                    'Mon',
-                    maxDayCount > 0 ? (monCount / maxDayCount) : 0.0,
-                    '$monCount',
+                  SizedBox(
+                    width: 80,
+                    child: Text(stage, style: const TextStyle(fontSize: 11)),
                   ),
-                  _barCol(
-                    'Tue',
-                    maxDayCount > 0 ? (tueCount / maxDayCount) : 0.0,
-                    '$tueCount',
+                  Expanded(
+                    child: LinearProgressIndicator(
+                      value: deals.isEmpty ? 0 : count / deals.length,
+                      minHeight: 16,
+                      borderRadius: BorderRadius.circular(4),
+                      backgroundColor: AppColors.primaryLight,
+                    ),
                   ),
-                  _barCol(
-                    'Wed',
-                    maxDayCount > 0 ? (wedCount / maxDayCount) : 0.0,
-                    '$wedCount',
-                  ),
-                  _barCol(
-                    'Thu',
-                    maxDayCount > 0 ? (thuCount / maxDayCount) : 0.0,
-                    '$thuCount',
-                  ),
-                  _barCol(
-                    'Fri',
-                    maxDayCount > 0 ? (friCount / maxDayCount) : 0.0,
-                    '$friCount',
-                  ),
-                  _barCol(
-                    'Sat',
-                    maxDayCount > 0 ? (satCount / maxDayCount) : 0.0,
-                    '$satCount',
-                  ),
-                  _barCol(
-                    'Sun',
-                    countForWeekday(DateTime.sunday) / maxDayCount,
-                    '${countForWeekday(DateTime.sunday)}',
-                  ),
+                  const SizedBox(width: 10),
+                  Text('$count'),
                 ],
               ),
-            ),
-            gap(20),
-
-            heading('Deal Pipeline Stage'),
-            ...[
-              'Qualified',
-              'Discovery',
-              'Proposal',
-              'Negotiation',
-              'Won',
-            ].map((stage) {
-              final count = inRangeDeals.where((d) => d.stage == stage).length;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 14),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text(stage), strong('$count')],
-                    ),
-                    gap(6),
-                    LinearProgressIndicator(
-                      value: inRangeDeals.isEmpty
-                          ? 0
-                          : count / inRangeDeals.length,
-                      minHeight: 10,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ],
-                ),
-              );
-            }),
-            gap(16),
-            button(
-              'Export Full Report (PDF / Excel / CSV)',
-              () => _showExportModal(c),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _metricCard(String label, String value, String change, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11)),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            change,
-            style: const TextStyle(fontSize: 10, color: Colors.grey),
-          ),
+            );
+          }),
+          gap(12),
+          button('Export Report', () => export(c)),
         ],
-      ),
-    );
-  }
-
-  Widget _barCol(String day, double fraction, String count) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
+      );
+    },
+  );
+  Widget metric(
+    String label,
+    String value,
+    String subtitle,
+    double? progress,
+  ) => Container(
+    height: 130,
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      border: Border.all(color: AppColors.border),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          count,
-          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+          label,
+          style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
         ),
-        const SizedBox(height: 4),
-        Container(
-          width: 22,
-          height: 70 * fraction,
-          decoration: BoxDecoration(
+        gap(8),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
             color: AppColors.primary,
-            borderRadius: BorderRadius.circular(4),
           ),
         ),
-        const SizedBox(height: 6),
-        Text(day, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+        const Spacer(),
+        Text(
+          subtitle,
+          style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+        ),
+        if (progress != null) ...[
+          gap(7),
+          LinearProgressIndicator(
+            value: progress.clamp(0.0, 1.0),
+            backgroundColor: AppColors.border,
+            color: AppColors.primary,
+            minHeight: 5,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ],
       ],
-    );
-  }
+    ),
+  );
 }
 
-/// Page 80: Export Report Modal Sheet (PDF / Excel / CSV) with file generation
 class _ExportReportModal extends StatefulWidget {
   const _ExportReportModal({
     this.initialPeriod = 'This Month',
@@ -1343,475 +1294,318 @@ class _ExportReportModal extends StatefulWidget {
 }
 
 class _ExportReportModalState extends State<_ExportReportModal> {
-  String selectedFormat = 'PDF Document (.pdf)';
-  late String selectedPeriod;
-  DateTime? customStartDate;
-  DateTime? customEndDate;
-  bool includeVisits = true;
-  bool includeDeals = true;
-  bool includeGps = true;
-  final emailController = TextEditingController(
-    text: 'arjun.mehta@fieldpulse.io',
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    selectedPeriod = widget.initialPeriod;
-    customStartDate = widget.initialStartDate;
-    customEndDate = widget.initialEndDate;
-  }
-
+  String format = 'pdf';
+  bool charts = true,
+      rawData = true,
+      summary = true,
+      team = false,
+      exporting = false;
+  late ReportRange range =
+      widget.initialStartDate != null && widget.initialEndDate != null
+      ? ReportRange('Custom', widget.initialStartDate!, widget.initialEndDate!)
+      : reportPreset(widget.initialPeriod);
+  final email = TextEditingController();
   @override
   void dispose() {
-    emailController.dispose();
+    email.dispose();
     super.dispose();
   }
 
-  Future<void> _exportNow() async {
-    final messenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
-    final store = CrmStore.instance;
-    final ext = selectedFormat.contains('PDF')
-        ? 'pdf'
-        : selectedFormat.contains('Excel')
-        ? 'xlsx'
-        : 'csv';
-
-    final filename =
-        'CRM_Field_Report_${DateTime.now().toIso8601String().split("T").first}.$ext';
-
-    // Filter records strictly by selected date range (exclude out-of-range records)
-    final inRangeVisits = store.visits
-        .where(
-          (v) => CrmStorage.isDateInRange(
-            v.date,
-            selectedPeriod,
-            null,
-            customStartDate,
-            customEndDate,
-          ),
-        )
-        .toList();
-    final inRangeDeals = store.deals
-        .where(
-          (d) => CrmStorage.isDateInRange(
-            d.createdAt,
-            selectedPeriod,
-            null,
-            customStartDate,
-            customEndDate,
-          ),
-        )
-        .toList();
-
-    // Compute actual real metrics and filter records based on checkboxes
-    final filteredVisits = includeVisits ? inRangeVisits : <Visit>[];
-    final filteredDeals = includeDeals ? inRangeDeals : <Deal>[];
-
-    final completedCount = filteredVisits
-        .where((v) => v.status == 'Completed')
-        .length;
-    final totalVisitsCount = filteredVisits.length;
-    final wonDeals = filteredDeals.where((d) => d.stage == 'Won').toList();
-    final closedDeals = filteredDeals
-        .where((d) => d.stage == 'Won' || d.stage == 'Lost')
-        .toList();
-
-    // Zero revenue must remain exactly 0.0 (never fabricated fallback)
-    final computedRevenueLakhs =
-        wonDeals.fold<double>(0.0, (acc, d) => acc + d.value) / 100000.0;
-
-    // Conversion rate without closed deals must be null (rendered as N/A, never fabricated fallback)
-    final double? computedConversion = closedDeals.isNotEmpty
-        ? (wonDeals.length / closedDeals.length * 100.0)
-        : null;
-
-    // Calculate average duration from actual visits (never fabricated '45 min')
-    final computedAvgDuration = CrmStorage.formatAverageDuration(
-      filteredVisits,
-    );
-
-    final exportPeriodLabel =
-        selectedPeriod == 'Custom Range' &&
-            customStartDate != null &&
-            customEndDate != null
-        ? '${customStartDate!.day}/${customStartDate!.month} - ${customEndDate!.day}/${customEndDate!.month}'
-        : selectedPeriod;
-
-    List<int> bytes;
-    String mimeType;
-
-    if (ext == 'csv') {
-      final csvString = CrmStorage.instance.generateCsv(
-        leads: store.leads,
-        customers: store.customers,
-        deals: filteredDeals,
-        visits: filteredVisits,
-      );
-      bytes = utf8.encode(csvString);
-      mimeType = 'text/csv;charset=utf-8';
-    } else if (ext == 'xlsx') {
-      bytes = CrmStorage.instance.generateXlsxBytes(
-        leads: store.leads,
-        customers: store.customers,
-        deals: filteredDeals,
-        visits: filteredVisits,
-      );
-      mimeType =
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-    } else {
-      bytes = CrmStorage.instance.generatePdfBytes(
-        period: exportPeriodLabel,
-        visitsGoalMet: completedCount,
-        visitsGoalTotal: totalVisitsCount,
-        revenueMet: computedRevenueLakhs,
-        revenueGoal: 5.0,
-        conversionRate: computedConversion,
-        avgDuration: computedAvgDuration,
-        leads: store.leads,
-        customers: store.customers,
-        deals: filteredDeals,
-        visits: filteredVisits,
-        profile: store.userProfile,
-        includeCharts: includeDeals,
-        includeRawData: includeVisits,
-        includeSummary: true,
-      );
-      mimeType = 'application/pdf';
+  Future<void> export() async {
+    if (exporting) return;
+    final address = email.text.trim();
+    if (address.isNotEmpty &&
+        !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(address)) {
+      message(context, 'Enter a valid email address');
+      return;
     }
-
-    final savedResult = await CrmStorage.saveExportFile(
-      filename: filename,
-      bytes: bytes,
-      mimeType: mimeType,
-    );
-
-    if (mounted) {
-      navigator.pop();
+    if (!charts && !rawData && !summary && !team) {
+      message(context, 'Select at least one content section');
+      return;
     }
-
-    if (savedResult != null) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text('Report exported: $filename (${bytes.length} bytes)'),
-          duration: const Duration(seconds: 4),
+    setState(() => exporting = true);
+    final messenger = ScaffoldMessenger.of(context),
+        navigator = Navigator.of(context);
+    try {
+      final file = buildReportFile(
+        CrmStore.instance,
+        format,
+        range.start,
+        range.end,
+        ReportContents(
+          charts: charts,
+          rawData: rawData,
+          summary: summary,
+          team: team,
         ),
       );
-    } else {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Export failed: unable to write file.')),
+      final filename =
+          'CRM_Report_${range.start.toIso8601String().split('T').first}.$format';
+      final saved = await CrmStorage.saveExportFile(
+        filename: filename,
+        bytes: file.bytes,
+        mimeType: file.mimeType,
       );
+      if (saved == null) throw StateError('Unable to write download');
+      if (!mounted) return;
+      if (address.isNotEmpty) {
+        final launched = await DeviceService.launchUri(
+          Uri(
+            scheme: 'mailto',
+            path: address,
+            queryParameters: {
+              'subject':
+                  'CRM Report: ${dateLabel(range.start)} - ${dateLabel(range.end)}',
+              'body':
+                  'Please find the CRM report attached.\nAttach the downloaded file: $filename',
+            },
+          ),
+        );
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              launched
+                  ? 'Report downloaded. Attach it in your email composer before sending.'
+                  : 'Report downloaded. Email composer unavailable; send the downloaded file manually.',
+            ),
+          ),
+        );
+      } else {
+        messenger.showSnackBar(
+          SnackBar(content: Text('Report downloaded: $filename')),
+        );
+      }
+      if (mounted) navigator.pop();
+    } catch (e) {
+      if (mounted) message(context, 'Export failed: $e');
+    } finally {
+      if (mounted) setState(() => exporting = false);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  Widget build(BuildContext c) => Container(
+    constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(c).height * .9),
+    decoration: const BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+    ),
+    child: SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        16,
+        20,
+        20 + MediaQuery.viewInsetsOf(c).bottom,
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Export Performance Report',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Select period, format and contents for management review:',
-            style: TextStyle(color: Colors.grey, fontSize: 12),
-          ),
-          const SizedBox(height: 14),
-
-          // Date Range / Period Selection
-          Wrap(
-            spacing: 8,
+          Row(
             children: [
-              for (final p in [
-                'This Week',
-                'This Month',
-                'Quarter 3',
-                'Custom Range',
-                'All Time',
-              ])
-                ChoiceChip(
-                  label: Text(p, style: const TextStyle(fontSize: 12)),
-                  selected: selectedPeriod == p,
-                  onSelected: (sel) {
-                    if (sel) {
-                      setState(() {
-                        selectedPeriod = p;
-                        if (p == 'Custom Range' &&
-                            (customStartDate == null ||
-                                customEndDate == null)) {
-                          final now = DateTime.now();
-                          customStartDate = now.subtract(
-                            const Duration(days: 7),
-                          );
-                          customEndDate = now;
-                        }
-                      });
-                    }
-                  },
-                ),
+              Expanded(child: strong('Export Report', 19)),
+              IconButton(
+                onPressed: exporting ? null : () => Navigator.pop(c),
+                icon: const Icon(Icons.close),
+              ),
             ],
           ),
-          if (selectedPeriod == 'Custom Range') ...[
-            const SizedBox(height: 8),
-            InkWell(
-              onTap: () async {
-                final now = DateTime.now();
-                final picked = await showDateRangePicker(
-                  context: context,
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime(2035),
-                  initialDateRange: DateTimeRange(
-                    start:
-                        customStartDate ??
-                        now.subtract(const Duration(days: 7)),
-                    end: customEndDate ?? now,
-                  ),
-                );
-                if (picked != null) {
-                  setState(() {
-                    customStartDate = picked.start;
-                    customEndDate = picked.end;
-                  });
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.date_range,
-                      size: 14,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      customStartDate != null && customEndDate != null
-                          ? '${customStartDate!.day}/${customStartDate!.month}/${customStartDate!.year} - ${customEndDate!.day}/${customEndDate!.month}/${customEndDate!.year}'
-                          : 'Pick Custom Dates',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.edit, size: 12, color: Colors.grey),
-                  ],
-                ),
-              ),
-            ),
-          ],
-          const SizedBox(height: 12),
-
-          for (final fmt in [
-            'PDF Document (.pdf)',
-            'Excel Spreadsheet (.xlsx)',
-            'Comma-Separated Values (.csv)',
+          TextButton(
+            onPressed: () async {
+              final selected = await selectReportRange(c, range);
+              if (selected != null) setState(() => range = selected);
+            },
+            child: Text('${dateLabel(range.start)} — ${dateLabel(range.end)}'),
+          ),
+          for (final choice in [
+            ('pdf', 'PDF Report', 'Formatted report with charts and tables'),
+            ('xlsx', 'Excel Spreadsheet', 'Raw data in .xlsx format'),
+            ('csv', 'CSV File', 'Plain data export'),
           ])
-            RadioListTile<String>(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              title: Text(
-                fmt,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+            Material(
+              color: Colors.transparent,
+              child: RadioListTile<String>(
+                contentPadding: EdgeInsets.zero,
+                value: choice.$1,
+                groupValue: format,
+                onChanged: exporting
+                    ? null
+                    : (v) => setState(() => format = v!),
+                title: Text(
+                  choice.$2,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
+                subtitle: Text(choice.$3, style: const TextStyle(fontSize: 11)),
               ),
-              value: fmt,
-              groupValue: selectedFormat,
-              onChanged: (v) => setState(() => selectedFormat = v!),
             ),
-          const Divider(),
-
-          CheckboxListTile(
-            dense: true,
-            contentPadding: EdgeInsets.zero,
-            title: const Text(
-              'Include Complete Visit Logs & Durations',
-              style: TextStyle(fontSize: 12),
-            ),
-            value: includeVisits,
-            onChanged: (v) => setState(() => includeVisits = v ?? true),
+          gap(12),
+          heading('INCLUDE CONTENT'),
+          Wrap(
+            spacing: 6,
+            runSpacing: 4,
+            children: [
+              FilterChip(
+                label: const Text('Charts'),
+                selected: charts,
+                onSelected: (v) => setState(() => charts = v),
+              ),
+              FilterChip(
+                label: const Text('Raw Data'),
+                selected: rawData,
+                onSelected: (v) => setState(() => rawData = v),
+              ),
+              FilterChip(
+                label: const Text('Summary'),
+                selected: summary,
+                onSelected: (v) => setState(() => summary = v),
+              ),
+              FilterChip(
+                label: const Text('Team Breakdown'),
+                selected: team,
+                onSelected: (v) => setState(() => team = v),
+              ),
+            ],
           ),
-          CheckboxListTile(
-            dense: true,
-            contentPadding: EdgeInsets.zero,
-            title: const Text(
-              'Include Deals Pipeline Movement',
-              style: TextStyle(fontSize: 12),
-            ),
-            value: includeDeals,
-            onChanged: (v) => setState(() => includeDeals = v ?? true),
-          ),
-          CheckboxListTile(
-            dense: true,
-            contentPadding: EdgeInsets.zero,
-            title: const Text(
-              'Include GPS Check-in & Audit Signatures',
-              style: TextStyle(fontSize: 12),
-            ),
-            value: includeGps,
-            onChanged: (v) => setState(() => includeGps = v ?? true),
-          ),
-          const SizedBox(height: 10),
-
+          gap(8),
+          if (format != 'pdf')
+            muted('Charts are exported as chart data in Excel and CSV.'),
+          gap(16),
+          heading('SEND COPY TO EMAIL'),
           TextField(
-            controller: emailController,
-            decoration: const InputDecoration(labelText: 'Email Copy To'),
+            controller: email,
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(
+              hintText: 'Email address (optional)',
+            ),
           ),
-          const SizedBox(height: 20),
-
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: _exportNow,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+          gap(6),
+          muted(
+            'Opens your email composer after download. Attach the file before sending.',
+          ),
+          gap(20),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: exporting ? null : () => Navigator.pop(c),
+                  child: const Text('Cancel'),
                 ),
               ),
-              icon: const Icon(Icons.file_download, size: 18),
-              label: const Text(
-                'Generate & Export Report',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 2,
+                child: AppButton(
+                  label: 'Export & Download',
+                  isLoading: exporting,
+                  onPressed: export,
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
 }
 
 /// Page 88: Targets Screen with circular gauge, real KPI calculation, and team comparison
-class TargetsScreen extends StatelessWidget {
+class TargetsScreen extends StatefulWidget {
   const TargetsScreen({super.key});
+  @override
+  State<TargetsScreen> createState() => _TargetsScreenState();
+}
 
+class _TargetsScreenState extends State<TargetsScreen> {
+  DateTime month = DateTime(DateTime.now().year, DateTime.now().month);
   @override
   Widget build(BuildContext c) => ListenableBuilder(
     listenable: CrmStore.instance,
     builder: (c, _) {
-      final store = CrmStore.instance;
-      final visitsCompleted = store.visits
-          .where((v) => v.status == 'Completed')
-          .length;
-      final wonDeals = store.deals.where((d) => d.stage == 'Won').toList();
-      final closedDeals = store.deals
-          .where((d) => d.stage == 'Won' || d.stage == 'Lost')
-          .toList();
-      final totalRevenue = wonDeals.fold<double>(0, (sum, d) => sum + d.value);
-      final qualifiedLeads = store.leads
-          .where((l) => l.stage == 'Qualified')
-          .length;
-      final winRate = closedDeals.isNotEmpty
-          ? (wonDeals.length / closedDeals.length * 100).round()
-          : 0;
-      final avgDealSize = store.deals.isNotEmpty
-          ? (store.deals.fold<double>(0, (sum, d) => sum + d.value) /
-                    store.deals.length)
-                .round()
-          : 0;
-
-      // Achieved overall percentage calculated dynamically
-      final visitRatio = (visitsCompleted / 60.0).clamp(0.0, 1.0);
-      final revRatio = (totalRevenue / 500000.0).clamp(0.0, 1.0);
-      final leadsRatio = (qualifiedLeads / 35.0).clamp(0.0, 1.0);
-      final overallAchieved = ((visitRatio + revRatio + leadsRatio) / 3.0 * 100)
-          .round();
-
+      final p = MonthlyPerformance(CrmStore.instance, month);
       return CrmPage(
         title: 'My Targets',
+        nav: 4,
+        actions: [
+          TextButton(
+            onPressed: () async {
+              final selected = await showDatePicker(
+                context: c,
+                initialDate: month,
+                firstDate: DateTime(2020),
+                lastDate: DateTime(2036),
+              );
+              if (selected != null)
+                setState(() => month = DateTime(selected.year, selected.month));
+            },
+            child: Text(monthLabel(month)),
+          ),
+        ],
         children: [
-          gap(10),
+          gap(16),
           Center(
-            child: Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.primary, width: 8),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '$overallAchieved%',
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.primary,
+            child: SizedBox(
+              width: 150,
+              height: 150,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox.expand(
+                    child: CircularProgressIndicator(
+                      value: p.overall,
+                      strokeWidth: 10,
+                      backgroundColor: AppColors.border,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      strong('${(p.overall * 100).round()}%', 34),
+                      const Text(
+                        'Overall\nAchieved',
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                    const Text(
-                      'Q3 Achieved',
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
-          gap(20),
-
-          heading('TARGET PROGRESS (QUARTER 3)'),
-          _kpiProgress('Visits Completed', visitsCompleted, 60, 'visits'),
-          _kpiProgress('Revenue Generated', totalRevenue.toInt(), 500000, '\$'),
-          _kpiProgress('New Leads Qualified', qualifiedLeads, 35, 'leads'),
-          _kpiProgress('Win Conversion Rate', winRate, 20, '%'),
-          _kpiProgress('Average Deal Size', avgDealSize, 75000, '\$'),
-          gap(20),
-
-          heading('TEAM COMPARISON (MUMBAI REGION) · (SAMPLE BENCHMARKS)'),
+          gap(28),
+          _target(
+            'Visits Target',
+            '${p.visits.length} / 50 visits',
+            p.visits.length / 50,
+          ),
+          _target(
+            'Revenue Target',
+            '${rupees(p.revenue)} / ₹10.0L',
+            p.revenue / 1000000,
+          ),
+          _target('New Leads', '${p.newLeads} / 20 leads', p.newLeads / 20),
+          _target(
+            'Conversion Rate',
+            '${p.conversion.round()}% achieved',
+            p.conversion / 20,
+            exceeding: p.conversion >= 20,
+          ),
+          _target(
+            'Avg Deal Size',
+            '${rupees(p.averageDeal)} (Target ₹1.5L)',
+            p.averageDeal / 150000,
+            exceeding: p.averageDeal >= 150000,
+          ),
+          gap(14),
+          heading('TEAM COMPARISON'),
           Panel(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _teamRank('1', 'Priya Sharma', '84%', Colors.amber),
-                const Divider(),
-                _teamRank('2', 'Rahul Patel', '76%', Colors.grey),
-                const Divider(),
-                _teamRank(
-                  '3',
-                  'Arjun Mehta (You)',
-                  '$overallAchieved%',
-                  AppColors.primary,
-                  isYou: true,
-                ),
-                const Divider(),
-                _teamRank('4', 'Karan Malhotra', '52%', Colors.grey),
+                strong(CrmStore.instance.userProfile.territory),
+                gap(8),
+                muted('Team ranking unavailable until team data is connected.'),
               ],
             ),
           ),
@@ -1819,89 +1613,40 @@ class TargetsScreen extends StatelessWidget {
       );
     },
   );
-
-  Widget _kpiProgress(String label, num actual, num target, String unit) {
-    final percent = (actual / target).clamp(0.0, 1.0);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+  Widget _target(
+    String title,
+    String value,
+    double fraction, {
+    bool exceeding = false,
+  }) => Padding(
+    padding: const EdgeInsets.only(bottom: 12),
+    child: Panel(
+      color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          muted(title),
+          gap(6),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-              ),
-              Text(
-                '$actual / $target $unit',
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
-              ),
+              Expanded(child: strong(value, 17)),
+              if (exceeding)
+                badge('Exceeding', color: AppColors.success)
+              else
+                strong('${(fraction * 100).round()}%', 17),
             ],
           ),
-          const SizedBox(height: 6),
+          gap(12),
           LinearProgressIndicator(
-            value: percent,
-            backgroundColor: Colors.grey.shade200,
-            color: percent >= 0.8
-                ? AppColors.success
-                : percent >= 0.5
-                ? AppColors.primary
-                : Colors.orange,
+            value: fraction.clamp(0.0, 1.0),
+            minHeight: 8,
+            borderRadius: BorderRadius.circular(6),
+            backgroundColor: AppColors.border,
           ),
         ],
       ),
-    );
-  }
-
-  Widget _teamRank(
-    String rank,
-    String name,
-    String score,
-    Color color, {
-    bool isYou = false,
-  }) {
-    return Row(
-      children: [
-        Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: Text(
-              rank,
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            name,
-            style: TextStyle(
-              fontWeight: isYou ? FontWeight.bold : FontWeight.w500,
-              fontSize: 13,
-            ),
-          ),
-        ),
-        Text(
-          score,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-        ),
-      ],
-    );
-  }
+    ),
+  );
 }
 
 /// Page 89: Visit History Screen with month filters and summary
@@ -1912,7 +1657,8 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  String selectedMonth = 'Aug 2026';
+  DateTime month = DateTime(DateTime.now().year, DateTime.now().month);
+  String get selectedMonth => monthLabel(month);
 
   @override
   Widget build(BuildContext c) => ListenableBuilder(
@@ -1920,38 +1666,59 @@ class _HistoryScreenState extends State<HistoryScreen> {
     builder: (c, _) {
       final store = CrmStore.instance;
       final completed = store.visits
-          .where((v) => v.status == 'Completed')
+          .where((v) => v.status == 'Completed' && inMonth(v.date, month))
           .toList();
       final totalMinutes = completed.fold<int>(
         0,
         (sum, v) => sum + CrmStorage.parseDurationMinutes(v),
       );
       final totalHoursStr = (totalMinutes / 60.0).toStringAsFixed(1) + 'h';
-      final totalScheduled = store.visits.length;
-      final completionRateStr = totalScheduled > 0
-          ? '${(completed.length / totalScheduled * 100).round()}%'
-          : '0%';
-
+      final uniqueClients = completed.map((v) => v.companyId).toSet().length;
       return CrmPage(
         title: 'Visit History',
+        nav: 4,
         actions: [
           IconButton(
             icon: const Icon(Icons.file_download_outlined),
             tooltip: 'Export History',
-            onPressed: () {
-              ScaffoldMessenger.of(c).showSnackBar(
-                const SnackBar(
-                  content: Text('Visit history CSV exported to device storage'),
-                ),
+            onPressed: () async {
+              final csv = CrmStorage.instance.generateCsv(
+                leads: [],
+                customers: [],
+                deals: [],
+                visits: completed,
               );
+              final result = await CrmStorage.saveExportFile(
+                filename: 'Visit_History_${month.year}_${month.month}.csv',
+                bytes: utf8.encode(csv),
+                mimeType: 'text/csv',
+              );
+              if (c.mounted)
+                message(
+                  c,
+                  result == null
+                      ? 'Failed to export visit history'
+                      : 'Visit history downloaded',
+                );
             },
           ),
         ],
         children: [
           chips(
-            const ['Jul 2026', 'Aug 2026', 'Sep 2026'],
+            [
+              for (var i = 2; i >= 0; i--)
+                monthLabel(
+                  DateTime(DateTime.now().year, DateTime.now().month - i),
+                ),
+            ],
             selectedMonth,
-            (v) => setState(() => selectedMonth = v),
+            (v) => setState(() {
+              final parts = v.split(' ');
+              month = DateTime(
+                int.parse(parts.last),
+                monthNames.indexOf(parts.first) + 1,
+              );
+            }),
           ),
           gap(14),
 
@@ -2001,12 +1768,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 Column(
                   children: [
                     const Text(
-                      'Completion',
+                      'Unique Clients',
                       style: TextStyle(color: Colors.grey, fontSize: 11),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      completionRateStr,
+                      '$uniqueClients',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -2115,7 +1882,7 @@ class _OfflineDataScreenState extends State<OfflineDataScreen> {
     final confirmed = await confirm(
       context,
       'Clear Old Data (>30 Days)?',
-      'Completed visits and old cached photos older than 30 days will be removed from local storage. Your unsynced records will not be deleted.',
+      'Completed visits, completed tasks and activity older than 30 days will be removed from this device. Download an offline backup first; no server backup is configured.',
       action: 'Clear Storage',
     );
     if (confirmed) {
@@ -2148,6 +1915,7 @@ class _OfflineDataScreenState extends State<OfflineDataScreen> {
 
       return CrmPage(
         title: 'Offline Data',
+        nav: 4,
         actions: [
           IconButton(
             icon: isSyncing
@@ -2177,7 +1945,7 @@ class _OfflineDataScreenState extends State<OfflineDataScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'LOCAL STORAGE USAGE',
+                      'Storage Used',
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 11,
@@ -2185,7 +1953,7 @@ class _OfflineDataScreenState extends State<OfflineDataScreen> {
                       ),
                     ),
                     Text(
-                      '${totalMb.toStringAsFixed(1)} MB / ${limitMb.toStringAsFixed(0)} MB',
+                      '${_storageSize(totalMb)} / ${limitMb.toStringAsFixed(0)} MB',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
@@ -2209,36 +1977,43 @@ class _OfflineDataScreenState extends State<OfflineDataScreen> {
           ),
           gap(16),
 
-          heading('STORAGE BREAKDOWN'),
+          heading('DATA BREAKDOWN'),
           Panel(
             child: Column(
               children: [
                 _storageItem(
+                  Icons.people_outline,
+                  'Leads Data',
+                  _storageSize(breakdown['leadsMb'] as num),
+                  '${store.leads.length} records',
+                ),
+                const Divider(),
+                _storageItem(
+                  Icons.business_outlined,
+                  'Customer Profiles',
+                  _storageSize(breakdown['customersMb'] as num),
+                  '${store.customers.length} records',
+                ),
+                const Divider(),
+                _storageItem(
+                  Icons.history,
+                  'Visit Logs',
+                  _storageSize(breakdown['visitsMb'] as num),
+                  '${store.visits.length} records',
+                ),
+                const Divider(),
+                _storageItem(
                   Icons.photo_library_outlined,
-                  'Captured Photos',
-                  '${(breakdown['photosMb'] as num).toStringAsFixed(1)} MB',
-                  '${breakdown['photosCount']} files',
+                  'Photos & Media',
+                  _storageSize(breakdown['photosMb'] as num),
+                  '${store.photos.length} files',
                 ),
                 const Divider(),
                 _storageItem(
                   Icons.mic_none,
-                  'Voice Memos',
-                  '${(breakdown['audioMb'] as num).toStringAsFixed(1)} MB',
-                  '${breakdown['audioCount']} files',
-                ),
-                const Divider(),
-                _storageItem(
-                  Icons.people_outline,
-                  'Accounts & Leads',
-                  '${(breakdown['accountsMb'] as num).toStringAsFixed(1)} MB',
-                  '${breakdown['accountsCount']} records',
-                ),
-                const Divider(),
-                _storageItem(
-                  Icons.storage_outlined,
-                  'Local Database & Cache',
-                  '${(breakdown['dbMb'] as num).toStringAsFixed(1)} MB',
-                  'Indexed data',
+                  'Voice Notes',
+                  _storageSize(breakdown['audioMb'] as num),
+                  '${store.voiceNotes.length} files',
                 ),
               ],
             ),
@@ -2246,18 +2021,37 @@ class _OfflineDataScreenState extends State<OfflineDataScreen> {
           gap(20),
 
           button(
-            isSyncing ? 'Synchronizing...' : 'Sync Now with Server',
+            isSyncing ? 'Synchronizing...' : 'Sync Now',
             isSyncing ? () {} : _triggerSync,
           ),
-          button(
-            'Clear Data Older Than 30 Days',
-            _confirmCleanup,
-            secondary: true,
+          button('Clear Old Data (>30 days)', _confirmCleanup, secondary: true),
+          gap(12),
+          button('Download All for Offline', () async {
+            try {
+              final result = await store.downloadAllForOffline();
+              if (c.mounted)
+                message(
+                  c,
+                  result == null
+                      ? 'Download failed'
+                      : 'Offline backup downloaded. Reference media remains bundled with the app.',
+                );
+            } catch (e) {
+              if (c.mounted) message(c, 'Download failed: $e');
+            }
+          }, secondary: true),
+          gap(16),
+          muted(
+            'Sizes reflect serialized local records and attached files. Bundled sample media is excluded. Clearing data cannot be undone. Remote backup is unavailable until server sync is connected.',
           ),
         ],
       );
     },
   );
+
+  String _storageSize(num mb) => mb < 1
+      ? '${(mb * 1024).toStringAsFixed(1)} KB'
+      : '${mb.toStringAsFixed(1)} MB';
 
   Widget _storageItem(IconData icon, String title, String size, String count) {
     return Row(

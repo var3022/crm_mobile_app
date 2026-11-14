@@ -1,7 +1,10 @@
+import 'dart:convert';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_bottom_navigation.dart';
+import '../../core/widgets/app_back_button.dart';
 export '../../core/theme/app_colors.dart';
 export '../../core/widgets/app_button.dart';
 
@@ -36,10 +39,26 @@ class CrmPage extends StatelessWidget {
     appBar: AppBar(
       title: Text(
         title,
-        style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800),
+        style: TextStyle(
+          fontSize:
+              [
+                'Leads',
+                'Customers',
+                'My Tasks',
+                'Profile',
+                'Settings',
+              ].contains(title)
+              ? 26
+              : 19,
+          fontWeight: FontWeight.w800,
+        ),
       ),
       centerTitle: nav == null,
-      leading: leading,
+      leading:
+          leading ??
+          (Navigator.canPop(context)
+              ? const Center(child: AppBackButton())
+              : null),
       actions: actions,
     ),
     body: ListView(
@@ -68,11 +87,13 @@ class Panel extends StatelessWidget {
     this.color = AppColors.surfaceSecondary,
     this.onTap,
     this.border = true,
+    this.inset = 16,
   });
   final Widget child;
   final Color color;
   final VoidCallback? onTap;
   final bool border;
+  final double inset;
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
@@ -83,7 +104,7 @@ class Panel extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(inset),
           decoration: BoxDecoration(
             border: border ? Border.all(color: AppColors.border) : null,
             borderRadius: BorderRadius.circular(12),
@@ -290,12 +311,19 @@ class FormFieldSpec {
     this.required = false,
     this.options,
     this.lines = 1,
+    this.section,
+    this.pair,
+    this.helper,
+    this.caption,
+    this.onAction,
     String kind = 'text',
     String? type,
   }) : value = initial ?? value,
        kind = type ?? kind;
 
   final String label, value, kind;
+  final String? section, pair, helper, caption;
+  final Future<String?> Function(BuildContext)? onAction;
   final bool required;
   final List<String>? options;
   final int lines;
@@ -308,8 +336,12 @@ class CrmForm extends StatefulWidget {
     required this.fields,
     required this.submit,
     required this.onSave,
+    this.alternateSubmit,
+    this.onDelete,
   });
   final String title, submit;
+  final String? alternateSubmit;
+  final Future<void> Function(BuildContext)? onDelete;
   final List<FormFieldSpec> fields;
   final Future<void> Function(BuildContext, Map<String, String>) onSave;
   @override
@@ -331,14 +363,14 @@ class _CrmFormState extends State<CrmForm> {
     super.dispose();
   }
 
-  Future<void> save() async {
+  Future<void> save({bool alternate = false}) async {
     if (!key.currentState!.validate() || saving) return;
     setState(() => saving = true);
     try {
-      await widget.onSave(
-        context,
-        controllers.map((k, v) => MapEntry(k, v.text.trim())),
-      );
+      await widget.onSave(context, {
+        ...controllers.map((k, v) => MapEntry(k, v.text.trim())),
+        '_scheduleVisit': '$alternate',
+      });
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -353,12 +385,295 @@ class _CrmFormState extends State<CrmForm> {
     }
   }
 
+  Future<void> pickDate(FormFieldSpec f) async {
+    final existing =
+        DateTime.tryParse(controllers[f.label]!.text) ?? DateTime.now();
+    final date = await showDatePicker(
+      context: context,
+      initialDate: existing,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2036),
+    );
+    if (date == null || !mounted) return;
+    var result = date;
+    if (f.kind == 'datetime') {
+      final time = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(existing),
+      );
+      if (time == null || !mounted) return;
+      result = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
+    }
+    setState(
+      () => controllers[f.label]!.text = f.kind == 'datetime'
+          ? result.toIso8601String()
+          : result.toIso8601String().split('T').first,
+    );
+  }
+
+  Future<void> attach(FormFieldSpec f) async {
+    try {
+      final files = await openFiles();
+      final stored = controllers[f.label]!.text.isEmpty
+          ? <dynamic>[]
+          : jsonDecode(controllers[f.label]!.text) as List;
+      for (final file in files) {
+        final bytes = await file.readAsBytes();
+        if (bytes.length > 10 * 1024 * 1024) {
+          if (mounted)
+            message(context, '${file.name}: maximum file size is 10 MB');
+          continue;
+        }
+        stored.add({
+          'name': file.name,
+          'bytes': base64Encode(bytes),
+          'mime': file.mimeType ?? 'application/octet-stream',
+        });
+      }
+      if (mounted)
+        setState(() => controllers[f.label]!.text = jsonEncode(stored));
+    } catch (e) {
+      if (mounted) message(context, 'Unable to attach file: $e');
+    }
+  }
+
+  Widget field(FormFieldSpec f) {
+    final controller = controllers[f.label]!;
+    Widget control;
+    if (f.kind == 'action') {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: OutlinedButton.icon(
+          onPressed: () async {
+            final result = await f.onAction?.call(context);
+            if (result != null && mounted) {
+              setState(() => controller.text = result);
+              message(context, '${f.label}: $result');
+            }
+          },
+          icon: const Icon(Icons.add_circle_outline),
+          label: Text(f.label),
+        ),
+      );
+    } else if (f.kind == 'toggle') {
+      return SwitchListTile.adaptive(
+        contentPadding: EdgeInsets.zero,
+        title: Text(f.label, style: const TextStyle(fontSize: 14)),
+        subtitle: f.helper == null
+            ? null
+            : Text(f.helper!, style: const TextStyle(fontSize: 11)),
+        value: controller.text == 'true',
+        onChanged: (v) => setState(() => controller.text = '$v'),
+      );
+    } else if (f.kind == 'attachments') {
+      final files = controller.text.isEmpty
+          ? <dynamic>[]
+          : jsonDecode(controller.text) as List;
+      control = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          OutlinedButton.icon(
+            onPressed: () => attach(f),
+            icon: const Icon(Icons.attach_file),
+            label: const Text('Add File'),
+          ),
+          for (var i = 0; i < files.length; i++)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.insert_drive_file_outlined),
+              title: Text(
+                files[i]['name'] as String,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: IconButton(
+                tooltip: 'Remove attachment',
+                icon: const Icon(Icons.close),
+                onPressed: () => setState(() {
+                  files.removeAt(i);
+                  controller.text = jsonEncode(files);
+                }),
+              ),
+            ),
+        ],
+      );
+    } else if (f.kind == 'chips') {
+      control = Wrap(
+        spacing: 6,
+        runSpacing: 4,
+        children: [
+          for (final v in f.options!)
+            ChoiceChip(
+              label: Text(
+                v,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: controller.text == v
+                      ? Colors.white
+                      : AppColors.primary,
+                ),
+              ),
+              showCheckmark: false,
+              selectedColor: AppColors.primary,
+              selected: controller.text == v,
+              onSelected: (_) => setState(() => controller.text = v),
+            ),
+        ],
+      );
+    } else if (f.kind == 'slider') {
+      final value = (double.tryParse(controller.text) ?? 50).clamp(0.0, 100.0);
+      control = Column(
+        children: [
+          Slider(
+            value: value,
+            max: 100,
+            divisions: 100,
+            label: '${value.round()}%',
+            onChanged: (v) => setState(() => controller.text = '${v.round()}'),
+          ),
+          Text('${value.round()}%'),
+        ],
+      );
+    } else if (f.kind == 'date' || f.kind == 'datetime') {
+      final date = DateTime.tryParse(controller.text);
+      final formatted = date == null
+          ? 'Select ${f.kind == 'datetime' ? 'date & time' : 'date'}'
+          : '${MaterialLocalizations.of(context).formatMediumDate(date)}${f.kind == 'datetime' ? ' · ${TimeOfDay.fromDateTime(date).format(context)}' : ''}';
+      control = FormField<String>(
+        initialValue: controller.text,
+        validator: (_) => f.required && controller.text.isEmpty
+            ? '${f.label} is required'
+            : null,
+        builder: (state) => InkWell(
+          onTap: () => pickDate(f),
+          child: InputDecorator(
+            decoration: InputDecoration(
+              errorText: state.errorText,
+              suffixIcon: const Icon(Icons.calendar_today, size: 18),
+            ),
+            child: Text(formatted, style: const TextStyle(fontSize: 13)),
+          ),
+        ),
+      );
+    } else if (f.options != null) {
+      control = DropdownButtonFormField<String>(
+        initialValue: f.options!.contains(controller.text)
+            ? controller.text
+            : null,
+        isExpanded: true,
+        hint: Text('Select ${f.label.toLowerCase()}'),
+        items: f.options!
+            .toSet()
+            .map(
+              (v) => DropdownMenuItem(
+                value: v,
+                child: Text(v, overflow: TextOverflow.ellipsis),
+              ),
+            )
+            .toList(),
+        onChanged: (v) => controller.text = v ?? '',
+        validator: (v) => f.required && (v == null || v.isEmpty)
+            ? 'Please select ${f.label.toLowerCase()}'
+            : null,
+      );
+    } else {
+      control = TextFormField(
+        controller: controller,
+        maxLines: f.kind == 'password' ? 1 : f.lines,
+        obscureText: f.kind == 'password',
+        readOnly: ['date', 'datetime', 'readonly'].contains(f.kind),
+        keyboardType: f.kind == 'number'
+            ? TextInputType.number
+            : f.kind == 'email'
+            ? TextInputType.emailAddress
+            : TextInputType.text,
+        decoration: InputDecoration(
+          hintText: 'Enter ${f.label.toLowerCase()}',
+          suffixIcon: ['date', 'datetime'].contains(f.kind)
+              ? const Icon(Icons.calendar_today, size: 18)
+              : null,
+        ),
+        onTap: ['date', 'datetime'].contains(f.kind) ? () => pickDate(f) : null,
+        validator: (v) {
+          final value = v?.trim() ?? '';
+          if (f.required && value.isEmpty) return '${f.label} is required';
+          if (value.isNotEmpty &&
+              f.kind == 'email' &&
+              !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value))
+            return 'Enter a valid email address';
+          if (f.kind == 'number' &&
+              (double.tryParse(value.replaceAll(',', '')) == null ||
+                  double.parse(value.replaceAll(',', '')) < 0))
+            return 'Enter a valid positive number';
+          return null;
+        },
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${f.caption ?? f.label}${f.required ? ' *' : ''}',
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+          ),
+          gap(8),
+          control,
+          if (f.helper != null) ...[gap(6), muted(f.helper!)],
+        ],
+      ),
+    );
+  }
+
+  List<Widget> formFields() {
+    final result = <Widget>[];
+    for (var i = 0; i < widget.fields.length; i++) {
+      final f = widget.fields[i];
+      if (f.section != null)
+        result.add(
+          Padding(
+            padding: const EdgeInsets.only(top: 8, bottom: 16),
+            child: heading(f.section!),
+          ),
+        );
+      if (f.pair != null &&
+          i + 1 < widget.fields.length &&
+          widget.fields[i + 1].pair == f.pair) {
+        result.add(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: field(f)),
+              const SizedBox(width: 12),
+              Expanded(child: field(widget.fields[++i])),
+            ],
+          ),
+        );
+      } else {
+        result.add(field(f));
+      }
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: Text(widget.title),
+      leading: Navigator.canPop(context)
+          ? const Center(child: AppBackButton())
+          : null,
       actions: [
-        TextButton(onPressed: saving ? null : save, child: const Text('Save')),
+        TextButton(
+          onPressed: saving ? null : () => save(),
+          child: const Text('Save'),
+        ),
       ],
     ),
     body: Form(
@@ -366,86 +681,47 @@ class _CrmFormState extends State<CrmForm> {
       child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          for (final f in widget.fields) ...[
-            Text(
-              '${f.label}${f.required ? ' *' : ''}',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+          ...formFields(),
+          AppButton(
+            label: widget.submit,
+            isLoading: saving,
+            onPressed: () => save(),
+          ),
+          if (widget.alternateSubmit != null) ...[
+            gap(12),
+            OutlinedButton(
+              onPressed: saving ? null : () => save(alternate: true),
+              child: Text(widget.alternateSubmit!),
             ),
-            gap(8),
-            if (f.options != null)
-              DropdownButtonFormField<String>(
-                initialValue: f.options!.contains(controllers[f.label]!.text)
-                    ? controllers[f.label]!.text
-                    : null,
-                isExpanded: true,
-                hint: Text('Select ${f.label.toLowerCase()}'),
-                items: f.options!
-                    .toSet()
-                    .map(
-                      (s) => DropdownMenuItem(
-                        value: s,
-                        child: Text(s, overflow: TextOverflow.ellipsis),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (v) => controllers[f.label]!.text = v ?? '',
-                validator: (v) => f.required && (v == null || v.isEmpty)
-                    ? 'Please select ${f.label.toLowerCase()}'
-                    : null,
-              )
-            else
-              TextFormField(
-                controller: controllers[f.label],
-                maxLines: f.kind == 'password' ? 1 : f.lines,
-                obscureText: f.kind == 'password',
-                readOnly: f.kind == 'date',
-                keyboardType: f.kind == 'number'
-                    ? TextInputType.number
-                    : f.kind == 'email'
-                    ? TextInputType.emailAddress
-                    : TextInputType.text,
-                decoration: InputDecoration(
-                  hintText: 'Enter ${f.label.toLowerCase()}',
-                  suffixIcon: f.kind == 'date'
-                      ? const Icon(Icons.calendar_today, size: 18)
-                      : null,
-                ),
-                onTap: f.kind == 'date'
-                    ? () async {
-                        final date = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now().subtract(
-                            const Duration(days: 365),
-                          ),
-                          lastDate: DateTime.now().add(
-                            const Duration(days: 730),
-                          ),
-                        );
-                        if (date != null)
-                          controllers[f.label]!.text =
-                              '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-                      }
-                    : null,
-                validator: (v) {
-                  final value = v?.trim() ?? '';
-                  if (f.required && value.isEmpty)
-                    return '${f.label} is required';
-                  if (value.isNotEmpty &&
-                      f.kind == 'email' &&
-                      !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value))
-                    return 'Enter a valid email address';
-                  if (f.kind == 'number' &&
-                      (double.tryParse(value.replaceAll(',', '')) == null ||
-                          double.parse(value.replaceAll(',', '')) < 0))
-                    return 'Enter a valid positive number';
-                  return null;
-                },
-              ),
-            gap(20),
           ],
-          AppButton(label: widget.submit, isLoading: saving, onPressed: save),
-          gap(20),
+          if (widget.onDelete != null) ...[
+            gap(12),
+            TextButton(
+              onPressed: saving
+                  ? null
+                  : () async {
+                      if (await confirm(
+                            context,
+                            'Delete ${widget.title.replaceFirst('Edit ', '')}?',
+                            'This cannot be undone.',
+                            action: 'Delete',
+                          ) &&
+                          context.mounted) {
+                        try {
+                          await widget.onDelete!(context);
+                        } catch (e) {
+                          if (context.mounted)
+                            message(context, 'Failed to delete: $e');
+                        }
+                      }
+                    },
+              child: Text(
+                'Delete ${widget.title.replaceFirst('Edit ', '')}',
+                style: const TextStyle(color: AppColors.error),
+              ),
+            ),
+          ],
+          gap(24),
         ],
       ),
     ),

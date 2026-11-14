@@ -1,5 +1,8 @@
 # Remaining design and functionality gaps
 
+> Historical audit. Several findings below have since been addressed. See
+> [PDF_RESTORATION.md](PDF_RESTORATION.md) for the latest restoration and remaining integration limits.
+
 Source-level audit against the user's 105-page `crm mobile application.pdf`,
 November 14, 2026. This is a confirmed implementation-gap checklist, not a claim
 that every pixel of every original screen has been visually verified.

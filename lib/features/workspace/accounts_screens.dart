@@ -1,3 +1,7 @@
+import 'reporting_ui.dart';
+import 'dart:convert';
+import 'crm_storage.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'crm_store.dart';
@@ -798,25 +802,16 @@ class AccountDetailsScreen extends StatelessWidget {
             ),
           ),
           for (final n in notes)
-            Panel(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.push_pin,
-                        size: 14,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(child: muted('Note')),
-                    ],
-                  ),
-                  Text(n, style: const TextStyle(fontSize: 13, height: 1.5)),
-                ],
-              ),
+            AccountNotePanel(
+              note: store.notes
+                  .where(
+                    (record) =>
+                        record.company == account.company && record.body == n,
+                  )
+                  .firstOrNull,
+              body: n,
             ),
+
           gap(20),
 
           if (!customer)
@@ -842,6 +837,73 @@ class AccountDetailsScreen extends StatelessWidget {
       ],
     );
   }
+}
+
+class AccountNotePanel extends StatelessWidget {
+  const AccountNotePanel({super.key, required this.note, required this.body});
+  final CrmNote? note;
+  final String body;
+  @override
+  Widget build(BuildContext c) => Panel(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(child: strong(note?.title ?? 'Note', 13)),
+            if (note?.isPinned == true)
+              const Icon(Icons.push_pin, size: 15, color: AppColors.primary),
+          ],
+        ),
+        if (note != null) ...[gap(4), muted(note!.category)],
+        gap(8),
+        Text(body, style: const TextStyle(fontSize: 13, height: 1.5)),
+        for (final attachment in note?.attachments ?? <String>[])
+          Builder(
+            builder: (c) {
+              Map<String, dynamic>? file;
+              try {
+                file = jsonDecode(attachment) as Map<String, dynamic>;
+              } catch (_) {}
+              if (file == null)
+                return Text(attachment, style: const TextStyle(fontSize: 11));
+              final data = file;
+              return TextButton.icon(
+                icon: const Icon(Icons.download, size: 16),
+                label: Text(
+                  data['name'] as String,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                onPressed: () async {
+                  try {
+                    final result = await CrmStorage.saveExportFile(
+                      filename: data['name'] as String,
+                      bytes: base64Decode(data['bytes'] as String),
+                      mimeType:
+                          data['mime'] as String? ?? 'application/octet-stream',
+                    );
+                    if (c.mounted)
+                      message(
+                        c,
+                        result == null
+                            ? 'Attachment download failed'
+                            : 'Attachment downloaded',
+                      );
+                  } catch (e) {
+                    if (c.mounted)
+                      message(c, 'Unable to download attachment: $e');
+                  }
+                },
+              );
+            },
+          ),
+        if (note?.notifyTeam == true) ...[
+          gap(6),
+          muted('Team notification requested; awaiting server integration'),
+        ],
+      ],
+    ),
+  );
 }
 
 /// Page 34: Duplicate Lead Modal Sheet
@@ -988,14 +1050,24 @@ class DuplicateLeadSheet extends StatelessWidget {
 Widget accountForm(Account? account) => CrmForm(
   title: account == null ? 'New Lead' : 'Edit Lead',
   submit: account == null ? 'Save Lead' : 'Save Changes',
+  alternateSubmit: account == null ? 'Save & Schedule Visit' : null,
+  onDelete: account == null
+      ? null
+      : (c) async {
+          await CrmStore.instance.deleteLead(account.id);
+          if (c.mounted) Navigator.pop(c);
+        },
   fields: [
     FormFieldSpec(
       'First Name',
+      section: 'Contact Person',
+      pair: 'name',
       value: account?.contact.split(' ').first ?? '',
       required: true,
     ),
     FormFieldSpec(
       'Last Name',
+      pair: 'name',
       value: account?.contact.split(' ').skip(1).join(' ') ?? '',
       required: true,
     ),
@@ -1008,12 +1080,14 @@ Widget accountForm(Account? account) => CrmForm(
     ),
     FormFieldSpec(
       'Company Name',
+      section: 'Company Details',
       value: account?.company ?? '',
       required: true,
     ),
     FormFieldSpec('Designation', value: account?.role ?? 'CTO'),
     FormFieldSpec(
       'Industry',
+      pair: 'company',
       value: account?.industry ?? 'Technology',
       options: const [
         'Technology',
@@ -1026,6 +1100,7 @@ Widget accountForm(Account? account) => CrmForm(
     ),
     FormFieldSpec(
       'Company Size',
+      pair: 'company',
       value: account?.companySize ?? '100-500',
       options: const [
         '1-10',
@@ -1037,9 +1112,51 @@ Widget accountForm(Account? account) => CrmForm(
       ],
     ),
     FormFieldSpec(
+      'Use Current GPS',
+      section: 'Location Details',
+      kind: 'action',
+      onAction: (c) async {
+        try {
+          if (!await Geolocator.isLocationServiceEnabled()) {
+            if (c.mounted) message(c, 'Enable location services first.');
+            return null;
+          }
+          var permission = await Geolocator.checkPermission();
+          if (permission == LocationPermission.denied)
+            permission = await Geolocator.requestPermission();
+          if (permission == LocationPermission.denied ||
+              permission == LocationPermission.deniedForever) {
+            if (c.mounted)
+              message(
+                c,
+                'Location permission is required. You can enter an address manually.',
+              );
+            return null;
+          }
+          final position = await Geolocator.getCurrentPosition(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.high,
+              timeLimit: Duration(seconds: 20),
+            ),
+          );
+          return '${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}';
+        } catch (e) {
+          if (c.mounted) message(c, 'Unable to get GPS location: $e');
+          return null;
+        }
+      },
+    ),
+    FormFieldSpec(
+      'Verified Address',
+      value: account?.verifiedAddress ?? '',
+      lines: 2,
+    ),
+    FormFieldSpec(
       'Lead Source',
+      section: 'Lead Logistics',
       value: account?.source ?? 'Referral',
       options: const [
+        'Walk-in',
         'Referral',
         'Website',
         'Cold Call',
@@ -1047,9 +1164,10 @@ Widget accountForm(Account? account) => CrmForm(
         'Trade Show',
       ],
     ),
-    FormFieldSpec('Address', value: account?.area ?? '', lines: 2),
     FormFieldSpec(
       'Lead Priority',
+      caption: 'Set Priority',
+      kind: 'chips',
       value: account?.priority ?? 'High',
       options: const ['Low', 'Medium', 'High'],
     ),
@@ -1065,6 +1183,13 @@ Widget accountForm(Account? account) => CrmForm(
       ],
     ),
     FormFieldSpec('Notes', value: account?.notes ?? '', lines: 3),
+    const FormFieldSpec(
+      'Scan / Add Visiting Card',
+      section: 'Attachments',
+      kind: 'attachments',
+      helper:
+          'Attach a visiting card. Enter contact details manually; OCR is not connected.',
+    ),
   ],
   onSave: (context, v) async {
     final store = CrmStore.instance;
@@ -1101,7 +1226,7 @@ Widget accountForm(Account? account) => CrmForm(
                 phone: phone,
                 email: email,
                 role: v['Designation'] ?? 'CTO',
-                area: v['Address'] ?? '',
+                area: v['Verified Address'] ?? '',
                 notes: v['Notes'] ?? '',
               );
               try {
@@ -1146,7 +1271,10 @@ Widget accountForm(Account? account) => CrmForm(
         a.phone = phone;
         a.email = email;
         a.role = v['Designation'] ?? 'CTO';
-        a.area = v['Address'] ?? '';
+        a.area = v['Verified Address'] ?? '';
+        a.verifiedAddress = v['Use Current GPS']?.isNotEmpty == true
+            ? '${v['Verified Address']} (${v['Use Current GPS']})'
+            : (v['Verified Address'] ?? '');
         a.notes = v['Notes'] ?? '';
         a.source = v['Lead Source'] ?? 'Referral';
         a.priority = v['Lead Priority'] ?? 'High';
@@ -1154,11 +1282,28 @@ Widget accountForm(Account? account) => CrmForm(
         if (v['Industry'] != null) a.industry = v['Industry']!;
         if (v['Company Size'] != null) a.companySize = v['Company Size']!;
         if (account == null) store.leads.add(a);
+        final cardFiles = v['Scan / Add Visiting Card'] ?? '';
+        if (cardFiles.isNotEmpty && cardFiles != '[]')
+          store.notes.add(
+            CrmNote(
+              companyId: a.id,
+              company: a.company,
+              title: 'Visiting Card',
+              content: 'Attached visiting card',
+              attachments: (jsonDecode(cardFiles) as List)
+                  .map((f) => jsonEncode(f))
+                  .toList(),
+            ),
+          );
       });
 
       if (context.mounted) {
         Navigator.pop(context);
-        message(context, 'Lead saved successfully!');
+        if (v['_scheduleVisit'] == 'true') {
+          open(context, '/schedule-visit', a);
+        } else {
+          message(context, 'Lead saved successfully!');
+        }
       }
     } catch (e) {
       if (context.mounted) {
@@ -1297,36 +1442,61 @@ Widget convertForm(Account a) => CrmForm(
 /// Page 44: Add Note Form with Category & Pinning
 Widget noteForm(Account a) => CrmForm(
   title: 'Add Note',
-  submit: 'Save Note',
+  submit: 'Save',
   fields: [
-    FormFieldSpec('Account', value: a.company),
+    FormFieldSpec('Account', value: a.company, kind: 'readonly'),
     const FormFieldSpec(
       'Category',
-      value: 'Meeting',
-      options: ['Meeting', 'Call Summary', 'Pricing', 'Legal', 'General'],
+      kind: 'chips',
+      value: 'General',
+      options: ['General', 'Meeting', 'Call', 'Follow-up', 'Issue'],
     ),
     const FormFieldSpec('Note Title', required: true),
-    const FormFieldSpec('Note', required: true, lines: 5),
+    const FormFieldSpec('Note', required: true, lines: 7),
+    const FormFieldSpec('Attachments', kind: 'attachments'),
+    const FormFieldSpec('Pin this note to top', kind: 'toggle', value: 'false'),
+    const FormFieldSpec(
+      'Notify team members',
+      kind: 'toggle',
+      value: 'false',
+      helper:
+          'Saves the notification request. Team delivery requires server sync.',
+    ),
   ],
   onSave: (c, v) async {
-    try {
-      await CrmStore.instance.addNote(
-        v['Account']!,
-        '${v['Note Title']}\n${v['Note']}',
+    final store = CrmStore.instance;
+    await store.update(() {
+      store.notes.insert(
+        0,
+        CrmNote(
+          companyId: a.id,
+          company: a.company,
+          title: v['Note Title']!,
+          content: v['Note']!,
+          category: v['Category']!,
+          isPinned: v['Pin this note to top'] == 'true',
+          notifyTeam: v['Notify team members'] == 'true',
+          attachments: v['Attachments']!.isEmpty
+              ? []
+              : (jsonDecode(v['Attachments']!) as List)
+                    .map((f) => jsonEncode(f))
+                    .toList(),
+        ),
       );
-      if (c.mounted) {
-        Navigator.pop(c);
-        message(c, 'Note saved');
-      }
-    } catch (e) {
-      if (c.mounted) {
-        ScaffoldMessenger.of(c).showSnackBar(
-          SnackBar(
-            content: Text('Failed to save note: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
+      store.activities.insert(
+        0,
+        CrmActivity(
+          companyId: a.id,
+          company: a.company,
+          type: 'Note',
+          title: 'Note Added',
+          description: v['Note Title']!,
+        ),
+      );
+    });
+    if (c.mounted) {
+      Navigator.pop(c);
+      message(c, 'Note saved');
     }
   },
 );
@@ -1496,19 +1666,32 @@ class _LeadFiltersScreenState extends State<LeadFiltersScreen> {
   String stage = 'All';
   String priority = 'All';
   String source = 'All';
-  String assignedTo = 'All';
+  String assignedTo = 'All', dateAdded = 'All';
+  DateTime? addedStart, addedEnd;
   RangeValues valueRange = const RangeValues(10, 250); // $10k to $250k
 
   @override
   Widget build(BuildContext c) {
     final leads = CrmStore.instance.leads.where((a) {
       final matchStage = stage == 'All' || a.stage == stage;
-      final matchPriority = priority == 'All' || a.priority == priority;
+      final matchPriority =
+          priority == 'All' ||
+          a.priority ==
+              {'Hot': 'High', 'Warm': 'Medium', 'Cold': 'Low'}[priority];
       final matchSource = source == 'All' || a.source == source;
       final matchValue =
           (a.accountValue / 1000) >= valueRange.start &&
           (a.accountValue / 1000) <= valueRange.end;
-      return matchStage && matchPriority && matchSource && matchValue;
+      return matchStage &&
+          matchPriority &&
+          matchSource &&
+          matchValue &&
+          (assignedTo == 'All' || a.owner == assignedTo) &&
+          (addedStart == null ||
+              (!a.createdAt.isBefore(addedStart!) &&
+                  a.createdAt.isBefore(
+                    addedEnd!.add(const Duration(days: 1)),
+                  )));
     }).toList();
 
     return CrmPage(
@@ -1520,6 +1703,9 @@ class _LeadFiltersScreenState extends State<LeadFiltersScreen> {
             priority = 'All';
             source = 'All';
             assignedTo = 'All';
+            dateAdded = 'All';
+            addedStart = null;
+            addedEnd = null;
             valueRange = const RangeValues(10, 250);
           }),
           child: const Text('Reset All'),
@@ -1543,7 +1729,7 @@ class _LeadFiltersScreenState extends State<LeadFiltersScreen> {
 
         heading('Priority'),
         chips(
-          const ['All', 'High', 'Medium', 'Low'],
+          const ['All', 'Hot', 'Warm', 'Cold'],
           priority,
           (v) => setState(() => priority = v),
         ),
@@ -1564,6 +1750,46 @@ class _LeadFiltersScreenState extends State<LeadFiltersScreen> {
         ),
         gap(10),
 
+        heading('Date Added'),
+        chips(
+          const ['All', 'Today', 'This Week', 'This Month', 'Custom Range'],
+          dateAdded,
+          (v) async {
+            if (v == 'Custom Range') {
+              final range = await showDateRangePicker(
+                context: c,
+                firstDate: DateTime(2020),
+                lastDate: DateTime(2036),
+              );
+              if (range != null)
+                setState(() {
+                  dateAdded = v;
+                  addedStart = range.start;
+                  addedEnd = range.end;
+                });
+            } else {
+              setState(() {
+                dateAdded = v;
+                if (v == 'All') {
+                  addedStart = null;
+                  addedEnd = null;
+                } else {
+                  final r = reportPreset(v);
+                  addedStart = r.start;
+                  addedEnd = r.end;
+                }
+              });
+            }
+          },
+        ),
+        gap(14),
+        heading('Assigned To'),
+        chips(
+          ['All', ...CrmStore.instance.leads.map((a) => a.owner).toSet()],
+          assignedTo,
+          (v) => setState(() => assignedTo = v),
+        ),
+        gap(14),
         heading('Estimated Value (\$K)'),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1597,6 +1823,9 @@ class _LeadFiltersScreenState extends State<LeadFiltersScreen> {
             c,
             MaterialPageRoute(
               builder: (_) => FilteredLeadsScreen(
+                assignedTo: assignedTo,
+                addedStart: addedStart,
+                addedEnd: addedEnd,
                 stage: stage,
                 priority: priority,
                 source: source,
@@ -1620,19 +1849,36 @@ class FilteredLeadsScreen extends StatelessWidget {
     required this.priority,
     required this.source,
     required this.range,
+    this.assignedTo = 'All',
+    this.addedStart,
+    this.addedEnd,
   });
   final String stage, priority, source;
   final RangeValues range;
+  final String assignedTo;
+  final DateTime? addedStart, addedEnd;
 
   @override
   Widget build(BuildContext c) {
     final items = CrmStore.instance.leads.where((a) {
       final matchStage = stage == 'All' || a.stage == stage;
-      final matchPriority = priority == 'All' || a.priority == priority;
+      final matchPriority =
+          priority == 'All' ||
+          a.priority ==
+              {'Hot': 'High', 'Warm': 'Medium', 'Cold': 'Low'}[priority];
       final matchSource = source == 'All' || a.source == source;
       final matchValue =
           a.accountValue >= range.start && a.accountValue <= range.end;
-      return matchStage && matchPriority && matchSource && matchValue;
+      return matchStage &&
+          matchPriority &&
+          matchSource &&
+          matchValue &&
+          (assignedTo == 'All' || a.owner == assignedTo) &&
+          (addedStart == null ||
+              (!a.createdAt.isBefore(addedStart!) &&
+                  a.createdAt.isBefore(
+                    addedEnd!.add(const Duration(days: 1)),
+                  )));
     }).toList();
 
     return CrmPage(

@@ -16,6 +16,9 @@ dependencies:
   archive: ^3.6.1
   url_launcher: ^6.3.3
   path_provider: ^2.1.6
+  file_selector: ^1.1.0
+  web: ^1.1.2
+  geolocator: ^14.1.2
 
 dev_dependencies:
   flutter_test:

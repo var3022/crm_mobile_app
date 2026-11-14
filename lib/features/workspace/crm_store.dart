@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'crm_models.dart';
@@ -102,11 +103,18 @@ class CrmStore extends ChangeNotifier {
 
   List<String> notesFor(String company) {
     final direct = accountNotes[company] ?? [];
-    final fromNotes = _notes
+    final matching = _notes
         .where((n) => n.company.toLowerCase() == company.toLowerCase())
-        .map((n) => n.body)
         .toList();
-    final combined = <String>{...direct, ...fromNotes}.toList();
+    matching.sort(
+      (a, b) => a.isPinned == b.isPinned
+          ? b.timestamp.compareTo(a.timestamp)
+          : (a.isPinned ? -1 : 1),
+    );
+    final combined = <String>{
+      ...matching.map((n) => n.body),
+      ...direct,
+    }.toList();
     return combined;
   }
 
@@ -597,33 +605,64 @@ class CrmStore extends ChangeNotifier {
   }
 
   // Storage breakdown & offline cleanup
+  Map<String, dynamic> offlineSnapshot() => {
+    'schemaVersion': CrmStorage.currentSchemaVersion,
+    'storageOrigin': 'crm_pro_local',
+    'savedAt': DateTime.now().toIso8601String(),
+    'leads': leads.map((v) => v.toJson()).toList(),
+    'customers': customers.map((v) => v.toJson()).toList(),
+    'visits': visits.map((v) => v.toJson()).toList(),
+    'deals': deals.map((v) => v.toJson()).toList(),
+    'tasks': tasks.map((v) => v.toJson()).toList(),
+    'notes': notes.map((v) => v.toJson()).toList(),
+    'photos': photos.map((v) => v.toJson()).toList(),
+    'voiceNotes': voiceNotes.map((v) => v.toJson()).toList(),
+    'activities': activities.map((v) => v.toJson()).toList(),
+    'profile': userProfile.toJson(),
+    'settings': appSettings.toJson(),
+    'recentSearches': recentSearches,
+    'accountNotes': accountNotes,
+    'activeVisitId': activeVisitId,
+    'activeVisitStart': activeVisitStart?.toIso8601String(),
+  };
+
   Map<String, dynamic> calculateStorageBreakdown() {
-    final accCount = _leads.length + _customers.length;
-    final dealCount = _deals.length;
-    final visCount = _visits.length;
-    final photoCount = _photos.length;
-    final audioCount = _voiceNotes.length;
-
-    // Approximate size in MB
-    final accSize = accCount * 0.004;
-    final photoSize = photoCount * 1.85;
-    final audioSize = audioCount * 1.2;
-    final dbSize =
-        (dealCount + visCount + _tasks.length + _notes.length) * 0.002;
-    final total = accSize + photoSize + audioSize + dbSize;
-
+    double size(dynamic data) =>
+        utf8.encode(jsonEncode(data)).length / (1024 * 1024);
+    final snapshot = offlineSnapshot();
+    final leadsMb = size(snapshot['leads']),
+        customersMb = size(snapshot['customers']);
+    final visitsMb = size(snapshot['visits']),
+        photosMb = size(snapshot['photos']),
+        audioMb = size(snapshot['voiceNotes']);
     return {
-      'totalMb': total > 0 ? total : 48.6,
-      'accountsMb': accSize > 0 ? accSize : 3.4,
-      'photosMb': photoSize > 0 ? photoSize : 32.1,
-      'audioMb': audioSize > 0 ? audioSize : 11.2,
-      'dbMb': dbSize > 0 ? dbSize : 1.9,
-      'accountsCount': accCount,
-      'photosCount': photoCount,
-      'audioCount': audioCount,
-      'visitsCount': visCount,
-      'storageLimitMb': 512.0,
+      'totalMb': size(snapshot),
+      'leadsMb': leadsMb,
+      'customersMb': customersMb,
+      'visitsMb': visitsMb,
+      'accountsMb': leadsMb + customersMb,
+      'photosMb': photosMb,
+      'audioMb': audioMb,
+      'dbMb':
+          size(snapshot['deals']) +
+          size(snapshot['tasks']) +
+          size(snapshot['notes']),
+      'accountsCount': leads.length + customers.length,
+      'photosCount': photos.length,
+      'audioCount': voiceNotes.length,
+      'visitsCount': visits.length,
+      'storageLimitMb': 500.0,
     };
+  }
+
+  Future<String?> downloadAllForOffline() async {
+    await ensureHydrated();
+    await update(() {});
+    return CrmStorage.saveExportFile(
+      filename: 'CRM_Offline_Backup.json',
+      bytes: utf8.encode(jsonEncode(offlineSnapshot())),
+      mimeType: 'application/json',
+    );
   }
 
   Future<void> clearOldData({int olderThanDays = 30}) async {

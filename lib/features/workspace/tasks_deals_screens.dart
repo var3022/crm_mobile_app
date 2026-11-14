@@ -154,23 +154,26 @@ String dateText(DateTime date) =>
 Widget taskForm(CrmTask? task) => CrmForm(
   title: task == null ? 'New Task' : 'Edit Task',
   submit: task == null ? 'Create Task' : 'Save Changes',
+  onDelete: task == null
+      ? null
+      : (c) async {
+          await CrmStore.instance.deleteTask(task.id);
+          if (c.mounted) Navigator.pop(c);
+        },
   fields: [
     FormFieldSpec('Task Title', value: task?.title ?? '', required: true),
     FormFieldSpec('Description', value: task?.description ?? '', lines: 3),
     FormFieldSpec(
-      'Due Date',
-      value: task == null
-          ? DateTime.now()
-                .add(const Duration(hours: 4))
-                .toIso8601String()
-                .split('T')
-                .first
-          : '${task.due.year}-${task.due.month.toString().padLeft(2, '0')}-${task.due.day.toString().padLeft(2, '0')}',
-      kind: 'date',
+      'Due Date & Time',
+      value: (task?.due ?? DateTime.now().add(const Duration(hours: 4)))
+          .toIso8601String(),
+      kind: 'datetime',
       required: true,
     ),
     FormFieldSpec(
       'Priority',
+      caption: 'Set Priority',
+      kind: 'chips',
       value: task?.priority ?? 'High',
       options: const ['Low', 'Medium', 'High'],
     ),
@@ -206,6 +209,24 @@ Widget taskForm(CrmTask? task) => CrmForm(
         'Contract NDA',
       ],
     ),
+    FormFieldSpec(
+      'Related Deal',
+      value: task?.dealTitle ?? 'None',
+      options: ['None', ...CrmStore.instance.deals.map((d) => d.title)],
+    ),
+    if (task != null)
+      FormFieldSpec(
+        'Status',
+        value: task.status,
+        options: const ['In Progress', 'Pending', 'Completed', 'Cancelled'],
+      ),
+    FormFieldSpec(
+      'Set Reminder',
+      kind: 'toggle',
+      value: '${task?.reminderEnabled ?? true}',
+      helper:
+          'Send alert 15 mins before due. Saved preference; OS delivery requires notifications integration.',
+    ),
   ],
   onSave: (c, v) async {
     try {
@@ -217,7 +238,18 @@ Widget taskForm(CrmTask? task) => CrmForm(
         t.priority = v['Priority']!;
         t.assignee = v['Assign To']!;
         t.type = v['Task Type']!;
-        t.due = DateTime.parse(v['Due Date']!);
+        t.reminderEnabled = v['Set Reminder'] == 'true';
+        t.reminderMinutesBefore = 15;
+        t.dealTitle = v['Related Deal'] == 'None' ? '' : v['Related Deal']!;
+        t.dealId =
+            CrmStore.instance.deals
+                .where((d) => d.title == t.dealTitle)
+                .firstOrNull
+                ?.id ??
+            '';
+        t.status = v['Status'] ?? t.status;
+        t.completed = t.status == 'Completed';
+        t.due = DateTime.parse(v['Due Date & Time']!);
         t.overdue = t.due.isBefore(DateUtils.dateOnly(DateTime.now()));
         if (task == null) CrmStore.instance.tasks.add(t);
       });
@@ -592,21 +624,21 @@ class _PipelineScreenState extends State<PipelineScreen> {
                 children: [
                   for (final stage in [
                     'Qualified',
-                    'Discovery',
                     'Proposal',
+                    'Discovery',
                     'Negotiation',
                     'Won',
                     'Lost',
                   ])
                     SizedBox(
-                      width: 250,
+                      width: (MediaQuery.sizeOf(context).width - 40) / 2,
                       child: Padding(
                         padding: const EdgeInsets.only(right: 12),
                         child: DragTarget<Deal>(
                           onAcceptWithDetails: (details) => CrmStore.instance
                               .update(() => details.data.stage = stage),
                           builder: (context, candidates, rejected) => Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
                               color: candidates.isEmpty
                                   ? AppColors.surfaceSecondary
@@ -623,6 +655,10 @@ class _PipelineScreenState extends State<PipelineScreen> {
                                       '${deals.where((d) => d.stage == stage).length}',
                                     ),
                                   ],
+                                ),
+                                gap(6),
+                                muted(
+                                  '\$${(deals.where((d) => d.stage == stage).fold<double>(0, (sum, d) => sum + d.value) / 1000).toStringAsFixed(0)}K',
                                 ),
                                 gap(12),
                                 Expanded(
@@ -664,6 +700,7 @@ class _PipelineScreenState extends State<PipelineScreen> {
   );
 
   Widget dealCard(BuildContext context, Deal deal) => Panel(
+    inset: 10,
     color: Colors.white,
     onTap: () => open(context, '/deal-details', deal),
     child: Column(
@@ -673,9 +710,11 @@ class _PipelineScreenState extends State<PipelineScreen> {
         gap(4),
         muted(deal.company),
         gap(10),
-        Row(
+        Wrap(
+          spacing: 8,
+          runSpacing: 6,
           children: [
-            Expanded(child: strong('\$${deal.value.toStringAsFixed(0)}', 15)),
+            strong('\$${(deal.value / 1000).toStringAsFixed(0)}K', 15),
             Text(
               '${deal.probability}% win',
               style: const TextStyle(
@@ -697,6 +736,7 @@ class _PipelineScreenState extends State<PipelineScreen> {
 Widget dealForm(Deal? deal, [Account? account]) => CrmForm(
   title: deal == null ? 'New Deal' : 'Update Deal',
   submit: deal == null ? 'Create Deal' : 'Save Changes',
+  alternateSubmit: deal == null ? 'Create & Schedule Visit' : null,
   fields: [
     FormFieldSpec('Deal Name', value: deal?.title ?? '', required: true),
     FormFieldSpec(
@@ -712,7 +752,7 @@ Widget dealForm(Deal? deal, [Account? account]) => CrmForm(
     ),
     FormFieldSpec('Contact Person', value: account?.contact ?? 'John Doe'),
     FormFieldSpec(
-      'Deal Value (\$)',
+      'Deal Value (₹)',
       value: deal?.value.toStringAsFixed(0) ?? '75000',
       required: true,
       kind: 'number',
@@ -731,6 +771,7 @@ Widget dealForm(Deal? deal, [Account? account]) => CrmForm(
     ),
     FormFieldSpec(
       'Deal Stage',
+      kind: 'chips',
       value: deal?.stage ?? 'Qualified',
       options: const [
         'Qualified',
@@ -744,7 +785,7 @@ Widget dealForm(Deal? deal, [Account? account]) => CrmForm(
     FormFieldSpec(
       'Win Probability (%)',
       value: deal?.probability ?? '75',
-      kind: 'number',
+      kind: 'slider',
     ),
     FormFieldSpec('Products / Services', value: deal?.products ?? '', lines: 2),
     FormFieldSpec(
@@ -757,6 +798,17 @@ Widget dealForm(Deal? deal, [Account? account]) => CrmForm(
         'Contract Sign',
       ],
     ),
+    if (deal != null)
+      const FormFieldSpec(
+        'Quick Reason Chips',
+        kind: 'chips',
+        options: [
+          'Demo went well',
+          'Budget approved',
+          'Needs compliance',
+          'Decision maker aligned',
+        ],
+      ),
     FormFieldSpec('Notes', value: deal?.notes ?? '', lines: 3),
   ],
   onSave: (c, v) async {
@@ -768,19 +820,31 @@ Widget dealForm(Deal? deal, [Account? account]) => CrmForm(
         d.title = v['Deal Name']!;
         d.company = v['Associated Lead / Customer']!;
         d.value = double.parse(
-          v['Deal Value (\$)']!.replaceAll(RegExp(r'[^0-9.]'), ''),
+          v['Deal Value (₹)']!.replaceAll(RegExp(r'[^0-9.]'), ''),
         );
         d.stage = v['Deal Stage']!;
         d.closeDate = DateTime.parse(v['Expected Close Date']!);
         d.probability = v['Win Probability (%)']!;
         d.products = v['Products / Services']!;
         d.nextAction = v['Next Action'] ?? 'Send Proposal';
-        d.notes = v['Notes']!;
+        d.notes = [
+          v['Notes']!,
+          if ((v['Quick Reason Chips'] ?? '').isNotEmpty)
+            v['Quick Reason Chips']!,
+        ].join('\n');
         if (deal == null) CrmStore.instance.deals.add(d);
       });
       if (c.mounted) {
         Navigator.pop(c);
-        if (d.stage == 'Won' || d.stage == 'Lost') {
+        if (v['_scheduleVisit'] == 'true') {
+          open(
+            c,
+            '/schedule-visit',
+            CrmStore.instance.leads
+                .where((a) => a.company == d.company)
+                .firstOrNull,
+          );
+        } else if (d.stage == 'Won' || d.stage == 'Lost') {
           open(c, d.stage == 'Won' ? '/deal-won' : '/deal-lost', d);
         } else {
           message(c, 'Deal saved');

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io' show Directory, File, Platform;
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -646,6 +645,7 @@ class CrmStorage {
 
   /// Generates genuine ISO 32000-1 / PDF 1.4 binary file bytes with complete multi-page pagination.
   Uint8List generatePdfBytes({
+    List<String> additionalLines = const [],
     String period = 'Current Month',
     int visitsGoalMet = 0,
     int visitsGoalTotal = 0,
@@ -811,6 +811,19 @@ class CrmStorage {
       }
     }
 
+    if (additionalLines.isNotEmpty) {
+      for (final line in ['TEAM BREAKDOWN', ...additionalLines]) {
+        if (y < 80) {
+          pageStreams.add(cs.toString());
+          cs = StringBuffer();
+          y = 740;
+        }
+        cs.writeln(
+          'BT /F1 9 Tf 0.2 0.2 0.2 rg 40 $y Td (${_pdfEscape(line)}) Tj ET',
+        );
+        y -= 15;
+      }
+    }
     pageStreams.add(cs.toString());
 
     // Build PDF objects with byte offsets

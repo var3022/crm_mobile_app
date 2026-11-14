@@ -14,6 +14,26 @@ class AppTheme {
       fontFamily: AppTypography.fontFamily,
       scaffoldBackgroundColor: AppColors.surface,
       primaryColor: AppColors.primary,
+      chipTheme: ChipThemeData(
+        side: const BorderSide(color: AppColors.border),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        backgroundColor: Colors.white,
+        selectedColor: AppColors.primaryLight,
+        labelStyle: const TextStyle(
+          fontFamily: AppTypography.fontFamily,
+          fontSize: 11,
+          color: AppColors.primary,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: AppColors.border),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         onPrimary: Colors.white,
