@@ -73,7 +73,8 @@ class OnboardingWelcomeScreen extends StatefulWidget {
   });
 
   @override
-  State<OnboardingWelcomeScreen> createState() => _OnboardingWelcomeScreenState();
+  State<OnboardingWelcomeScreen> createState() =>
+      _OnboardingWelcomeScreenState();
 }
 
 class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
@@ -175,9 +176,14 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
               // 4. Company & Territory Info Card
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF3F4F6), // Neutral grey card background
+                  color: const Color(
+                    0xFFF3F4F6,
+                  ), // Neutral grey card background
                   borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
                   border: Border.all(
                     color: const Color(0xFFE5E7EB),
@@ -254,7 +260,8 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                   physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.symmetric(vertical: 6),
                   itemCount: widget.steps.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final item = widget.steps[index];
                     final isCompleted = _completedStepIds.contains(item.id);
@@ -263,7 +270,10 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                       onTap: () => _toggleStep(item.id),
                       borderRadius: BorderRadius.circular(10),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 2.0),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8.0,
+                          horizontal: 2.0,
+                        ),
                         child: Row(
                           children: [
                             // Left item icon
@@ -335,7 +345,9 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusButton,
+                        ),
                       ),
                     ),
                     child: Text(

@@ -114,6 +114,17 @@ class CrmProApp extends StatelessWidget {
           Navigator.of(context).pushReplacementNamed("/password-reset-success");
         },
       ),
+      "/reset-link": (context) => ResetPasswordScreen(
+        onBack: () {
+          Navigator.of(context).maybePop();
+        },
+        onSignInTap: () {
+          Navigator.of(context).pushReplacementNamed("/sign-in");
+        },
+        onResetSuccess: (newPassword) {
+          Navigator.of(context).pushReplacementNamed("/password-reset-success");
+        },
+      ),
       "/password-reset-success": (context) => PasswordResetSuccessScreen(
         onBackToSignIn: () {
           Navigator.of(
@@ -184,6 +195,11 @@ class CrmProApp extends StatelessWidget {
         },
       ),
       "/onboarding-welcome": (context) => OnboardingWelcomeScreen(
+        onLetsGo: () {
+          Navigator.of(context).pushNamed("/onboarding-location");
+        },
+      ),
+      "/welcome": (context) => OnboardingWelcomeScreen(
         onLetsGo: () {
           Navigator.of(context).pushNamed("/onboarding-location");
         },
@@ -289,6 +305,14 @@ class CrmProApp extends StatelessWidget {
         );
       },
       "/app-intro-walkthrough": (context) => AppIntroWalkthroughScreen(
+        onFinished: () {
+          Navigator.of(context).pushReplacementNamed("/biometric-login");
+        },
+        onSkip: () {
+          Navigator.of(context).pushReplacementNamed("/biometric-login");
+        },
+      ),
+      "/walkthrough": (context) => AppIntroWalkthroughScreen(
         onFinished: () {
           Navigator.of(context).pushReplacementNamed("/biometric-login");
         },

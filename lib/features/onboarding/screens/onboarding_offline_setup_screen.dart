@@ -64,7 +64,9 @@ class _OnboardingOfflineSetupScreenState
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text("Offline cache ready! South Mumbai territory synced."),
+              content: Text(
+                "Offline cache ready! South Mumbai territory synced.",
+              ),
               backgroundColor: AppColors.primary,
               duration: Duration(seconds: 2),
             ),
@@ -75,7 +77,9 @@ class _OnboardingOfflineSetupScreenState
               if (widget.onDownloadComplete != null) {
                 widget.onDownloadComplete!();
               } else {
-                Navigator.of(context).pushReplacementNamed("/onboarding-complete");
+                Navigator.of(
+                  context,
+                ).pushReplacementNamed("/onboarding-complete");
               }
             }
           });
@@ -237,8 +241,8 @@ class _OnboardingOfflineSetupScreenState
                         _isCompleted
                             ? "Download complete"
                             : _isDownloading
-                                ? "Downloading leads..."
-                                : "Downloading leads...",
+                            ? "Downloading leads..."
+                            : "Downloading leads...",
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -433,37 +437,52 @@ class _CloudDownloadIllustrationPainter extends CustomPainter {
 
     // Left lower flank and lobe
     cloudPath.cubicTo(
-      36.0 * scaleX, 66.0 * scaleY,
-      27.0 * scaleX, 61.0 * scaleY,
-      26.0 * scaleX, 51.0 * scaleY,
+      36.0 * scaleX,
+      66.0 * scaleY,
+      27.0 * scaleX,
+      61.0 * scaleY,
+      26.0 * scaleX,
+      51.0 * scaleY,
     );
 
     // Left upper curve
     cloudPath.cubicTo(
-      25.0 * scaleX, 41.0 * scaleY,
-      33.0 * scaleX, 33.0 * scaleY,
-      43.0 * scaleX, 33.0 * scaleY,
+      25.0 * scaleX,
+      41.0 * scaleY,
+      33.0 * scaleX,
+      33.0 * scaleY,
+      43.0 * scaleX,
+      33.0 * scaleY,
     );
 
     // Center apex top dome
     cloudPath.cubicTo(
-      47.0 * scaleX, 22.0 * scaleY,
-      61.0 * scaleX, 22.0 * scaleY,
-      67.0 * scaleX, 32.0 * scaleY,
+      47.0 * scaleX,
+      22.0 * scaleY,
+      61.0 * scaleX,
+      22.0 * scaleY,
+      67.0 * scaleX,
+      32.0 * scaleY,
     );
 
     // Right upper curve and lobe
     cloudPath.cubicTo(
-      77.0 * scaleX, 33.0 * scaleY,
-      83.0 * scaleX, 42.0 * scaleY,
-      82.0 * scaleX, 51.0 * scaleY,
+      77.0 * scaleX,
+      33.0 * scaleY,
+      83.0 * scaleX,
+      42.0 * scaleY,
+      82.0 * scaleX,
+      51.0 * scaleY,
     );
 
     // Right lower flank to bottom right opening
     cloudPath.cubicTo(
-      81.0 * scaleX, 61.0 * scaleY,
-      72.0 * scaleX, 66.0 * scaleY,
-      58.0 * scaleX, 66.0 * scaleY,
+      81.0 * scaleX,
+      61.0 * scaleY,
+      72.0 * scaleX,
+      66.0 * scaleY,
+      58.0 * scaleX,
+      66.0 * scaleY,
     );
 
     canvas.drawPath(cloudPath, strokePaint);

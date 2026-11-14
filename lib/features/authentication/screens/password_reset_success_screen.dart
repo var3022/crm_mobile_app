@@ -18,12 +18,14 @@ class PasswordResetSuccessScreen extends StatefulWidget {
     super.key,
     this.onBackToSignIn,
     this.title = "Password Reset!",
-    this.message = "Your password has been successfully reset. You can now sign in with your new password.",
+    this.message =
+        "Your password has been successfully reset. You can now sign in with your new password.",
     this.buttonText = "Back to Sign In",
   });
 
   @override
-  State<PasswordResetSuccessScreen> createState() => _PasswordResetSuccessScreenState();
+  State<PasswordResetSuccessScreen> createState() =>
+      _PasswordResetSuccessScreenState();
 }
 
 class _PasswordResetSuccessScreenState extends State<PasswordResetSuccessScreen>
@@ -63,10 +65,9 @@ class _PasswordResetSuccessScreenState extends State<PasswordResetSuccessScreen>
     if (widget.onBackToSignIn != null) {
       widget.onBackToSignIn!();
     } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        "/sign-in",
-        (route) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil("/sign-in", (route) => false);
     }
   }
 
@@ -79,11 +80,11 @@ class _PasswordResetSuccessScreenState extends State<PasswordResetSuccessScreen>
           builder: (context, constraints) {
             return SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenHorizontal,
+              ),
               child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: IntrinsicHeight(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -100,7 +101,9 @@ class _PasswordResetSuccessScreenState extends State<PasswordResetSuccessScreen>
                             height: 196,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Color(0xFFD1FADF), // Soft mint outer glow circle
+                              color: Color(
+                                0xFFD1FADF,
+                              ), // Soft mint outer glow circle
                             ),
                             alignment: Alignment.center,
                             child: Container(
@@ -108,7 +111,9 @@ class _PasswordResetSuccessScreenState extends State<PasswordResetSuccessScreen>
                               height: 128,
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Color(0xFF10B981), // Emerald green inner circle
+                                color: Color(
+                                  0xFF10B981,
+                                ), // Emerald green inner circle
                                 boxShadow: [
                                   BoxShadow(
                                     color: Color(0x1A10B981),
@@ -150,7 +155,9 @@ class _PasswordResetSuccessScreenState extends State<PasswordResetSuccessScreen>
                             ),
                             const SizedBox(height: 12),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                              ),
                               child: Text(
                                 widget.message,
                                 textAlign: TextAlign.center,
@@ -216,10 +223,7 @@ class _DoubleCheckPainter extends CustomPainter {
   final Color color;
   final double strokeWidth;
 
-  const _DoubleCheckPainter({
-    required this.color,
-    required this.strokeWidth,
-  });
+  const _DoubleCheckPainter({required this.color, required this.strokeWidth});
 
   @override
   void paint(Canvas canvas, Size size) {

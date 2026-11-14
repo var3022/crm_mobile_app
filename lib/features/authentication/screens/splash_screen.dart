@@ -33,10 +33,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _scaleAnimation = Tween<double>(begin: 0.92, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutBack,
-      ),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
     );
 
     _animationController.forward();
@@ -65,9 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
         children: [
           // Background: Subtle Field Sales Radar / Geometric rings & crosshair grid
           Positioned.fill(
-            child: CustomPaint(
-              painter: const _SplashRadarPainter(),
-            ),
+            child: CustomPaint(painter: const _SplashRadarPainter()),
           ),
 
           // Main Centered Content

@@ -7,17 +7,10 @@ class ScreenLogoutConfirmation extends StatelessWidget {
   final VoidCallback? onSignOut;
   final VoidCallback? onCancel;
 
-  const ScreenLogoutConfirmation({
-    super.key,
-    this.onSignOut,
-    this.onCancel,
-  });
+  const ScreenLogoutConfirmation({super.key, this.onSignOut, this.onCancel});
 
   @override
   Widget build(BuildContext context) {
-    return LogoutConfirmationScreen(
-      onSignOut: onSignOut,
-      onCancel: onCancel,
-    );
+    return LogoutConfirmationScreen(onSignOut: onSignOut, onCancel: onCancel);
   }
 }

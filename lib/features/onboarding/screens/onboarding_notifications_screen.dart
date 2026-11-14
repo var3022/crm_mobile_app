@@ -44,7 +44,9 @@ class _OnboardingNotificationsScreenState
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Notifications enabled! Push channels calibrated for field sales."),
+          content: Text(
+            "Notifications enabled! Push channels calibrated for field sales.",
+          ),
           backgroundColor: AppColors.primary,
           duration: Duration(seconds: 2),
         ),
@@ -257,10 +259,7 @@ class _BenefitItem extends StatelessWidget {
   final String title;
   final String description;
 
-  const _BenefitItem({
-    required this.title,
-    required this.description,
-  });
+  const _BenefitItem({required this.title, required this.description});
 
   @override
   Widget build(BuildContext context) {
@@ -276,11 +275,7 @@ class _BenefitItem extends StatelessWidget {
             color: Color(0xFFD1FADF),
           ),
           alignment: Alignment.center,
-          child: const Icon(
-            Icons.check,
-            size: 14,
-            color: Color(0xFF0F766E),
-          ),
+          child: const Icon(Icons.check, size: 14, color: Color(0xFF0F766E)),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -338,23 +333,32 @@ class _NotificationBellIllustrationPainter extends CustomPainter {
 
     // Arch over top apex to the left shoulder
     bellPath.cubicTo(
-      42.0 * scaleX, 17.0 * scaleY,
-      37.5 * scaleX, 21.0 * scaleY,
-      36.0 * scaleX, 28.0 * scaleY,
+      42.0 * scaleX,
+      17.0 * scaleY,
+      37.5 * scaleX,
+      21.0 * scaleY,
+      36.0 * scaleX,
+      28.0 * scaleY,
     );
 
     // Down through the left waist
     bellPath.cubicTo(
-      35.0 * scaleX, 35.0 * scaleY,
-      35.0 * scaleX, 41.0 * scaleY,
-      33.5 * scaleX, 46.0 * scaleY,
+      35.0 * scaleX,
+      35.0 * scaleY,
+      35.0 * scaleX,
+      41.0 * scaleY,
+      33.5 * scaleX,
+      46.0 * scaleY,
     );
 
     // Graceful outward flare to bottom-left rim tip
     bellPath.cubicTo(
-      31.5 * scaleX, 52.0 * scaleY,
-      26.0 * scaleX, 55.0 * scaleY,
-      24.0 * scaleX, 56.5 * scaleY,
+      31.5 * scaleX,
+      52.0 * scaleY,
+      26.0 * scaleX,
+      55.0 * scaleY,
+      24.0 * scaleX,
+      56.5 * scaleY,
     );
 
     // Rounded bottom-left corner
@@ -376,16 +380,22 @@ class _NotificationBellIllustrationPainter extends CustomPainter {
 
     // Graceful inward swoop from bottom-right flare tip through right waist
     bellPath.cubicTo(
-      72.0 * scaleX, 55.0 * scaleY,
-      66.5 * scaleX, 52.0 * scaleY,
-      64.5 * scaleX, 46.0 * scaleY,
+      72.0 * scaleX,
+      55.0 * scaleY,
+      66.5 * scaleX,
+      52.0 * scaleY,
+      64.5 * scaleX,
+      46.0 * scaleY,
     );
 
     // Up through the right waist, terminating cleanly below the alert circle
     bellPath.cubicTo(
-      63.0 * scaleX, 41.0 * scaleY,
-      63.0 * scaleX, 36.0 * scaleY,
-      59.5 * scaleX, 31.0 * scaleY,
+      63.0 * scaleX,
+      41.0 * scaleY,
+      63.0 * scaleX,
+      36.0 * scaleY,
+      59.5 * scaleX,
+      31.0 * scaleY,
     );
 
     canvas.drawPath(bellPath, strokePaint);
@@ -399,8 +409,10 @@ class _NotificationBellIllustrationPainter extends CustomPainter {
     final clapperPath = Path();
     clapperPath.moveTo(44.0 * scaleX, 64.0 * scaleY);
     clapperPath.quadraticBezierTo(
-      49.0 * scaleX, 68.0 * scaleY,
-      54.0 * scaleX, 64.0 * scaleY,
+      49.0 * scaleX,
+      68.0 * scaleY,
+      54.0 * scaleX,
+      64.0 * scaleY,
     );
     canvas.drawPath(clapperPath, strokePaint);
   }

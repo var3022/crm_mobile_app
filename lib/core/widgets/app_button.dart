@@ -39,10 +39,7 @@ class AppButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (icon != null) ...[
-                icon!,
-                const SizedBox(width: 8),
-              ],
+              if (icon != null) ...[icon!, const SizedBox(width: 8)],
               Text(
                 label,
                 style: isSecondary

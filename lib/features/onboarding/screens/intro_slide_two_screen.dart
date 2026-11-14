@@ -10,11 +10,7 @@ class IntroSlideTwoScreen extends StatelessWidget {
   final VoidCallback? onNext;
   final VoidCallback? onSkip;
 
-  const IntroSlideTwoScreen({
-    super.key,
-    this.onNext,
-    this.onSkip,
-  });
+  const IntroSlideTwoScreen({super.key, this.onNext, this.onSkip});
 
   void _handleNext(BuildContext context) {
     if (onNext != null) {
@@ -256,12 +252,26 @@ class TrackVisitsGraphicPainter extends CustomPainter {
     // Diagonal dashed line: Building -> Pin
     final pDiagStart = Offset(buildingCenter.dx + 4, buildingCenter.dy - 16);
     final pDiagEnd = Offset(pinCenter.dx - 1, pinCenter.dy + 23);
-    _drawDashedLine(canvas, pDiagStart, pDiagEnd, dashPaint, dashLength: 6, dashSpace: 5);
+    _drawDashedLine(
+      canvas,
+      pDiagStart,
+      pDiagEnd,
+      dashPaint,
+      dashLength: 6,
+      dashSpace: 5,
+    );
 
     // Horizontal dashed line: Building -> Checkmark
     final pHorizStart = Offset(buildingCenter.dx + 16, buildingCenter.dy);
     final pHorizEnd = Offset(checkmarkCenter.dx - 22, checkmarkCenter.dy);
-    _drawDashedLine(canvas, pHorizStart, pHorizEnd, dashPaint, dashLength: 6, dashSpace: 5);
+    _drawDashedLine(
+      canvas,
+      pHorizStart,
+      pHorizEnd,
+      dashPaint,
+      dashLength: 6,
+      dashSpace: 5,
+    );
 
     // 3. Draw Building Icon at bottom left
     _drawBuildingIcon(canvas, buildingCenter);

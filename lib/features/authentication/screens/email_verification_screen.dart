@@ -26,7 +26,8 @@ class EmailVerificationScreen extends StatefulWidget {
   });
 
   @override
-  State<EmailVerificationScreen> createState() => _EmailVerificationScreenState();
+  State<EmailVerificationScreen> createState() =>
+      _EmailVerificationScreenState();
 }
 
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
@@ -110,11 +111,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             builder: (context, constraints) {
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.screenHorizontal,
+                ),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -132,7 +133,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                 Navigator.of(context).maybePop();
                               }
                             },
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusBackButton),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusBackButton,
+                            ),
                             child: Container(
                               width: 44,
                               height: 44,
@@ -151,15 +154,24 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
                             margin: const EdgeInsets.only(top: 8, bottom: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.successLight,
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+                              border: Border.all(
+                                color: AppColors.success.withValues(alpha: 0.3),
+                              ),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 20),
+                                const Icon(
+                                  Icons.check_circle_rounded,
+                                  color: AppColors.success,
+                                  size: 20,
+                                ),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
@@ -183,7 +195,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                             width: 120,
                             height: 120,
                             decoration: const BoxDecoration(
-                              color: Color(0xFFE8F5F3), // Soft mint / brand teal tint
+                              color: Color(
+                                0xFFE8F5F3,
+                              ), // Soft mint / brand teal tint
                               shape: BoxShape.circle,
                             ),
                             child: Center(
@@ -219,7 +233,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         // 4. Instructions & Masked Email
                         Center(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                            ),
                             child: RichText(
                               textAlign: TextAlign.center,
                               text: TextSpan(
@@ -230,7 +246,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                   color: Color(0xFF64748B),
                                 ),
                                 children: [
-                                  const TextSpan(text: "We've sent a verification link to\n"),
+                                  const TextSpan(
+                                    text: "We've sent a verification link to\n",
+                                  ),
                                   TextSpan(
                                     text: widget.email,
                                     style: const TextStyle(
@@ -238,7 +256,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                       color: Color(0xFF0F172A),
                                     ),
                                   ),
-                                  const TextSpan(text: ". Please check your inbox."),
+                                  const TextSpan(
+                                    text: ". Please check your inbox.",
+                                  ),
                                 ],
                               ),
                             ),
@@ -257,7 +277,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text("Launching mail application..."),
+                                    content: Text(
+                                      "Launching mail application...",
+                                    ),
                                     duration: Duration(seconds: 2),
                                   ),
                                 );
@@ -268,7 +290,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusButton,
+                                ),
                               ),
                             ),
                             child: const Text(
@@ -289,17 +313,23 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         SizedBox(
                           height: AppDimensions.buttonHeight,
                           child: OutlinedButton(
-                            onPressed: canResend && !_isResending ? _handleResend : null,
+                            onPressed: canResend && !_isResending
+                                ? _handleResend
+                                : null,
                             style: OutlinedButton.styleFrom(
                               backgroundColor: Colors.white,
                               foregroundColor: AppColors.primary,
                               disabledForegroundColor: const Color(0xFF94A3B8),
                               side: BorderSide(
-                                color: canResend ? AppColors.primary : const Color(0xFFCBD5E1),
+                                color: canResend
+                                    ? AppColors.primary
+                                    : const Color(0xFFCBD5E1),
                                 width: 1.5,
                               ),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusButton,
+                                ),
                               ),
                             ),
                             child: _isResending
@@ -336,7 +366,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                 fontWeight: FontWeight.w500,
                               ),
                               children: [
-                                const TextSpan(text: "Resend link available in "),
+                                const TextSpan(
+                                  text: "Resend link available in ",
+                                ),
                                 TextSpan(
                                   text: _formatTime(_secondsRemaining),
                                   style: const TextStyle(
@@ -353,14 +385,19 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
                         // 8. Bottom Footer: Back to Sign In
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 24.0, top: 20.0),
+                          padding: const EdgeInsets.only(
+                            bottom: 24.0,
+                            top: 20.0,
+                          ),
                           child: Center(
                             child: GestureDetector(
                               onTap: () {
                                 if (widget.onSignInTap != null) {
                                   widget.onSignInTap!();
                                 } else {
-                                  Navigator.of(context).pushReplacementNamed("/sign-in");
+                                  Navigator.of(
+                                    context,
+                                  ).pushReplacementNamed("/sign-in");
                                 }
                               },
                               child: RichText(
@@ -404,10 +441,7 @@ class _ShieldCheckPainter extends CustomPainter {
   final Color color;
   final double strokeWidth;
 
-  _ShieldCheckPainter({
-    required this.color,
-    required this.strokeWidth,
-  });
+  _ShieldCheckPainter({required this.color, required this.strokeWidth});
 
   @override
   void paint(Canvas canvas, Size size) {

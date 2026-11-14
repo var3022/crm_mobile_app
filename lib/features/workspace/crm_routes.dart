@@ -74,6 +74,7 @@ Route<dynamic>? crmRoute(RouteSettings settings) {
       page = accountForm(account());
       break;
     case '/filter-leads':
+    case '/filtered-leads':
       page = const LeadFiltersScreen();
       break;
     case '/log-call':
@@ -152,8 +153,14 @@ Route<dynamic>? crmRoute(RouteSettings settings) {
       page = const NearbyScreen();
       break;
     case '/plan-route':
+      page = const PlanRouteScreen();
+      break;
     case '/todays-route':
-      page = const NearbyScreen(routeMode: true);
+      page = const TodaysRouteScreen();
+      break;
+    case '/search':
+    case '/search-leads':
+      page = const SearchScreen();
       break;
     case '/tasks':
       page = const TasksScreen();
@@ -183,10 +190,10 @@ Route<dynamic>? crmRoute(RouteSettings settings) {
       page = const SettingsScreen();
       break;
     case '/permissions':
-      page = const SettingsScreen(permissions: true);
+      page = const PermissionsScreen();
       break;
     case '/notification-settings':
-      page = const SettingsScreen(notifications: true);
+      page = const NotificationSettingsScreen();
       break;
     case '/change-password':
       page = const ChangePasswordScreen();
@@ -195,7 +202,7 @@ Route<dynamic>? crmRoute(RouteSettings settings) {
       page = const ReportsScreen();
       break;
     case '/targets':
-      page = const ReportsScreen(targets: true);
+      page = const TargetsScreen();
       break;
     case '/visit-history':
       page = const HistoryScreen();
@@ -211,6 +218,33 @@ Route<dynamic>? crmRoute(RouteSettings settings) {
       break;
     case '/photos':
       page = const PhotoGalleryScreen();
+      break;
+    case '/photo-preview':
+      page = PhotoPreviewScreen(
+        photo: arg is PhotoRecord
+            ? arg
+            : store.photos.isNotEmpty
+            ? store.photos.first
+            : PhotoRecord(category: 'Storefront', title: 'Sample Photo'),
+      );
+      break;
+    case '/voice-notes':
+      page = const VoiceNotesLibraryScreen();
+      break;
+    case '/recording-player':
+      page = RecordingPlayerScreen(
+        record: arg is VoiceNoteRecord
+            ? arg
+            : store.voiceNotes.isNotEmpty
+            ? store.voiceNotes.first
+            : VoiceNoteRecord(title: 'Voice Note', company: 'Acme Corp'),
+      );
+      break;
+    case '/empty-media':
+      page = const EmptyMediaLibraryScreen();
+      break;
+    case '/logout-confirmation':
+      page = const Scaffold(body: LogoutConfirmationModal());
       break;
     case '/camera':
       page = const CameraPreviewScreen();
@@ -301,6 +335,7 @@ Widget screenIndex(BuildContext context) => CrmPage(
       'Accounts': [
         'leads',
         'empty-leads',
+        'search',
         'nearby-leads',
         'new-lead',
         'lead-details',
@@ -363,8 +398,12 @@ Widget screenIndex(BuildContext context) => CrmPage(
         'help',
         'day-complete',
         'photos',
+        'photo-preview',
         'camera',
+        'voice-notes',
         'voice-note',
+        'recording-player',
+        'empty-media',
       ],
       'System States': [
         'offline',

@@ -257,10 +257,7 @@ class _BenefitItem extends StatelessWidget {
   final String title;
   final String description;
 
-  const _BenefitItem({
-    required this.title,
-    required this.description,
-  });
+  const _BenefitItem({required this.title, required this.description});
 
   @override
   Widget build(BuildContext context) {
@@ -276,11 +273,7 @@ class _BenefitItem extends StatelessWidget {
             color: Color(0xFFD1FADF),
           ),
           alignment: Alignment.center,
-          child: const Icon(
-            Icons.check,
-            size: 14,
-            color: Color(0xFF0F766E),
-          ),
+          child: const Icon(Icons.check, size: 14, color: Color(0xFF0F766E)),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -337,9 +330,12 @@ class _WaveformIllustrationPainter extends CustomPainter {
 
     // Curve into the first vertical stem
     path.cubicTo(
-      22.0 * scaleX, 51.0 * scaleY,
-      26.0 * scaleX, 42.0 * scaleY,
-      28.0 * scaleX, 32.0 * scaleY,
+      22.0 * scaleX,
+      51.0 * scaleY,
+      26.0 * scaleX,
+      42.0 * scaleY,
+      28.0 * scaleX,
+      32.0 * scaleY,
     );
 
     // Peak 1 top rounded dome with wider breathing room
@@ -381,9 +377,12 @@ class _WaveformIllustrationPainter extends CustomPainter {
 
     // Curve out to the right ending tail
     path.cubicTo(
-      91.0 * scaleX, 55.0 * scaleY,
-      94.0 * scaleX, 48.0 * scaleY,
-      98.0 * scaleX, 44.0 * scaleY,
+      91.0 * scaleX,
+      55.0 * scaleY,
+      94.0 * scaleX,
+      48.0 * scaleY,
+      98.0 * scaleX,
+      44.0 * scaleY,
     );
 
     canvas.drawPath(path, strokePaint);

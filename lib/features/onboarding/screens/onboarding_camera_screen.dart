@@ -10,11 +10,7 @@ class OnboardingCameraScreen extends StatefulWidget {
   final VoidCallback? onAllowCamera;
   final VoidCallback? onSkip;
 
-  const OnboardingCameraScreen({
-    super.key,
-    this.onAllowCamera,
-    this.onSkip,
-  });
+  const OnboardingCameraScreen({super.key, this.onAllowCamera, this.onSkip});
 
   @override
   State<OnboardingCameraScreen> createState() => _OnboardingCameraScreenState();
@@ -255,10 +251,7 @@ class _BenefitItem extends StatelessWidget {
   final String title;
   final String description;
 
-  const _BenefitItem({
-    required this.title,
-    required this.description,
-  });
+  const _BenefitItem({required this.title, required this.description});
 
   @override
   Widget build(BuildContext context) {

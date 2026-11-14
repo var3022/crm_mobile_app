@@ -39,10 +39,7 @@ class AppTextField extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (label != null) ...[
-          Text(
-            label!,
-            style: AppTypography.formLabel,
-          ),
+          Text(label!, style: AppTypography.formLabel),
           const SizedBox(height: 6),
         ],
         TextFormField(
@@ -58,7 +55,10 @@ class AppTextField extends StatelessWidget {
             hintText: hintText,
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
             border: OutlineInputBorder(
               borderRadius: AppDimensions.inputBorderRadius,
               borderSide: const BorderSide(color: AppColors.border, width: 1.0),
@@ -69,7 +69,10 @@ class AppTextField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: AppDimensions.inputBorderRadius,
-              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppColors.primary,
+                width: 1.5,
+              ),
             ),
           ),
         ),

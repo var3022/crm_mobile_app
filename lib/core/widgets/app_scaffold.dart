@@ -42,9 +42,7 @@ class AppScaffold extends StatelessWidget {
       backgroundColor: backgroundColor ?? AppColors.surface,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       appBar: appBar,
-      body: SafeArea(
-        child: content,
-      ),
+      body: SafeArea(child: content),
       bottomNavigationBar: bottomNavigationBar != null && applyMaxContentWidth
           ? Center(
               child: ConstrainedBox(

@@ -3,6 +3,7 @@ import "package:flutter/material.dart";
 import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_spacing.dart";
+import "../../workspace/crm_store.dart";
 
 /// Dashboard and Notification Screen 1: Screen-Dashboard
 /// Follows the CRM Pro Flutter/Dart master prompt and design system.
@@ -62,7 +63,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Main content area with scrollbar strictly hidden
                 Expanded(
                   child: ScrollConfiguration(
-                    behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                    behavior: ScrollConfiguration.of(
+                      context,
+                    ).copyWith(scrollbars: false),
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       padding: const EdgeInsets.only(bottom: 110),
@@ -197,11 +200,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                   child: const Center(
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+                    child: Icon(Icons.add, color: Colors.white, size: 28),
                   ),
                 ),
               ),
@@ -397,10 +396,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Header: Robot/Brain Icon + "AI DAILY BRIEF"
           Row(
             children: [
-              const Text(
-                "🤖",
-                style: TextStyle(fontSize: 16),
-              ),
+              const Text("🤖", style: TextStyle(fontSize: 16)),
               const SizedBox(width: 8),
               Text(
                 "AI DAILY BRIEF",
@@ -466,25 +462,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   /// 3. Horizontally Scrollable Metric Cards Carousel with scrollbars hidden
   Widget _buildMetricsCarousel() {
+    final store = CrmStore.instance;
+    final totalVisits = store.visits.length;
+    final completedVisits = store.visits
+        .where((v) => v.status == 'Completed')
+        .length;
+    final inProgressVisits = store.visits
+        .where((v) => v.status == 'In Progress')
+        .length;
+    final totalCheckins = completedVisits + inProgressVisits;
+    final activeLeadsValue = store.leads.fold<double>(
+      0,
+      (s, l) => s + l.accountValue,
+    );
+    final revenueLakhs = (activeLeadsValue / 100000.0).toStringAsFixed(1);
+
     final metrics = [
       _MetricItem(
         title: "Today's Visits",
-        value: "2/6",
-        subtitle: "Goal: 6 visits",
+        value: "$completedVisits/$totalVisits",
+        subtitle: "Goal: $totalVisits visits",
       ),
       _MetricItem(
         title: "Check-ins",
-        value: "2",
-        subtitle: "Completed",
+        value: "$totalCheckins",
+        subtitle: "Active/Done",
       ),
       _MetricItem(
         title: "Distance",
         value: "18 km",
-        subtitle: "Estimated tra...",
+        subtitle: "Estimated (Sample)",
       ),
       _MetricItem(
         title: "Revenue",
-        value: "₹4.2L",
+        value: "₹${revenueLakhs}L",
         subtitle: "Active leads",
       ),
     ];
@@ -506,10 +517,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: const Color(0xFFE5E7EB),
-                  width: 1,
-                ),
+                border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.02),
@@ -565,16 +573,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   /// 4. Monthly Target Card with circular progress
   Widget _buildMonthlyTargetCard() {
+    final store = CrmStore.instance;
+    final wonDeals = store.deals.where((d) => d.stage == 'Won').toList();
+    final totalWon = wonDeals.fold<double>(0, (sum, d) => sum + d.value);
+    const targetAmount = 1000000.0;
+    final percentage = (totalWon / targetAmount).clamp(0.0, 1.0);
+    final percentInt = (percentage * 100).round();
+    final achievedLakhs = (totalWon / 100000.0).toStringAsFixed(1);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFE5E7EB),
-          width: 1,
-        ),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
@@ -596,14 +609,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 CustomPaint(
                   size: const Size(68, 68),
                   painter: _CircularProgressPainter(
-                    percentage: 0.68,
+                    percentage: percentage,
                     trackColor: const Color(0xFFF1F5F9),
                     progressColor: const Color(0xFF0F4C4C),
                     strokeWidth: 6.5,
                   ),
                 ),
                 Text(
-                  "68%",
+                  "$percentInt%",
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
@@ -634,7 +647,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "₹6,80,000 / ₹10,00,000",
+                  "₹${achievedLakhs}L / ₹10.0L",
                   style: GoogleFonts.inter(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
@@ -681,10 +694,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: const Color(0xFFE5E7EB),
-            width: 1,
-          ),
+          border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.015),
