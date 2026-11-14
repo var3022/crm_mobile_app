@@ -1,6 +1,5 @@
 import "dart:math" as math;
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_spacing.dart";
 import "../../workspace/crm_store.dart";
@@ -108,7 +107,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               children: [
                                 Text(
                                   "Today's Schedule",
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(fontFamily: 'Inter', 
                                     fontSize: 18,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.textPrimary,
@@ -119,7 +118,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   onTap: widget.onViewAllMapTap,
                                   child: Text(
                                     "View All Map",
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(fontFamily: 'Inter', 
                                       fontSize: 13.5,
                                       fontWeight: FontWeight.w600,
                                       color: const Color(0xFF0F4C4C),
@@ -238,7 +237,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             alignment: Alignment.center,
             child: Text(
               "AM",
-              style: GoogleFonts.inter(
+              style: TextStyle(fontFamily: 'Inter', 
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: const Color(0xFF0F4C4C),
@@ -256,7 +255,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Text(
                   "Good morning,...",
-                  style: GoogleFonts.inter(
+                  style: TextStyle(fontFamily: 'Inter', 
                     fontSize: 19,
                     fontWeight: FontWeight.w800,
                     color: AppColors.textPrimary,
@@ -268,7 +267,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 2),
                 Text(
                   "Thursday, Aug 9",
-                  style: GoogleFonts.inter(
+                  style: TextStyle(fontFamily: 'Inter', 
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF6B7280),
@@ -299,7 +298,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(width: 6),
                 Text(
                   "Synced",
-                  style: GoogleFonts.inter(
+                  style: TextStyle(fontFamily: 'Inter', 
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF059669),
@@ -358,7 +357,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     alignment: Alignment.center,
                     child: Text(
                       "3",
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -400,7 +399,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(width: 8),
               Text(
                 "AI DAILY BRIEF",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 12.5,
                   fontWeight: FontWeight.w800,
                   color: const Color(0xFF99F6E4),
@@ -415,7 +414,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Brief Body
           Text(
             "You have 6 visits planned today. 2 are high-priority. Start with Acme Corp they viewed your proposal yesterday.",
-            style: GoogleFonts.inter(
+            style: TextStyle(fontFamily: 'Inter', 
               fontSize: 13.5,
               fontWeight: FontWeight.w400,
               color: Colors.white.withOpacity(0.92),
@@ -434,7 +433,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Text(
                   "View Full Brief",
-                  style: GoogleFonts.inter(
+                  style: TextStyle(fontFamily: 'Inter', 
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -531,7 +530,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Text(
                     item.title,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: const Color(0xFF6B7280),
@@ -543,7 +542,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 6),
                   Text(
                     item.value,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                       color: const Color(0xFF0F4C4C),
@@ -553,7 +552,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 6),
                   Text(
                     item.subtitle,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 11,
                       fontWeight: FontWeight.w400,
                       color: const Color(0xFF9CA3AF),
@@ -617,7 +616,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 Text(
                   "$percentInt%",
-                  style: GoogleFonts.inter(
+                  style: TextStyle(fontFamily: 'Inter', 
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: const Color(0xFF0F4C4C),
@@ -638,7 +637,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Text(
                   "MONTHLY TARGET",
-                  style: GoogleFonts.inter(
+                  style: TextStyle(fontFamily: 'Inter', 
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF6B7280),
@@ -648,7 +647,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 4),
                 Text(
                   "₹${achievedLakhs}L / ₹10.0L",
-                  style: GoogleFonts.inter(
+                  style: TextStyle(fontFamily: 'Inter', 
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
                     color: AppColors.textPrimary,
@@ -658,7 +657,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 4),
                 Text(
                   "22 days remaining",
-                  style: GoogleFonts.inter(
+                  style: TextStyle(fontFamily: 'Inter', 
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFFD97706),
@@ -714,7 +713,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Text(
                     time,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFF0F4C4C),
@@ -737,7 +736,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       const SizedBox(width: 5),
                       Text(
                         status,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(fontFamily: 'Inter', 
                           fontSize: 11.5,
                           fontWeight: FontWeight.w500,
                           color: const Color(0xFF6B7280),
@@ -764,7 +763,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Text(
                     company,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -774,7 +773,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 2),
                   Text(
                     contact,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 12.5,
                       fontWeight: FontWeight.w500,
                       color: const Color(0xFF4B5563),
@@ -783,7 +782,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 2),
                   Text(
                     location,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
                       color: const Color(0xFF9CA3AF),
@@ -882,7 +881,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         const SizedBox(height: 2),
                         Text(
                           item.label,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(fontFamily: 'Inter', 
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
                             color: const Color(0xFF0F4C4C),
@@ -907,7 +906,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         const SizedBox(height: 2),
                         Text(
                           item.label,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(fontFamily: 'Inter', 
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
                             color: const Color(0xFF6B7280),

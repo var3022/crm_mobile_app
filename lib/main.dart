@@ -431,7 +431,14 @@ class CrmProApp extends StatelessWidget {
                 child: MediaQuery(
                   data: MediaQuery.of(
                     context,
-                  ).copyWith(size: Size(width, bounds.maxHeight)),
+                  ).copyWith(
+                    size: Size(width, bounds.maxHeight),
+                    padding: MediaQuery.paddingOf(context).copyWith(
+                      top: MediaQuery.paddingOf(context).top < 24
+                          ? 24
+                          : MediaQuery.paddingOf(context).top,
+                    ),
+                  ),
                   child: child ?? const SizedBox.shrink(),
                 ),
               ),

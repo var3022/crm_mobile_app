@@ -25,6 +25,7 @@ class AppTheme {
         onError: Colors.white,
       ),
       appBarTheme: const AppBarTheme(
+        toolbarHeight: 72,
         backgroundColor: AppColors.surface,
         elevation: 0,
         centerTitle: true,

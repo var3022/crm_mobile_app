@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_dimensions.dart";
 import "../../../core/theme/app_spacing.dart";
@@ -123,7 +122,7 @@ class _OnboardingMicrophoneScreenState
               // 3. Title: "Enable Microphone"
               Text(
                 "Enable Microphone",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
@@ -137,7 +136,7 @@ class _OnboardingMicrophoneScreenState
               // 4. Subtitle / Purpose Explanation
               Text(
                 "Record voice notes during or after meetings instead of typing.",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
                   color: AppColors.textSecondary,
@@ -210,7 +209,7 @@ class _OnboardingMicrophoneScreenState
                                 _isGranted
                                     ? "Microphone Access Granted"
                                     : "Allow Microphone Access",
-                                style: GoogleFonts.inter(
+                                style: TextStyle(fontFamily: 'Inter', 
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.white,
@@ -234,7 +233,7 @@ class _OnboardingMicrophoneScreenState
                       ),
                       child: Text(
                         "Skip for now",
-                        style: GoogleFonts.inter(
+                        style: TextStyle(fontFamily: 'Inter', 
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                           color: const Color(0xFF6B7280),
@@ -282,7 +281,7 @@ class _BenefitItem extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -292,7 +291,7 @@ class _BenefitItem extends StatelessWidget {
               const SizedBox(height: 3),
               Text(
                 description,
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 13.5,
                   fontWeight: FontWeight.w400,
                   color: AppColors.textSecondary,

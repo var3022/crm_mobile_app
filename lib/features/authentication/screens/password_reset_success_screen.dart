@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_typography.dart";
 import "../../../core/theme/app_dimensions.dart";
@@ -145,7 +144,7 @@ class _PasswordResetSuccessScreenState extends State<PasswordResetSuccessScreen>
                             Text(
                               widget.title,
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(fontFamily: 'Inter', 
                                 fontSize: 26,
                                 fontWeight: FontWeight.w800,
                                 color: const Color(0xFF0F172A),
@@ -161,7 +160,7 @@ class _PasswordResetSuccessScreenState extends State<PasswordResetSuccessScreen>
                               child: Text(
                                 widget.message,
                                 textAlign: TextAlign.center,
-                                style: GoogleFonts.inter(
+                                style: TextStyle(fontFamily: 'Inter', 
                                   fontSize: 15,
                                   fontWeight: FontWeight.w400,
                                   color: const Color(0xFF4B5563),

@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_dimensions.dart";
 import "../../../core/theme/app_spacing.dart";
@@ -122,7 +121,7 @@ class _OnboardingCompleteScreenState extends State<OnboardingCompleteScreen>
               // 2. Title: "You're All Set!"
               Text(
                 "You're All Set!",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
@@ -136,7 +135,7 @@ class _OnboardingCompleteScreenState extends State<OnboardingCompleteScreen>
               // 3. Subtitle: "Your field kit is ready. Time to hit the road."
               Text(
                 "Your field kit is ready. Time to hit the road.",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
                   color: AppColors.textSecondary,
@@ -164,7 +163,7 @@ class _OnboardingCompleteScreenState extends State<OnboardingCompleteScreen>
                     // Header label
                     Text(
                       "TERRITORY PREP OVERVIEW",
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: const Color(0xFF6B7280),
@@ -185,7 +184,7 @@ class _OnboardingCompleteScreenState extends State<OnboardingCompleteScreen>
                         Expanded(
                           child: Text(
                             "120 leads parsed and mapped",
-                            style: GoogleFonts.inter(
+                            style: TextStyle(fontFamily: 'Inter', 
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: const Color(0xFF1F2937),
@@ -209,7 +208,7 @@ class _OnboardingCompleteScreenState extends State<OnboardingCompleteScreen>
                         Expanded(
                           child: Text(
                             "6 priority visits mapped out for today",
-                            style: GoogleFonts.inter(
+                            style: TextStyle(fontFamily: 'Inter', 
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: const Color(0xFF1F2937),
@@ -234,7 +233,7 @@ class _OnboardingCompleteScreenState extends State<OnboardingCompleteScreen>
                         Expanded(
                           child: RichText(
                             text: TextSpan(
-                              style: GoogleFonts.inter(
+                              style: TextStyle(fontFamily: 'Inter', 
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 color: const Color(0xFF10B981), // Green text
@@ -280,7 +279,7 @@ class _OnboardingCompleteScreenState extends State<OnboardingCompleteScreen>
                     ),
                     child: Text(
                       "Continue",
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,

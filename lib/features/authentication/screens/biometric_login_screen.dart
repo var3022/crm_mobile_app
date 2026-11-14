@@ -1,7 +1,6 @@
 // ignore_for_file: unused_import
 
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_typography.dart";
 import "../../../core/theme/app_spacing.dart";
@@ -206,7 +205,7 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                 Text(
                   widget.title,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(fontFamily: 'Inter', 
                     fontSize: 23,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
@@ -301,7 +300,7 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                   Text(
                     widget.failedTitle,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 23,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
@@ -314,7 +313,7 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                     child: Text(
                       widget.failedSubtitle,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: Colors.white.withOpacity(0.75),
@@ -334,7 +333,7 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                           ? "Verified!"
                           : widget.promptText,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: Colors.white.withOpacity(0.95),
@@ -352,7 +351,7 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                   Text(
                     widget.errorBannerText,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFFEF4444),
@@ -377,7 +376,7 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                       ),
                       child: Text(
                         "Try Again",
-                        style: GoogleFonts.inter(
+                        style: TextStyle(fontFamily: 'Inter', 
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF1B3B3B),
@@ -402,7 +401,7 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                       ),
                       child: Text(
                         "Use Password Instead",
-                        style: GoogleFonts.inter(
+                        style: TextStyle(fontFamily: 'Inter', 
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -425,7 +424,7 @@ class _BiometricLoginScreenState extends State<BiometricLoginScreen>
                       ),
                       child: Text(
                         widget.alternativeOptionText,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(fontFamily: 'Inter', 
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                           color: Colors.white.withOpacity(0.9),

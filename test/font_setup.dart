@@ -6,4 +6,7 @@ Future<void> loadAppTestFont() async {
   final loader = FontLoader('Inter');
   loader.addFont(rootBundle.load('assets/fonts/Inter.ttf'));
   await loader.load();
+  final icons = FontLoader('MaterialIcons');
+  icons.addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));
+  await icons.load();
 }

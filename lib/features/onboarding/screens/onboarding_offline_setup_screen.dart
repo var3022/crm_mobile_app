@@ -1,6 +1,5 @@
 import "dart:async";
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_dimensions.dart";
 import "../../../core/theme/app_spacing.dart";
@@ -154,7 +153,7 @@ class _OnboardingOfflineSetupScreenState
               // 3. Title: "Prepare for Offline"
               Text(
                 "Prepare for Offline",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
@@ -168,7 +167,7 @@ class _OnboardingOfflineSetupScreenState
               // 4. Subtitle / Purpose Explanation
               Text(
                 "Download your leads and customer data so you can work without internet.",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
                   color: AppColors.textSecondary,
@@ -199,7 +198,7 @@ class _OnboardingOfflineSetupScreenState
                       children: [
                         Text(
                           "SOUTH MUMBAI SYNC PAYLOAD",
-                          style: GoogleFonts.inter(
+                          style: TextStyle(fontFamily: 'Inter', 
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: const Color(0xFF6B7280),
@@ -208,7 +207,7 @@ class _OnboardingOfflineSetupScreenState
                         ),
                         Text(
                           "~45 MB",
-                          style: GoogleFonts.inter(
+                          style: TextStyle(fontFamily: 'Inter', 
                             fontSize: 13,
                             fontWeight: FontWeight.w800,
                             color: AppColors.primary,
@@ -243,7 +242,7 @@ class _OnboardingOfflineSetupScreenState
                             : _isDownloading
                             ? "Downloading leads..."
                             : "Downloading leads...",
-                        style: GoogleFonts.inter(
+                        style: TextStyle(fontFamily: 'Inter', 
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
@@ -251,7 +250,7 @@ class _OnboardingOfflineSetupScreenState
                       ),
                       Text(
                         "$_downloadedCount / $_totalCount ($percent%)",
-                        style: GoogleFonts.inter(
+                        style: TextStyle(fontFamily: 'Inter', 
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
                           color: AppColors.primary,
@@ -324,7 +323,7 @@ class _OnboardingOfflineSetupScreenState
                                   const SizedBox(width: 10),
                                   Text(
                                     "Downloading...",
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(fontFamily: 'Inter', 
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.white,
@@ -337,7 +336,7 @@ class _OnboardingOfflineSetupScreenState
                                 _isCompleted
                                     ? "Sync Completed"
                                     : "Download Now",
-                                style: GoogleFonts.inter(
+                                style: TextStyle(fontFamily: 'Inter', 
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.white,
@@ -361,7 +360,7 @@ class _OnboardingOfflineSetupScreenState
                       ),
                       child: Text(
                         "Skip — I'll sync later",
-                        style: GoogleFonts.inter(
+                        style: TextStyle(fontFamily: 'Inter', 
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                           color: const Color(0xFF6B7280),
@@ -401,7 +400,7 @@ class _PayloadBullet extends StatelessWidget {
         ),
         Text(
           text,
-          style: GoogleFonts.inter(
+          style: TextStyle(fontFamily: 'Inter', 
             fontSize: 14,
             fontWeight: FontWeight.w400,
             color: const Color(0xFF1F2937),

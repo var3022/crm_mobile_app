@@ -1,6 +1,5 @@
 import "dart:math" as math;
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_spacing.dart";
 
@@ -53,7 +52,7 @@ class IntroSlideThreeScreen extends StatelessWidget {
                   ),
                   child: Text(
                     "Skip",
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       color: const Color(0xFF99F6E4),
@@ -103,7 +102,7 @@ class IntroSlideThreeScreen extends StatelessWidget {
                     // Headline: "Win with AI Insights"
                     Text(
                       "Win with AI Insights",
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 32,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
@@ -117,7 +116,7 @@ class IntroSlideThreeScreen extends StatelessWidget {
                     // Subtitle
                     Text(
                       "Smart lead scoring, deal win probability, and personalized day-coaching to close deals faster.",
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 15.5,
                         fontWeight: FontWeight.w400,
                         color: const Color(0xFFD1FAE5).withOpacity(0.85),
@@ -196,7 +195,7 @@ class IntroSlideThreeScreen extends StatelessWidget {
                       ),
                       child: Text(
                         "Get Started",
-                        style: GoogleFonts.inter(
+                        style: TextStyle(fontFamily: 'Inter', 
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF0F4C4C),

@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 // ignore: unused_import
 import "../../../core/theme/app_typography.dart";
@@ -134,7 +133,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                   alignment: Alignment.center,
                   child: Text(
                     widget.userInitials,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
@@ -149,7 +148,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
               // 2. Greeting Headline: "Hi Arjun!"
               Text(
                 "Hi ${widget.userName}!",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
@@ -163,7 +162,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
               // 3. Subtitle / Description
               Text(
                 "Let's set up your field kit in under a minute to prepare for ${widget.assignedTerritory} territory operations.",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 14.5,
                   fontWeight: FontWeight.w400,
                   color: AppColors.textSecondary,
@@ -216,7 +215,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                         children: [
                           Text(
                             widget.companyName,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(fontFamily: 'Inter', 
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
@@ -226,7 +225,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                           const SizedBox(height: 2),
                           Text(
                             "Assigned Territory: ${widget.assignedTerritory}",
-                            style: GoogleFonts.inter(
+                            style: TextStyle(fontFamily: 'Inter', 
                               fontSize: 13,
                               fontWeight: FontWeight.w400,
                               color: AppColors.textSecondary,
@@ -244,7 +243,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
               // 5. Section Header: "REQUIRED SETUP PROGRESS"
               Text(
                 "REQUIRED SETUP PROGRESS",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: const Color(0xFF6B7280),
@@ -290,7 +289,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                             Expanded(
                               child: Text(
                                 item.title,
-                                style: GoogleFonts.inter(
+                                style: TextStyle(fontFamily: 'Inter', 
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,
                                   color: AppColors.textPrimary,
@@ -352,7 +351,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                     ),
                     child: Text(
                       "Let's Go",
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,

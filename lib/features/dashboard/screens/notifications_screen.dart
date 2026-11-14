@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_spacing.dart";
 
@@ -166,7 +165,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       SnackBar(
         content: Text(
           "All notifications marked as read",
-          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+          style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w500),
         ),
         backgroundColor: const Color(0xFF0F4C4C),
         behavior: SnackBarBehavior.floating,
@@ -184,7 +183,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       SnackBar(
         content: Text(
           "All notifications cleared",
-          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+          style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w500),
         ),
         backgroundColor: const Color(0xFF0F4C4C),
         behavior: SnackBarBehavior.floating,
@@ -203,7 +202,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       SnackBar(
         content: Text(
           "Demo notifications restored",
-          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+          style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w500),
         ),
         backgroundColor: const Color(0xFF0F4C4C),
         behavior: SnackBarBehavior.floating,
@@ -218,7 +217,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       SnackBar(
         content: Text(
           "Opening lead details for $company",
-          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+          style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w500),
         ),
         backgroundColor: const Color(0xFF0F4C4C),
         behavior: SnackBarBehavior.floating,
@@ -279,7 +278,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               const SizedBox(height: 20),
               Text(
                 "Notification Preferences",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 19,
                   fontWeight: FontWeight.w800,
                   color: const Color(0xFF111827),
@@ -289,7 +288,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               const SizedBox(height: 6),
               Text(
                 "Control which alerts and push notifications appear on your field device.",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 13.5,
                   color: const Color(0xFF6B7280),
                   height: 1.4,
@@ -310,7 +309,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       SnackBar(
                         content: Text(
                           "Notification preferences saved",
-                          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+                          style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w500),
                         ),
                         backgroundColor: const Color(0xFF0F4C4C),
                         behavior: SnackBarBehavior.floating,
@@ -332,7 +331,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ),
                   child: Text(
                     "Save Preferences",
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -354,7 +353,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         children: [
           Text(
             title,
-            style: GoogleFonts.inter(
+            style: TextStyle(fontFamily: 'Inter', 
               fontSize: 14.5,
               fontWeight: FontWeight.w500,
               color: const Color(0xFF374151),
@@ -403,7 +402,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             Text(
               "All Caught Up!",
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: TextStyle(fontFamily: 'Inter', 
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
                 color: const Color(0xFF111827),
@@ -419,7 +418,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 message ??
                     "You have no new notifications. We'll alert you when something needs your attention.",
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 14.5,
                   fontWeight: FontWeight.w400,
                   color: const Color(0xFF6B7280),
@@ -444,7 +443,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   children: [
                     Text(
                       "View notification settings",
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF0F4C4C),
@@ -495,7 +494,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         children: [
                           Text(
                             "Notifications",
-                            style: GoogleFonts.inter(
+                            style: TextStyle(fontFamily: 'Inter', 
                               fontSize: 26,
                               fontWeight: FontWeight.w800,
                               color: AppColors.textPrimary,
@@ -515,7 +514,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               ),
                               child: Text(
                                 "$unreadCount",
-                                style: GoogleFonts.inter(
+                                style: TextStyle(fontFamily: 'Inter', 
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.white,
@@ -538,7 +537,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 ),
                                 child: Text(
                                   "Mark All Read",
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(fontFamily: 'Inter', 
                                     fontSize: 14.5,
                                     fontWeight: FontWeight.w600,
                                     color: const Color(0xFF0F4C4C),
@@ -558,7 +557,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 ),
                                 child: Text(
                                   "Clear",
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(fontFamily: 'Inter', 
                                     fontSize: 13.5,
                                     fontWeight: FontWeight.w500,
                                     color: const Color(0xFF9CA3AF),
@@ -579,7 +578,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             ),
                             child: Text(
                               "Load Demo",
-                              style: GoogleFonts.inter(
+                              style: TextStyle(fontFamily: 'Inter', 
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: const Color(0xFF0F4C4C),
@@ -715,7 +714,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           children: [
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: TextStyle(fontFamily: 'Inter', 
                 fontSize: 13.5,
                 fontWeight: isAllSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isAllSelected
@@ -735,7 +734,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 alignment: Alignment.center,
                 child: Text(
                   "$badgeCount",
-                  style: GoogleFonts.inter(
+                  style: TextStyle(fontFamily: 'Inter', 
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -795,7 +794,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 children: [
                   Text(
                     item.title,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -805,7 +804,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   const SizedBox(height: 3),
                   Text(
                     item.time,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: const Color(0xFF6B7280),
@@ -838,7 +837,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ),
                   child: Text(
                     item.actionText!,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -939,7 +938,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             const SizedBox(height: 4),
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: TextStyle(fontFamily: 'Inter', 
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected

@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_spacing.dart";
 
@@ -52,7 +51,7 @@ class IntroSlideTwoScreen extends StatelessWidget {
                   ),
                   child: Text(
                     "Skip",
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       color: const Color(0xFF99F6E4),
@@ -102,7 +101,7 @@ class IntroSlideTwoScreen extends StatelessWidget {
                     // Headline: "Track Your Visits"
                     Text(
                       "Track Your Visits",
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 32,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
@@ -116,7 +115,7 @@ class IntroSlideTwoScreen extends StatelessWidget {
                     // Subtitle
                     Text(
                       "GPS-verified check-ins, real-time visit tracking, and automated meeting logs kept instantly in sync.",
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 15.5,
                         fontWeight: FontWeight.w400,
                         color: const Color(0xFFD1FAE5).withOpacity(0.85),

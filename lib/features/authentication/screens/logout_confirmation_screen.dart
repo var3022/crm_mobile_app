@@ -1,7 +1,6 @@
 // ignore_for_file: unused_import
 
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_dimensions.dart";
 import "../../../core/theme/app_spacing.dart";
@@ -130,7 +129,7 @@ class _LogoutConfirmationScreenState extends State<LogoutConfirmationScreen>
                       children: [
                         Text(
                           "Settings",
-                          style: GoogleFonts.inter(
+                          style: TextStyle(fontFamily: 'Inter', 
                             fontSize: 24,
                             fontWeight: FontWeight.w800,
                             color: AppColors.textPrimary,
@@ -163,7 +162,7 @@ class _LogoutConfirmationScreenState extends State<LogoutConfirmationScreen>
                         // "ACCOUNT" Section Header
                         Text(
                           "ACCOUNT",
-                          style: GoogleFonts.inter(
+                          style: TextStyle(fontFamily: 'Inter', 
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             color: const Color(0xFF6B7280),
@@ -281,7 +280,7 @@ class _LogoutConfirmationScreenState extends State<LogoutConfirmationScreen>
                 Expanded(
                   child: Text(
                     title,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 15.5,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textPrimary,
@@ -362,7 +361,7 @@ class _LogoutConfirmationScreenState extends State<LogoutConfirmationScreen>
             const SizedBox(height: 3),
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: TextStyle(fontFamily: 'Inter', 
                 fontSize: 11,
                 fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                 color: isActive ? activeColor : inactiveColor,
@@ -443,7 +442,7 @@ class LogoutConfirmationSheet extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Text(
                       "MV",
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -459,7 +458,7 @@ class LogoutConfirmationSheet extends StatelessWidget {
           // User Name: Marcus Vance
           Text(
             "Marcus Vance",
-            style: GoogleFonts.inter(
+            style: TextStyle(fontFamily: 'Inter', 
               fontSize: 18.5,
               fontWeight: FontWeight.w700,
               color: const Color(0xFF111827),
@@ -471,7 +470,7 @@ class LogoutConfirmationSheet extends StatelessWidget {
           // Territory Subtitle: Pacific Northwest Territory
           Text(
             "Pacific Northwest Territory",
-            style: GoogleFonts.inter(
+            style: TextStyle(fontFamily: 'Inter', 
               fontSize: 13.5,
               fontWeight: FontWeight.w400,
               color: const Color(0xFF6B7280),
@@ -482,7 +481,7 @@ class LogoutConfirmationSheet extends StatelessWidget {
           // Sign Out? Title
           Text(
             "Sign Out?",
-            style: GoogleFonts.inter(
+            style: TextStyle(fontFamily: 'Inter', 
               fontSize: 22,
               fontWeight: FontWeight.w800,
               color: const Color(0xFF111827),
@@ -497,7 +496,7 @@ class LogoutConfirmationSheet extends StatelessWidget {
             child: Text(
               "Are you sure you want to sign out? You will need to sign in again to access your account.",
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: TextStyle(fontFamily: 'Inter', 
                 fontSize: 14.5,
                 fontWeight: FontWeight.w400,
                 color: const Color(0xFF4B5563),
@@ -532,7 +531,7 @@ class LogoutConfirmationSheet extends StatelessWidget {
                     )
                   : Text(
                       "Sign Out",
-                      style: GoogleFonts.inter(
+                      style: TextStyle(fontFamily: 'Inter', 
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -558,7 +557,7 @@ class LogoutConfirmationSheet extends StatelessWidget {
               ),
               child: Text(
                 "Cancel",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF374151),

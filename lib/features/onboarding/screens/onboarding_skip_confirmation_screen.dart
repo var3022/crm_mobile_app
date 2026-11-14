@@ -1,7 +1,6 @@
 // ignore_for_file: unused_import
 
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 import "../../../core/theme/app_colors.dart";
 import "../../../core/theme/app_dimensions.dart";
 import "../../../core/theme/app_spacing.dart";
@@ -139,7 +138,7 @@ class _OnboardingSkipConfirmationScreenState
                       Text(
                         "Permissions",
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(fontFamily: 'Inter', 
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
                           color: const Color(0xFF1E293B),
@@ -153,7 +152,7 @@ class _OnboardingSkipConfirmationScreenState
                         child: Text(
                           "Enable the following permissions to ensure a smooth CRM field sales workflow.",
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(fontFamily: 'Inter', 
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
                             color: const Color(0xFF334155),
@@ -260,7 +259,7 @@ class _OnboardingSkipConfirmationScreenState
             const SizedBox(height: 3),
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: TextStyle(fontFamily: 'Inter', 
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: navColor,
@@ -318,7 +317,7 @@ class OnboardingSkipConfirmationSheet extends StatelessWidget {
           Text(
             "Skip Permissions?",
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
+            style: TextStyle(fontFamily: 'Inter', 
               fontSize: 22,
               fontWeight: FontWeight.w800,
               color: const Color(0xFF111827),
@@ -333,7 +332,7 @@ class OnboardingSkipConfirmationSheet extends StatelessWidget {
             child: Text(
               "Some features will be limited without these permissions. You can enable them later in Settings.",
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: TextStyle(fontFamily: 'Inter', 
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: const Color(0xFF4B5563),
@@ -395,7 +394,7 @@ class OnboardingSkipConfirmationSheet extends StatelessWidget {
               ),
               child: Text(
                 "Go Back",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
@@ -421,7 +420,7 @@ class OnboardingSkipConfirmationSheet extends StatelessWidget {
               ),
               child: Text(
                 "Skip Anyway",
-                style: GoogleFonts.inter(
+                style: TextStyle(fontFamily: 'Inter', 
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF374151),
@@ -443,7 +442,7 @@ class OnboardingSkipConfirmationSheet extends StatelessWidget {
       children: [
         Text(
           "•  ",
-          style: GoogleFonts.inter(
+          style: TextStyle(fontFamily: 'Inter', 
             fontSize: 14,
             fontWeight: FontWeight.w800,
             color: const Color(0xFF111827),
@@ -452,7 +451,7 @@ class OnboardingSkipConfirmationSheet extends StatelessWidget {
         Expanded(
           child: RichText(
             text: TextSpan(
-              style: GoogleFonts.inter(
+              style: TextStyle(fontFamily: 'Inter', 
                 fontSize: 13.5,
                 color: const Color(0xFF334155),
                 height: 1.35,
@@ -460,14 +459,14 @@ class OnboardingSkipConfirmationSheet extends StatelessWidget {
               children: [
                 TextSpan(
                   text: "$category: ",
-                  style: GoogleFonts.inter(
+                  style: TextStyle(fontFamily: 'Inter', 
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF0F172A),
                   ),
                 ),
                 TextSpan(
                   text: description,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(fontFamily: 'Inter', 
                     fontWeight: FontWeight.w400,
                     color: const Color(0xFF475569),
                   ),
