@@ -212,6 +212,10 @@ Widget chips(
     itemCount: values.length,
     separatorBuilder: (_, __) => const SizedBox(width: 7),
     itemBuilder: (_, i) => ChoiceChip(
+      side: BorderSide(
+        color: selected == values[i] ? AppColors.primary : AppColors.border,
+      ),
+      shape: const StadiumBorder(),
       label: Text(values[i], style: const TextStyle(fontSize: 11)),
       selected: selected == values[i],
       showCheckmark: false,

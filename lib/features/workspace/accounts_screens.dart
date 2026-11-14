@@ -36,6 +36,14 @@ class _AccountsScreenState extends State<AccountsScreen> {
                 (filter == 'All' ||
                     a.stage == filter ||
                     (filter == 'Hot' && a.score > 80) ||
+                    (filter == 'Nearby' && a.distance <= 2) ||
+                    (filter == 'Followup Due' &&
+                        store.tasks.any(
+                          (t) =>
+                              t.company == a.company &&
+                              t.due.isBefore(DateTime.now()) &&
+                              !t.completed,
+                        )) ||
                     (filter == 'Active' && a.stage == 'Healthy') ||
                     (filter == 'High Value' && a.score > 80)) &&
                 '${a.company} ${a.contact} ${a.area}'.toLowerCase().contains(
@@ -100,7 +108,16 @@ class _AccountsScreenState extends State<AccountsScreen> {
           chips(
             widget.customers
                 ? ['All', 'Active', 'Inactive', 'High Value']
-                : ['All', 'New', 'Contacted', 'Qualified', 'Hot'],
+                : [
+                    'All',
+                    'New',
+                    'Contacted',
+                    'Qualified',
+                    'Hot',
+                    'Followup Due',
+                    'Nearby',
+                    'Cold',
+                  ],
             filter,
             (s) => setState(() => filter = s),
           ),
@@ -205,7 +222,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               strong(a.company, 15),
-                              muted('${a.contact} · ${a.role}'),
+                              muted(a.industry),
                               const SizedBox(height: 4),
                               Text(
                                 a.area,
@@ -232,14 +249,14 @@ class _AccountsScreenState extends State<AccountsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Tier: ${a.customerType}',
+                          'Primary Contact: ${a.contact}',
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          '₹${(a.accountValue / 100000).toStringAsFixed(1)} Lakhs',
+                          '₹${(a.accountValue / 100000).toStringAsFixed(1)}L',
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
@@ -1093,7 +1110,9 @@ Widget accountForm(Account? account) => CrmForm(
                 if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Records merged successfully!')),
+                    const SnackBar(
+                      content: Text('Records merged successfully!'),
+                    ),
                   );
                 }
               } catch (e) {

@@ -78,7 +78,7 @@ class ProfileScreen extends StatelessWidget {
                 wonDealsValue > 0
                     ? '₹${(wonDealsValue / 100000).toStringAsFixed(1)}L'
                     : '₹6.8L',
-                'revenue won',
+                'revenue generated',
               ),
               _stat('32%', 'conversion rate'),
             ],
@@ -88,18 +88,14 @@ class ProfileScreen extends StatelessWidget {
 
           // Navigation Links
           linkRow('My Reports', Icons.bar_chart, () => open(c, '/reports')),
-          linkRow(
-            'My Targets & Leaderboard',
-            Icons.flag_outlined,
-            () => open(c, '/targets'),
-          ),
+          linkRow('My Targets', Icons.flag_outlined, () => open(c, '/targets')),
           linkRow(
             'Visit History',
             Icons.history,
             () => open(c, '/visit-history'),
           ),
           linkRow(
-            'Offline Data & Storage',
+            'Offline Data',
             Icons.cloud_download_outlined,
             () => open(c, '/offline-data'),
           ),
@@ -114,11 +110,7 @@ class ProfileScreen extends StatelessWidget {
             () => open(c, '/settings'),
           ),
           linkRow('Help & Support', Icons.help_outline, () => open(c, '/help')),
-          linkRow(
-            'About FieldPulse CRM',
-            Icons.info_outline,
-            () => open(c, '/about'),
-          ),
+          linkRow('About', Icons.info_outline, () => open(c, '/about')),
           const SizedBox(height: 10),
           Center(
             child: TextButton.icon(
@@ -309,6 +301,26 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  Widget _setting(
+    BuildContext c,
+    String label,
+    bool value,
+    void Function(bool) change,
+  ) => SwitchListTile(
+    contentPadding: EdgeInsets.zero,
+    title: Text(
+      label,
+      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+    ),
+    value: value,
+    onChanged: (v) async {
+      try {
+        await CrmStore.instance.update(() => change(v));
+      } catch (_) {
+        if (c.mounted) message(c, 'Failed to save setting');
+      }
+    },
+  );
   @override
   Widget build(BuildContext c) => ListenableBuilder(
     listenable: CrmStore.instance,
@@ -317,33 +329,69 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       return CrmPage(
         title: 'Settings',
+        nav: 4,
         children: [
-          heading('NOTIFICATIONS & ALERTS'),
-          SwitchListTile(
-            title: const Text(
-              'Push Notifications',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          Panel(
+            child: Row(
+              children: [
+                avatar(CrmStore.instance.userProfile.avatarInitials),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      strong(CrmStore.instance.name, 16),
+                      muted(CrmStore.instance.email),
+                      muted(CrmStore.instance.userProfile.designation),
+                      muted(CrmStore.instance.userProfile.territory),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            subtitle: const Text(
-              'Visit reminders, overdue tasks, team updates',
-              style: TextStyle(fontSize: 12),
-            ),
-            value: s.pushNotifications,
-            onChanged: (v) =>
-                CrmStore.instance.update(() => s.pushNotifications = v),
           ),
-          SwitchListTile(
-            title: const Text(
-              'Nearby Leads Proximity Alerts',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-            ),
-            subtitle: const Text(
-              'Alert when within 2 km of high-score leads',
-              style: TextStyle(fontSize: 12),
-            ),
-            value: s.nearbyLeadsAlert,
-            onChanged: (v) =>
-                CrmStore.instance.update(() => s.nearbyLeadsAlert = v),
+          gap(20),
+          heading('Account Settings'),
+          linkRow(
+            'Edit Profile',
+            Icons.person_outline,
+            () => open(c, '/edit-profile'),
+          ),
+          linkRow(
+            'Change Password',
+            Icons.lock_outline,
+            () => open(c, '/change-password'),
+          ),
+          _setting(
+            c,
+            'Biometric Login',
+            s.biometricLogin,
+            (v) => s.biometricLogin = v,
+          ),
+          linkRow(
+            'Two-Factor Authentication (2FA)',
+            Icons.shield_outlined,
+            () => open(c, '/security'),
+          ),
+          gap(14),
+          heading('Notifications'),
+          _setting(
+            c,
+            'Push Notifications',
+            s.pushNotifications,
+            (v) => s.pushNotifications = v,
+          ),
+          _setting(
+            c,
+            'Visit Reminders',
+            s.visitReminders,
+            (v) => s.visitReminders = v,
+          ),
+          _setting(
+            c,
+            'Nearby Leads Alert',
+            s.nearbyLeadsAlert,
+            (v) => s.nearbyLeadsAlert = v,
           ),
           linkRow(
             'Notification Categories & Quiet Hours',
@@ -351,72 +399,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
             () => open(c, '/notification-settings'),
           ),
           gap(14),
-
-          heading('LOCATION & PRIVACY'),
-          SwitchListTile(
-            title: const Text(
-              'Location Tracking',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-            ),
-            subtitle: Text(
-              'Active hours: ${s.trackingHours} (Battery optimized)',
-              style: const TextStyle(fontSize: 12),
-            ),
-            value: s.locationTracking,
-            onChanged: (v) =>
-                CrmStore.instance.update(() => s.locationTracking = v),
-          ),
-          gap(14),
-
-          heading('SYNC & STORAGE'),
-          SwitchListTile(
-            title: const Text(
-              'Sync Over Wi-Fi Only',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-            ),
-            subtitle: const Text(
-              'Save cellular data during photo / voice upload',
-              style: TextStyle(fontSize: 12),
-            ),
-            value: s.wifiOnlySync,
-            onChanged: (v) =>
-                CrmStore.instance.update(() => s.wifiOnlySync = v),
+          heading('Location & Tracking'),
+          _setting(
+            c,
+            'Location Tracking',
+            s.locationTracking,
+            (v) => s.locationTracking = v,
           ),
           linkRow(
-            'Manage Local Storage & Cache',
-            Icons.sd_storage_outlined,
+            'Tracking Hours',
+            Icons.schedule,
+            () async {
+              final start = await showTimePicker(context: c, initialTime: const TimeOfDay(hour: 8, minute: 0));
+              if (start == null || !c.mounted) return;
+              final end = await showTimePicker(context: c, initialTime: const TimeOfDay(hour: 20, minute: 0));
+              if (end == null || !c.mounted) return;
+              final hours = '${start.format(c)} - ${end.format(c)}';
+              try { await CrmStore.instance.update(() => s.trackingHours = hours); }
+              catch (_) { if (c.mounted) message(c, 'Failed to save tracking hours'); }
+            },
+            trailing: muted(s.trackingHours),
+          ),
+          gap(14),
+          heading('Offline & Data'),
+          linkRow(
+            'Offline Data',
+            Icons.cloud_download_outlined,
             () => open(c, '/offline-data'),
           ),
-          gap(14),
-
-          heading('AI COPILOT'),
-          SwitchListTile(
-            title: const Text(
-              'AI Field Assistant',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-            ),
-            subtitle: const Text(
-              'Proactive meeting tips, win probability & route order',
-              style: TextStyle(fontSize: 12),
-            ),
-            value: s.aiAssistant,
-            onChanged: (v) => CrmStore.instance.update(() => s.aiAssistant = v),
+          _setting(
+            c,
+            'Wi-Fi only Sync',
+            s.wifiOnlySync,
+            (v) => s.wifiOnlySync = v,
           ),
           gap(14),
-
-          heading('SECURITY'),
-          linkRow(
-            'Two-Factor Authentication (2FA)',
-            Icons.shield_outlined,
-            () => open(c, '/security'),
-          ),
-          linkRow(
-            'Change Password',
-            Icons.lock_outline,
-            () => open(c, '/change-password'),
+          heading('AI Settings'),
+          _setting(c, 'AI Assistant', s.aiAssistant, (v) => s.aiAssistant = v),
+          _setting(
+            c,
+            'Daily Briefing',
+            s.dailyBriefing,
+            (v) => s.dailyBriefing = v,
           ),
           gap(20),
-
           button('Sign Out', () {
             showModalBottomSheet(
               context: c,
@@ -990,9 +1016,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
           0,
           (sum, v) => sum + CrmStorage.parseDurationMinutes(v),
         );
-        final fieldDriveTimeDisplay = totalDurationMinutes >= 60
-            ? '${totalDurationMinutes ~/ 60}h ${totalDurationMinutes % 60}m'
-            : '${totalDurationMinutes}m';
         final activeProposalsCount = inRangeDeals
             .where((d) => d.stage.toLowerCase() == 'proposal')
             .length;
@@ -1016,7 +1039,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
         ].fold<int>(1, (m, val) => val > m ? val : m);
 
         return CrmPage(
-          title: 'Performance Reports',
+          title: 'My Reports',
+          nav: 0,
           actions: [
             IconButton(
               icon: const Icon(Icons.file_download_outlined),
@@ -1026,7 +1050,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
           ],
           children: [
             chips(
-              const ['This Week', 'This Month', 'Quarter 3', 'Custom Range'],
+              const [
+                'This Week',
+                'This Month',
+                'Last Month',
+                'Quarter 3',
+                'Custom Range',
+              ],
               period,
               (v) {
                 if (v == 'Custom Range' &&
@@ -1079,12 +1109,36 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ],
             gap(14),
 
+            Panel(
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.insights,
+                    color: AppColors.primary,
+                    size: 30,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        strong('Your performance this month', 16),
+                        muted(
+                          '${inRangeVisits.where((v) => v.status == "Completed").length} visits completed • ${wonDeals.length} deals won',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            gap(16),
             // Metrics 2x2 Grid with Calculated Values and Clear Sample Labels
             Row(
               children: [
                 Expanded(
                   child: _metricCard(
-                    'Completed Visits',
+                    'VISITS GOAL',
                     '${inRangeVisits.where((v) => v.status == "Completed").length}',
                     'vs target (Sample benchmark)',
                     Colors.green,
@@ -1093,8 +1147,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _metricCard(
-                    'Revenue Closed',
-                    '\$${(totalWon / 1000).toStringAsFixed(0)}K',
+                    'REVENUE',
+                    '₹${(totalWon / 100000).toStringAsFixed(1)}L',
                     'vs last month (Sample benchmark)',
                     AppColors.primary,
                   ),
@@ -1106,8 +1160,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
               children: [
                 Expanded(
                   child: _metricCard(
-                    'Deals Progressed',
-                    '${inRangeDeals.length}',
+                    'CONVERSION',
+                    '${inRangeDeals.isEmpty ? 0 : (wonDeals.length * 100 / inRangeDeals.length).round()}%',
                     '$activeProposalsCount proposals active',
                     Colors.blue,
                   ),
@@ -1115,8 +1169,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _metricCard(
-                    'Field Drive Time',
-                    fieldDriveTimeDisplay,
+                    'AVG DURATION',
+                    '${inRangeVisits.isEmpty ? 0 : (totalDurationMinutes / inRangeVisits.length).round()} min',
                     '${inRangeVisits.length} visits logged',
                     Colors.amber.shade900,
                   ),
@@ -1125,7 +1179,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ),
             gap(18),
 
-            heading('VISITS BY DAY (${period.toUpperCase()})'),
+            heading('Visit Activity (Last Week)'),
             Container(
               height: 140,
               padding: const EdgeInsets.all(14),
@@ -1168,11 +1222,46 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     maxDayCount > 0 ? (satCount / maxDayCount) : 0.0,
                     '$satCount',
                   ),
+                  _barCol(
+                    'Sun',
+                    countForWeekday(DateTime.sunday) / maxDayCount,
+                    '${countForWeekday(DateTime.sunday)}',
+                  ),
                 ],
               ),
             ),
             gap(20),
 
+            heading('Deal Pipeline Stage'),
+            ...[
+              'Qualified',
+              'Discovery',
+              'Proposal',
+              'Negotiation',
+              'Won',
+            ].map((stage) {
+              final count = inRangeDeals.where((d) => d.stage == stage).length;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [Text(stage), strong('$count')],
+                    ),
+                    gap(6),
+                    LinearProgressIndicator(
+                      value: inRangeDeals.isEmpty
+                          ? 0
+                          : count / inRangeDeals.length,
+                      minHeight: 10,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            gap(16),
             button(
               'Export Full Report (PDF / Excel / CSV)',
               () => _showExportModal(c),
@@ -2058,7 +2147,7 @@ class _OfflineDataScreenState extends State<OfflineDataScreen> {
       final limitMb = (breakdown['storageLimitMb'] as num).toDouble();
 
       return CrmPage(
-        title: 'Offline Data & Storage',
+        title: 'Offline Data',
         actions: [
           IconButton(
             icon: isSyncing

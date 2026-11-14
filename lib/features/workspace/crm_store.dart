@@ -65,10 +65,10 @@ class CrmStore extends ChangeNotifier {
   final Map<String, bool> preferences = {};
   UserProfile userProfile = UserProfile(
     name: 'Arjun Mehta',
-    email: 'arjun.mehta@fieldpulse.io',
+    email: 'arjun@acme.com',
     phone: '+91 99876 54321',
-    designation: 'Senior Enterprise Account Executive',
-    territory: 'Mumbai South & West Region',
+    designation: 'Field Sales Executive',
+    territory: 'South Mumbai',
     manager: 'Rajesh Singhania',
   );
   AppSettings appSettings = AppSettings();

@@ -560,6 +560,10 @@ class CrmStorage {
     }
 
     if (p.contains('month')) {
+      if (p.contains('last')) {
+        return !date.isBefore(DateTime(now.year, now.month - 1, 1)) &&
+            date.isBefore(DateTime(now.year, now.month, 1));
+      }
       final startOfMonth = DateTime(now.year, now.month, 1);
       final endOfMonth = DateTime(now.year, now.month + 1, 1);
       return !date.isBefore(startOfMonth) && date.isBefore(endOfMonth);

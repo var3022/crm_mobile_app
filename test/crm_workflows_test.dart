@@ -100,6 +100,9 @@ void main() {
         (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
       ),
     );
+    await tester.ensureVisible(find.text('Mark as Complete'));
+    await tester.drag(find.byType(ListView).first, const Offset(0, -160));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Mark as Complete'));
     await tester.pumpAndSettle();
     expect(task.completed, isTrue);
@@ -1785,11 +1788,13 @@ void main() {
       adapter.flushCalled = false;
 
       var updateFinished = false;
-      final updateFuture = store.update(() {
-        store.leads.add(Account('Pending Storage Corp', 'Alice'));
-      }).then((_) {
-        updateFinished = true;
-      });
+      final updateFuture = store
+          .update(() {
+            store.leads.add(Account('Pending Storage Corp', 'Alice'));
+          })
+          .then((_) {
+            updateFinished = true;
+          });
 
       // Allow microtasks to execute
       await Future.delayed(const Duration(milliseconds: 20));
@@ -1799,7 +1804,8 @@ void main() {
       expect(
         updateFinished,
         isFalse,
-        reason: 'awaited update must remain pending while storage write is blocked',
+        reason:
+            'awaited update must remain pending while storage write is blocked',
       );
       expect(
         adapter.flushCalled,
@@ -1843,153 +1849,153 @@ void main() {
     },
   );
 
-  test('write failure reaches the caller via update and direct mutators', () async {
-    final adapter = _FailingStorageAdapter(
-      errorMessage: 'Disk I/O failure: quota exceeded',
-    );
-    final store = CrmStore(storageAdapter: adapter);
-    await store.ensureHydrated();
-
-    // 1. Synchronous mutation in update() propagates write failure to caller
-    await expectLater(
-      () => store.update(() {
-        store.leads.add(Account('Failing Corp', 'John'));
-      }),
-      throwsA(
-        isA<FileSystemException>().having(
-          (e) => e.message,
-          'message',
-          contains('quota exceeded'),
-        ),
-      ),
-    );
-
-    // 2. Async mutation in update() propagates write failure to caller
-    await expectLater(
-      () => store.update(() async {
-        await Future.delayed(const Duration(milliseconds: 10));
-        store.leads.add(Account('Failing Async Corp', 'Bob'));
-      }),
-      throwsA(
-        isA<FileSystemException>().having(
-          (e) => e.message,
-          'message',
-          contains('quota exceeded'),
-        ),
-      ),
-    );
-
-    // 3. Direct public mutator addNote propagates write failure to caller
-    await expectLater(
-      () => store.addNote('Acme Corp', 'Important takeaway note'),
-      throwsA(
-        isA<FileSystemException>().having(
-          (e) => e.message,
-          'message',
-          contains('quota exceeded'),
-        ),
-      ),
-    );
-
-    // 4. Direct public mutator createLead propagates write failure to caller
-    await expectLater(
-      () => store.createLead(Account('New Lead Corp', 'Alice')),
-      throwsA(
-        isA<FileSystemException>().having(
-          (e) => e.message,
-          'message',
-          contains('quota exceeded'),
-        ),
-      ),
-    );
-
-    // 5. Direct public mutator finishActiveVisit propagates write failure to caller
-    final testVisit = Visit('Acme Corp', 'Alice', '10:00 AM', 'Meeting');
-    await expectLater(
-      () => store.finishActiveVisit(
-        testVisit,
-        outcome: 'Completed',
-        summary: 'Summary',
-      ),
-      throwsA(
-        isA<FileSystemException>().having(
-          (e) => e.message,
-          'message',
-          contains('quota exceeded'),
-        ),
-      ),
-    );
-
-    expect(store.lastStorageError, contains('quota exceeded'));
-    store.dispose();
-  });
-
-  testWidgets(
-    'failed saves do not trigger success messages or navigation',
-    (tester) async {
-      final failingAdapter = _FailingStorageAdapter(
-        errorMessage: 'Simulated disk full error',
+  test(
+    'write failure reaches the caller via update and direct mutators',
+    () async {
+      final adapter = _FailingStorageAdapter(
+        errorMessage: 'Disk I/O failure: quota exceeded',
       );
-      final store = CrmStore(storageAdapter: failingAdapter);
+      final store = CrmStore(storageAdapter: adapter);
       await store.ensureHydrated();
 
-      final prevStore = CrmStore.instance;
-      CrmStore.setInstanceForTesting(store);
-      addTearDown(() {
-        CrmStore.setInstanceForTesting(prevStore);
-        store.dispose();
-      });
-
-      var navigatedAway = false;
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
-            body: Builder(
-              builder: (ctx) => TextButton(
-                onPressed: () {
-                  Navigator.of(ctx)
-                      .push(
-                        MaterialPageRoute(builder: (_) => taskForm(null)),
-                      )
-                      .then((_) {
-                        navigatedAway = true;
-                      });
-                },
-                child: const Text('Open Form'),
-              ),
-            ),
+      // 1. Synchronous mutation in update() propagates write failure to caller
+      await expectLater(
+        () => store.update(() {
+          store.leads.add(Account('Failing Corp', 'John'));
+        }),
+        throwsA(
+          isA<FileSystemException>().having(
+            (e) => e.message,
+            'message',
+            contains('quota exceeded'),
           ),
         ),
       );
 
-      // Open form
-      await tester.tap(find.text('Open Form'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('New Task'), findsOneWidget);
-
-      // Fill required task title
-      await tester.enterText(
-        find.byType(TextFormField).first,
-        'Simulated failing task',
+      // 2. Async mutation in update() propagates write failure to caller
+      await expectLater(
+        () => store.update(() async {
+          await Future.delayed(const Duration(milliseconds: 10));
+          store.leads.add(Account('Failing Async Corp', 'Bob'));
+        }),
+        throwsA(
+          isA<FileSystemException>().having(
+            (e) => e.message,
+            'message',
+            contains('quota exceeded'),
+          ),
+        ),
       );
 
-      // Tap 'Save' action button in AppBar
-      await tester.tap(find.text('Save'));
-      await tester.pumpAndSettle();
+      // 3. Direct public mutator addNote propagates write failure to caller
+      await expectLater(
+        () => store.addNote('Acme Corp', 'Important takeaway note'),
+        throwsA(
+          isA<FileSystemException>().having(
+            (e) => e.message,
+            'message',
+            contains('quota exceeded'),
+          ),
+        ),
+      );
 
-      // 1. Proves: Error message displayed
-      expect(find.textContaining('Failed to save'), findsOneWidget);
+      // 4. Direct public mutator createLead propagates write failure to caller
+      await expectLater(
+        () => store.createLead(Account('New Lead Corp', 'Alice')),
+        throwsA(
+          isA<FileSystemException>().having(
+            (e) => e.message,
+            'message',
+            contains('quota exceeded'),
+          ),
+        ),
+      );
 
-      // 2. Proves: Did NOT navigate away (form is still mounted)
-      expect(find.text('New Task'), findsOneWidget);
-      expect(navigatedAway, isFalse);
+      // 5. Direct public mutator finishActiveVisit propagates write failure to caller
+      final testVisit = Visit('Acme Corp', 'Alice', '10:00 AM', 'Meeting');
+      await expectLater(
+        () => store.finishActiveVisit(
+          testVisit,
+          outcome: 'Completed',
+          summary: 'Summary',
+        ),
+        throwsA(
+          isA<FileSystemException>().having(
+            (e) => e.message,
+            'message',
+            contains('quota exceeded'),
+          ),
+        ),
+      );
 
-      // 3. Proves: Success message was NOT triggered
-      expect(find.text('Task saved successfully'), findsNothing);
+      expect(store.lastStorageError, contains('quota exceeded'));
+      store.dispose();
     },
   );
+
+  testWidgets('failed saves do not trigger success messages or navigation', (
+    tester,
+  ) async {
+    final failingAdapter = _FailingStorageAdapter(
+      errorMessage: 'Simulated disk full error',
+    );
+    final store = CrmStore(storageAdapter: failingAdapter);
+    await store.ensureHydrated();
+
+    final prevStore = CrmStore.instance;
+    CrmStore.setInstanceForTesting(store);
+    addTearDown(() {
+      CrmStore.setInstanceForTesting(prevStore);
+      store.dispose();
+    });
+
+    var navigatedAway = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.lightTheme,
+        home: Scaffold(
+          body: Builder(
+            builder: (ctx) => TextButton(
+              onPressed: () {
+                Navigator.of(ctx)
+                    .push(MaterialPageRoute(builder: (_) => taskForm(null)))
+                    .then((_) {
+                      navigatedAway = true;
+                    });
+              },
+              child: const Text('Open Form'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Open form
+    await tester.tap(find.text('Open Form'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('New Task'), findsOneWidget);
+
+    // Fill required task title
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      'Simulated failing task',
+    );
+
+    // Tap 'Save' action button in AppBar
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    // 1. Proves: Error message displayed
+    expect(find.textContaining('Failed to save'), findsOneWidget);
+
+    // 2. Proves: Did NOT navigate away (form is still mounted)
+    expect(find.text('New Task'), findsOneWidget);
+    expect(navigatedAway, isFalse);
+
+    // 3. Proves: Success message was NOT triggered
+    expect(find.text('Task saved successfully'), findsNothing);
+  });
 }
 
 class _ControllableStorageAdapter implements StorageAdapter {

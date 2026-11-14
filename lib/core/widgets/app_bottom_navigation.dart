@@ -18,9 +18,19 @@ class AppBottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: AppDimensions.bottomNavHeight,
-      decoration: const BoxDecoration(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      decoration: BoxDecoration(
         color: AppColors.surface,
-        border: Border(top: BorderSide(color: AppColors.border, width: 1.0)),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.border),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: SafeArea(
         top: false,
@@ -31,26 +41,26 @@ class AppBottomNavigation extends StatelessWidget {
             _buildNavItem(
               1,
               "Leads",
-              Icons.people_outline_rounded,
-              Icons.people_rounded,
+              Icons.folder_outlined,
+              Icons.folder_rounded,
             ),
             _buildNavItem(
               2,
               "Visits",
-              Icons.location_on_outlined,
-              Icons.location_on_rounded,
+              Icons.route_outlined,
+              Icons.route_rounded,
             ),
             _buildNavItem(
               3,
               "Tasks",
-              Icons.check_circle_outline_rounded,
-              Icons.check_circle_rounded,
+              Icons.checklist_outlined,
+              Icons.checklist_rounded,
             ),
             _buildNavItem(
               4,
               "Profile",
-              Icons.person_outline_rounded,
-              Icons.person_rounded,
+              Icons.manage_accounts_outlined,
+              Icons.manage_accounts_rounded,
             ),
           ],
         ),
@@ -67,34 +77,35 @@ class AppBottomNavigation extends StatelessWidget {
     final isSelected = currentIndex == index;
     final color = isSelected ? AppColors.primary : AppColors.textTertiary;
 
-    return InkWell(
-      onTap: () => onTap(index),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: 68,
-        height: 44,
-        padding: const EdgeInsets.symmetric(vertical: 2),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryLight : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isSelected ? activeIcon : inactiveIcon,
-              size: AppDimensions.bottomNavIconSize,
-              color: color,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: AppTypography.navigationLabel.copyWith(
+    return Expanded(
+      child: InkWell(
+        onTap: () => onTap(index),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          height: 44,
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primaryLight : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                isSelected ? activeIcon : inactiveIcon,
+                size: AppDimensions.bottomNavIconSize,
                 color: color,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               ),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: AppTypography.navigationLabel.copyWith(
+                  color: color,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
